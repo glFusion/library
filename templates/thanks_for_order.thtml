@@ -1,0 +1,5 @@
+{# begin {templatelocation} #}
+Thank you for your purchase from {site_name}.<br />
+Payment of {mc_gross} {currency} was made via PayPal on {payment_date}, and a receipt for your purchase has been emailed to you.<p />
+You may log into your account at {paypal_url} to view details of this transaction.
+{# end {templatelocation} #}

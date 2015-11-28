@@ -1,0 +1,68 @@
+{# begin {templatelocation} #}
+<div style="text-align:center;">
+  <form action="{pi_url}/index.php" method="post">
+  {$LANG_LIB['search']}:&nbsp;
+  <input type="text" name="query" value="{query}">&nbsp;&nbsp;
+  {$LANG_LIB['sort']}:&nbsp;
+  <select name="sortdir" onchange="this.form.submit();">
+    <option value="ASC" {sortdir_asc_sel}>{$LANG_LIB['ascending']}</option>
+    <option value="DESC" {sortdir_desc_sel}>{$LANG_LIB['descending']}</option>
+  </select> &nbsp;&nbsp;
+  {$LANG_LIB['type']}:&nbsp;
+  <select name="type" onchange="this.form.submit();">
+    <option value="0">-- {$LANG_LIB['all']} --</option>
+    {type_select}
+  </select>
+  </form>
+
+<!-- BEGIN ItemRow -->
+<div style="clear:both;">
+  <hr width="85%" />
+</div>
+
+<div style="text-align:left;">
+  <div class="libListItem">
+    <div class="libListItemImage">
+      {!if small_pic}
+      <a href="{pi_url}/index.php?detail=x&id={id}{url_opts}">
+        <img src="{small_pic}" alt="{name}" style="border: none" />
+      </a>
+      {!else}
+        &nbsp;
+      {!endif}
+    </div>
+
+
+    <div style="float:left;width:80%;">
+      {avail_blk}
+      <a class="lib_itemlist" href="{pi_url}/index.php?detail=x&id={id}{url_opts}">
+        <b><large>{hi_name}</large></b><br />
+      </a>
+      {#<small>{id}</small><br />#}
+      {!if hi_short_description}
+        {hi_short_description}<br />
+      {!endif}
+      {!if publisher}
+        {publisher}<br />
+      {!endif}
+      {!if author}
+        {author}
+      {!endif}
+      {!if rating_bar}
+        <div>{rating_bar}</div>
+      {!endif}
+    </div>
+  </div>
+
+</div>
+<!-- END ItemRow -->
+
+<div style="clear:both;">
+  <hr width="85%" />
+</div>
+
+<p>
+  <div style="align: center">{pagination}</div>
+</p>
+</div>
+{# end {templatelocation} #}

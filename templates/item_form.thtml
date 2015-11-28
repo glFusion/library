@@ -1,0 +1,253 @@
+{# begin {templatelocation} #}
+<form action="{pi_admin_url}/index.php" method="POST" 
+    class="libItemForm"
+    enctype="multipart/form-data" onsubmit='set_postcontent();'>
+
+<fieldset>
+<legend>{$LANG_LIB['item_info']}</legend>
+
+<p>
+  <label><font color="red">*</font>{$LANG_LIB['item_name']}:
+    <a href="#" onclick="popupWindow('{doc_url}#desc_item_id', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <input type="text" name="id" value="{id}" size="40" maxlength="255">
+</p>
+
+<p>
+  <label><font color="red">*</font>{$LANG_LIB['item_name']}:
+    <a href="#" onclick="popupWindow('{doc_url}#desc_name', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <input type="text" name="name" value="{name}" size="40" maxlength="255">
+</p>
+
+<p>
+  <label>{$LANG_LIB['short_description']}:
+    <a href="#" onclick="popupWindow('{doc_url}#desc_short_descrip', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <input type="text" name="short_description" value="{short_description}" 
+      size="40" maxlength="255">
+</p>
+
+<!--<p>
+  <label>{$LANG_LIB['category']}:
+    <a href="#" onclick="popupWindow('{doc_url}#desc_category', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <select name="categories">
+    <option value="0">{$LANG_LIB['top_cat']}</option>
+    {cat_select}
+  </select>
+</p>-->
+
+<p>
+  <label>{$LANG_LIB['type']}:
+    <a href="#" onclick="popupWindow('{doc_url}#desc_mediatype', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <select name="type">
+    <!-- BEGIN TypeSelBlock -->
+    <option value="{type_id}" {selected}>{type_name}</option>
+    <!-- END TypeSelBlock -->
+  </select>
+</p>
+
+<p id="html_editarea">
+  <label>{$LANG_LIB['description']}:
+    <a href="#" onclick="popupWindow('{doc_url}#desc_description', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <textarea id="html_content" 
+      name="description" cols="35" rows="10" 
+      style="width:70%">{description}</textarea>
+</p>
+
+<p>
+  <label>{$LANG_LIB['keywords']}:
+    <a href="#" onclick="popupWindow('{doc_url}#desc_keywords', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <input type="text" name="keywords" value="{keywords}" size="40"
+        maxlength="40">
+</p>
+
+<p>
+  <label>{$LANG_LIB['price']}:
+    <a href="#" onclick="popupWindow('{doc_url}#desc_price', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <input type="text" name="price" value="{price}" size="20" maxlength="20">
+    &nbsp;{currency}
+</p>
+
+<p>
+  <label>{$LANG_LIB['images']}:
+    <a href="#" onclick="popupWindow('{doc_url}#desc_images', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <span>
+  <table border=0>
+    <!-- BEGIN PhotoRow -->
+    <tr>
+      <td align="left">
+        <a href="{img_url}" rel="slimbox[ad]"">
+          <img src="{thumb_url}">
+        </a>
+      </td>
+      <td align="left">
+        <a href="{del_img_url}">{$LANG_LIB['delete']}</a><br>
+      </td>
+    </tr>
+    <!-- END PhotoRow -->
+    <!-- BEGIN UploadFld -->
+    <tr>
+      <td align="left">
+        <input type="file" name="images[]"><br />
+      </td>
+    </tr>
+    <!-- END UploadFld -->
+  </table>
+  </span>
+</p>
+
+<p>
+  <label>{$LANG_LIB['exp_time_days']}:
+    <a href="#" onclick="popupWindow('{doc_url}#desc_expiration', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <input type="text" name="expiration" value="{expiration}" 
+    size="20" maxlength="20">
+</p>
+
+<p>
+  <label>{$LANG_LIB['enabled']}?
+    <a href="#" onclick="popupWindow('{doc_url}#desc_enabled', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <input type="checkbox" name="enabled" value="1" {ena_chk}>
+</p>
+
+<p>
+  <label>{$LANG_LIB['featured']}?
+    <a href="#" onclick="popupWindow('{doc_url}#desc_featured', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <input type="checkbox" name="featured" value="1" {feat_chk}>
+</p>
+
+<p>
+  <label>{$LANG_LIB['taxable']}?
+    <a href="#" onclick="popupWindow('{doc_url}#desc_taxable', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <input type="checkbox" name="taxable" value="1" {tax_chk}>
+</p>
+
+<p>
+  <label>{$LANG_LIB['txt_buttons']}:
+    <a href="#" onclick="popupWindow('{doc_url}#desc_buttons', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <!-- BEGIN BtnRow -->
+    <input type="checkbox" name="buttons[]" value="{btn_type}" {btn_chk}>{btn_name}&nbsp;
+  <!-- END BtnRow -->
+</p>
+
+<p>
+  <label>{$LANG_LIB['comments']}:
+   <a href="#" onclick="popupWindow('{doc_url}#desc_comments', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <select name="comments_enabled">
+    <option value="0" {sel_comment_0}>{$LANG_LIB['yes']}</option>
+    <option value="2" {sel_comment_2}>{$LANG_LIB['no']}</option>
+    <option value="1" {sel_comment_1}>{$LANG_LIB['closed']}</option>
+  </select>
+</p>
+
+</fieldset>
+
+<fieldset>
+<legend>{$LANG_LIB['delivery_info']}</legend>
+
+<p>
+  <label>{$LANG_LIB['downloadable']}?:
+    <a href="#" onclick="popupWindow('{doc_url}#desc_downloadable', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <!-- BEGIN ProdTypeRadio -->
+    <input type="radio" name="prod_type" value="{type_val}" {type_sel}
+        onclick="PP_changeProdType(this.value)"
+    > {type_txt}&nbsp;&nbsp;
+  <!-- END ProdTypeRadio -->
+  <!--<select name="download">
+    <option value="0"{download_no}>No</option>
+    <option value="1"{download_yes}>Yes</option>
+  </select>-->
+</p>
+
+<div id="type_download">
+<p>
+  <label>{$LANG_LIB['select_file']}:
+    <a href="#" onclick="popupWindow('{doc_url}#desc_select_file', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <select name="file">
+    <option value="">-- {$LANG_LIB['select_file']} --</option>
+    {file_selection}
+  </select>
+</p>
+
+<p>
+  <label>{$LANG_LIB['or_upload_new']}:
+    <a href="#" onclick="popupWindow('{doc_url}#desc_upload_file', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <input type="file" name="uploadfile">
+</p>
+</div>
+
+<div id="type_physical">
+<p>
+  <label>{$LANG_LIB['weight']}:
+    <a href="#" onclick="popupWindow('{doc_url}#desc_weight', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <input type="text" name="weight" value="{weight}">
+</p>
+
+<p>
+  <label>{$LANG_LIB['shipping_type']}:
+    <a href="#" onclick="popupWindow('{doc_url}#desc_shipping_type', 'Help', 640, 480, 1)" class="toolbar">
+    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  </label>
+  <select name="shipping_type" onchange="PP_changeShippingType(this.value);">
+    <option value="0" {ship_sel_0}>{$LANG_LIB['no_shipping']}</option>
+    <option value="1" {ship_sel_1}>{$LANG_LIB['pp_profile']}</option>
+    <option value="2" {ship_sel_2}>{$LANG_LIB['fixed']}</option>
+  </select>
+  <span id="shipping_amount">
+    &nbsp;&nbsp;{$LANG_LIB['shipping_amt']} ({$LANG_LIB['per_item']}):
+    <input type="text" name="shipping_amt" value="{shipping_amt}">
+  </span>
+</p>
+</div>
+
+</fieldset>
+<font color="red">*</font>{$LANG_LIB['indicate_req_fld']}
+
+<div align="center">
+  <input type="submit" class="lgButton green" name="saveproduct"
+    value="{$LANG_LIB['saveitem']}" />
+  <input type="submit" class="lgButton grey" name="clearform"
+    value="{$LANG_LIB['clearform']}" />
+  {!if candelete}
+  <input type="submit" class="lgButton red" name="deleteproduct"
+    value="{$LANG_LIB['deleteitem']}" />
+  {!endif}
+</div>
+
+</form>
+{# end {templatelocation} #}

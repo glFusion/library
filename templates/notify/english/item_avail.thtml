@@ -1,0 +1,13 @@
+Hello, {username},
+<p />
+The library item that you requested is available:<p />
+Item {item_id}<br />
+{item_descrip}
+<p />
+<p>
+{!if daysonhold}
+This item will be on hold for you for {daysonhold} days.
+{!endif}
+Please contact our librarian to arrange for checkout.
+</p>
+<p>Click <a href="{pi_url}/index.php?detail=x&id={item_id}">here</a> for details about this item.</p>

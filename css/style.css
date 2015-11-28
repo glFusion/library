@@ -1,0 +1,87 @@
+.libItemForm label
+{
+/*color: #781351;*/
+width: 16em;
+float: left;
+text-align: right;
+vertical-align: bottom;
+margin-right: 0.5em;
+display: block
+}
+
+.libItemForm p {
+  line-height: 1px;
+  margin-top:0px;
+}
+
+.libItemForm form div {
+  clear: left;
+  display: block;
+/*  width: 354px; */
+  height: expression('1%');
+  margin: 5px 0 0 0;
+  padding: 1px 3px;
+}
+
+.libListItem {
+    padding: 5px;
+    clear:both;
+    text-align:left;
+}
+.libListItemImage {
+    float: left;
+    width: 110px;
+    text-align: left;
+    margin-right: 5px;
+}
+.libListItemImage a {
+    text-decoration: none;
+}
+
+.formBtnOrange, .formBtnOrange1 {
+/*    border:1px solid #d5bd98; 
+    border-right-color:#935e0d; 
+    border-bottom-color:#935e0d; 
+    background:#ffa822 url(library/images/btn_bg_sprite.gif) left 17.5% repeat-x;
+    color:#003366;
+    font-weight:bold;
+    font-style:italic;*/
+}
+
+/*.formbutton {
+    cursor:pointer;
+    border:outset 1px #ccc;
+    background:#999;
+    color:#333;
+    font-weight:bold;
+    padding: 1px 2px;
+}
+
+.formbuttonDisabled {
+    cursor:pointer;
+    border:outset 1px #ccc;
+    background:#999;
+    color:#666;
+    font-weight:bold;
+    padding: 1px 2px;
+}*/
+
+a.lib_itemlist {
+    color:black;
+    text-decoration:none;
+    font-size:1.2em;
+    font-weight:bold;
+}
+
+.lib_itemlist div {
+    position:relative;
+    float:left;
+    margin:2px;
+}
+
+.libNewAdminItem {
+    font-style: italic;
+    font-weight: bold;
+    color: red;
+}
+
