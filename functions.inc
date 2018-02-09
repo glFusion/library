@@ -583,7 +583,6 @@ return;
     list($sql, $ftsql) = $search->buildSearchSQL($keyType, $query, $columns, $sql);
     $search->setSQL($sql);
     return $search;
-
 }
 
 
@@ -597,7 +596,6 @@ function plugin_getheaderjs_library()
     $files = array(
         LIBRARY_PI_PATH . '/js/toggleEnabled.js',
     );
-
     return $files;
 }
 
@@ -625,7 +623,6 @@ function plugin_getheadercss_library()
             $styles[] = $path . '/' . $file;
         }
     }
-
     return $styles;
 }
 
@@ -678,7 +675,6 @@ function LIBRARY_getDocURL($file='', $doclang='english')
         }
         $doc_url = LIBRARY_URL . "/docs/$doclang/";
     }
-
     return $doc_url;
 }
 
@@ -689,7 +685,7 @@ function LIBRARY_getDocURL($file='', $doclang='english')
 *
 *   @return   array     Array of items to be removed.
 */
-function plugin_autouninstall_library ()
+function plugin_autouninstall_library()
 {
     $out = array (
         // Give the name of the tables, without $_TABLES[]
@@ -741,36 +737,131 @@ function plugin_autouninstall_library ()
 
 
 /**
-*   Return the configured currency.
-*   This is an API function to allow other plugins to find out what
-*   currency we accept.
+*   Provides the getItemInfo function for classified ads
 *
-*   @return string      Our configured currency code.
+*   @param  string  $id         Product ID
+*   @param  string  $fields     Comma-separated list of fields to return
+*   @param  integer $uid        User ID
+*   @param  array   $options    Not used
+*   @return array           Array of product information
 */
-function LIBRARY_getCurrency()
+function plugin_getiteminfo_library($id, $what, $uid=0, $options=array())
 {
-    global $_CONF_LIB;
-    return $_CONF_LIB['currency'];
-}
+    global $_TABLES, $_CONF, $LANG_LIB;
 
+    $properties = explode(',', $what);
+    $fields = array();
+    $retval = array();
+    $buildingSearchIndex = false;
+    foreach ($properties as $p) {
+        switch ($p) {
+        case 'search_index':
+            $buildingSearchIndex = true;
+            break;
+        case 'id':
+            $fields[] = 'id';
+            break;
+        case 'title':
+            $fields[] = 'name';
+            break;
+        case 'content':
+        case 'description':
+            $fields[] = 'short_description';
+            $fields[] = 'description';
+            break;
+        case 'searchidx':
+            $fields[] = 'name';
+            $fields[] = 'short_description';
+            $fields[] = 'description';
+            $fields[] = 'keywords';
+            break;
+        case 'author':
+        case 'author_name':
+            $fields[] = 'author';
+            break;
+        case 'date':
+            $fields[] = 'dt_add';
+            break;
+        }
+    }
+    if (count($fields) == 0) {
+        return $retval;
+    }
+    $fields = array_unique($fields);
+    $fields = implode(',', $fields);
+    $retval = array();
+    $sql = "SELECT $fields FROM {$_TABLES['library.items']} ";
+    if ($id == '*') {
+        $where = ' WHERE 1=1 ';
+    } else {
+        $where = " WHERE (id = '" . DB_escapeString($id) . "')";
+    }
+    //echo $sql;die;
+    $res = DB_query($sql . $where);
+    while ($A = DB_fetchArray($res, false)) {
+        foreach ($properties as $p) {
+            switch ($p) {
+            case 'id':
+                $props[$p] = $A['id'];
+                break;
+            case 'description':
+                $props[$p] = $A['description'];
+                break;
+            case 'excerpt':
+            case 'content':
+                $props[$p] = $A['name'] . ' ' . $A['short_description'] . ' ' . $A['description'];
+                break;
+            case 'title':
+                $props[$p] = $A['name'];
+                break;
+            case 'author':
+            case 'author_name':
+                $props[$p] = $A['author'];
+                break;
+            case 'date':
+                $props[$p] = $A['dt_add'];
+                break;
+            case 'searchidx':
+                $props[$p] = $A['name'] . ' ' . $A['short_description'] . ' ' .
+                        $A['description'] . ' ' . $A['keywords'];
+                break;
+            case 'url':
+                $props[$p] = COM_buildUrl($_CONF['site_url'] .
+                    '/library/index.php?mode=detail&id=' . urlencode($A['id']));
+                break;
+            default:
+                $props[$p] = isset($A[$p]) ? $A[$p] : NULL;
+                break;
+            }
+        }
+        $mapped = array();
+        foreach ($props as $key => $value) {
+            if ($id == '*') {
+                if ($value != '') {
+                    $mapped[$key] = $value;
+                }
+            } else {
+                $mapped[$key] = $value;
+            }
+        }
 
-/**
-*   Return an array containing all currecies that we accept.
-*
-*   @return array   Array of $description => $code
-*/
-function LIBRARY_getCurrencyOptions()
-{
-    global $LANG_configselects, $_CONF_LIB;
-
-    $retval = '';
-
-    foreach ($LANG_configselects['library'][4] as $descrip => $name) {
-        $sel = $name == $_CONF_LIB['currency'] ? ' selected="selected" ' : '';
-        $retval .= "<option value=\"$name\" $sel>$descrip</option>\n";
+        if ($id == '*') {
+            $retval[] = $mapped;
+        } else {
+            $retval = $mapped;
+            break;
+        }
     }
 
-    return $retval;
+    if (($id != '*') && (count($retval) == 1)) {
+        $tRet = array_values($retval);
+        $retval = $tRet[0];
+    }
+    if ($retval === '' || (is_array($retval) && count($retval) == 0)) {
+        return NULL;
+    } else {
+        return $retval;
+    }
 }
 
 
@@ -1017,7 +1108,6 @@ function LIBRARY_siteFooter()
     }
 
     return $retval;
-
 }
 
 

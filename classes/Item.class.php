@@ -241,7 +241,7 @@ class Item
     */
     public function Save($A = '')
     {
-        global $_TABLES;
+        global $_TABLES, $_CONF_LIB;
 
         if (is_array($A)) {
             $this->setVars($A);
@@ -290,6 +290,7 @@ class Item
             }
         }    
         if (empty($this->Error)) {
+            PLG_itemSaved($this->id, $_CONF_LIB['pi_name']);
             return true;
         } else {
             return false;
@@ -318,7 +319,7 @@ class Item
             $this->DeleteImage($prow['img_id']);
         }
  
-        //DB_delete($_TABLES['library.prodXcat'], 'prod_id', $this->Get('id'));
+        PLG_itemDeleted($this->id, $_CONF_LIB['pi_name']);
         DB_delete($_TABLES['library.items'], 'id', $this->id);
         $this->id = 0;
         return true;
