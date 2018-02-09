@@ -10,15 +10,13 @@
 *               GNU Public License v2 or later
 *   @filesource
 */
-
-// Import core glFusion upload functions
-USES_class_upload();
+namespace Library;
 
 /**
 *   Image-handling class
 *   @package library
 */
-class LibraryImage extends upload
+class Image extends \upload
 {
     /** Path to actual image (without filename)
     *   @var string */
@@ -47,7 +45,7 @@ class LibraryImage extends upload
         $this->setContinueOnError(true);
         $this->setLogFile('/tmp/warn.log');
         $this->setDebug(true);
-        parent::upload();
+        parent::__construct();
 
         // Before anything else, check the upload directory
         if (!$this->setPath($_CONF_LIB['image_dir'])) {
@@ -296,7 +294,6 @@ class LibraryImage extends upload
 
     }
 
-
-}   // class LibraryImage
+}   // class Image
 
 ?>

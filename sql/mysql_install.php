@@ -24,6 +24,8 @@ $_SQL['library.items'] = "CREATE TABLE {$_TABLES['library.items']} (
   `short_description` varchar(255) NOT NULL DEFAULT '',
   `description` text,
   `keywords` varchar(255) DEFAULT '',
+  `author` varchar(255) DEFAULT '',
+  `publisher` varchar(255) DEFAULT '',
   `type` tinyint(2) DEFAULT '0',
   `qoh` int(4) DEFAULT '1',
   `daysonhold` int(4) DEFAULT '0',
@@ -83,6 +85,8 @@ $_SQL['library.categories'] = "CREATE TABLE {$_TABLES['library.categories']} (
   `perm_group` tinyint(1) unsigned NOT NULL default '3',
   `perm_members` tinyint(1) unsigned NOT NULL default '2',
   `perm_anon` tinyint(1) unsigned NOT NULL default '2',
+  `lft` int(5) unsigned NOT NULL DEFAULT '0',
+  `rgt` int(5) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY  (`cat_id`),
   KEY `idxName` (`cat_name`,`cat_id`)
 )";
@@ -95,5 +99,13 @@ $_SQL['library.types'] = "CREATE TABLE {$_TABLES['library.types']} (
 
 $_DEFDATA['library.types'] = "INSERT INTO {$_TABLES['library.types']} VALUES 
     (1,'Book'),(2,'CD'),(3,'DVD')";
+
+$_DEFDATA['library.categories'] = "INSERT INTO {$_TABLES['library.categories']} (
+        parent_id, cat_name, description,
+        group_id, owner_id, perm_owner, perm_group, perm_members, perm_anon
+    ) VALUES (
+        0, 'Miscellaneous', 'Miscellaneous Items',
+        13, 2, 3, 3, 2, 2
+    )";
 
 ?>

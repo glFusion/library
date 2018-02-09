@@ -2,6 +2,11 @@
 <form action="{pi_admin_url}/index.php" method="POST" 
     class="libItemForm"
     enctype="multipart/form-data" onsubmit='set_postcontent();'>
+  <input type="hidden" name="dt_add" value="{dt_add}" />
+  <input type="hidden" name="oldid" value="{id}" />
+  <input type="hidden" name="views" value="{views}" />
+  <input type="hidden" name="votes" value="{votes}" />
+  <input type="hidden" name="rating" value="{rating}" />
 
 <fieldset>
 <legend>{$LANG_LIB['item_info']}</legend>
@@ -31,16 +36,27 @@
       size="40" maxlength="255">
 </p>
 
-<!--<p>
+<p>
   <label>{$LANG_LIB['category']}:
     <a href="#" onclick="popupWindow('{doc_url}#desc_category', 'Help', 640, 480, 1)" class="toolbar">
     <img src="{layout_url}/images/button_help.png" alt="" /></a>
   </label>
-  <select name="categories">
-    <option value="0">{$LANG_LIB['top_cat']}</option>
+  <select name="cat_id">
+    <option value="1">{$LANG_LIB['top_cat']}</option>
     {cat_select}
   </select>
-</p>-->
+</p>
+
+<p>
+  <label>{$LANG_LIB['author']}:</label>
+  <input type="text" name="author" value="{author}" size="40" maxlength="255" />
+</p>
+
+<p>
+  <label>{$LANG_LIB['publisher']}:
+  </label>
+  <input type="text" name="publisher" value="{publisher}" size="40" maxlength="255" />
+</p>
 
 <p>
   <label>{$LANG_LIB['type']}:
@@ -78,7 +94,7 @@
     <a href="#" onclick="popupWindow('{doc_url}#desc_price', 'Help', 640, 480, 1)" class="toolbar">
     <img src="{layout_url}/images/button_help.png" alt="" /></a>
   </label>
-  <input type="text" name="price" value="{price}" size="20" maxlength="20">
+  <input type="text" name="price" value="{price}" size="20" maxlength="20" />
     &nbsp;{currency}
 </p>
 
@@ -104,7 +120,7 @@
     <!-- BEGIN UploadFld -->
     <tr>
       <td align="left">
-        <input type="file" name="images[]"><br />
+        <input type="file" name="images[]" /><br />
       </td>
     </tr>
     <!-- END UploadFld -->
@@ -113,12 +129,15 @@
 </p>
 
 <p>
-  <label>{$LANG_LIB['exp_time_days']}:
-    <a href="#" onclick="popupWindow('{doc_url}#desc_expiration', 'Help', 640, 480, 1)" class="toolbar">
-    <img src="{layout_url}/images/button_help.png" alt="" /></a>
+  <label>{$LANG_LIB['maxcheckout']}:
   </label>
-  <input type="text" name="expiration" value="{expiration}" 
-    size="20" maxlength="20">
+  <input type="text" name="maxcheckout" value="{maxcheckout}" size="5" maxlength="5" />
+</p>
+
+<p>
+  <label>{$LANG_LIB['daysonhold']}:
+  </label>
+  <input type="text" name="daysonhold" value="{daysonhold}" size="5" maxlength="5" />
 </p>
 
 <p>
@@ -126,33 +145,7 @@
     <a href="#" onclick="popupWindow('{doc_url}#desc_enabled', 'Help', 640, 480, 1)" class="toolbar">
     <img src="{layout_url}/images/button_help.png" alt="" /></a>
   </label>
-  <input type="checkbox" name="enabled" value="1" {ena_chk}>
-</p>
-
-<p>
-  <label>{$LANG_LIB['featured']}?
-    <a href="#" onclick="popupWindow('{doc_url}#desc_featured', 'Help', 640, 480, 1)" class="toolbar">
-    <img src="{layout_url}/images/button_help.png" alt="" /></a>
-  </label>
-  <input type="checkbox" name="featured" value="1" {feat_chk}>
-</p>
-
-<p>
-  <label>{$LANG_LIB['taxable']}?
-    <a href="#" onclick="popupWindow('{doc_url}#desc_taxable', 'Help', 640, 480, 1)" class="toolbar">
-    <img src="{layout_url}/images/button_help.png" alt="" /></a>
-  </label>
-  <input type="checkbox" name="taxable" value="1" {tax_chk}>
-</p>
-
-<p>
-  <label>{$LANG_LIB['txt_buttons']}:
-    <a href="#" onclick="popupWindow('{doc_url}#desc_buttons', 'Help', 640, 480, 1)" class="toolbar">
-    <img src="{layout_url}/images/button_help.png" alt="" /></a>
-  </label>
-  <!-- BEGIN BtnRow -->
-    <input type="checkbox" name="buttons[]" value="{btn_type}" {btn_chk}>{btn_name}&nbsp;
-  <!-- END BtnRow -->
+  <input type="checkbox" name="enabled" value="1" {ena_chk} />
 </p>
 
 <p>
@@ -169,82 +162,15 @@
 
 </fieldset>
 
-<fieldset>
-<legend>{$LANG_LIB['delivery_info']}</legend>
-
-<p>
-  <label>{$LANG_LIB['downloadable']}?:
-    <a href="#" onclick="popupWindow('{doc_url}#desc_downloadable', 'Help', 640, 480, 1)" class="toolbar">
-    <img src="{layout_url}/images/button_help.png" alt="" /></a>
-  </label>
-  <!-- BEGIN ProdTypeRadio -->
-    <input type="radio" name="prod_type" value="{type_val}" {type_sel}
-        onclick="PP_changeProdType(this.value)"
-    > {type_txt}&nbsp;&nbsp;
-  <!-- END ProdTypeRadio -->
-  <!--<select name="download">
-    <option value="0"{download_no}>No</option>
-    <option value="1"{download_yes}>Yes</option>
-  </select>-->
-</p>
-
-<div id="type_download">
-<p>
-  <label>{$LANG_LIB['select_file']}:
-    <a href="#" onclick="popupWindow('{doc_url}#desc_select_file', 'Help', 640, 480, 1)" class="toolbar">
-    <img src="{layout_url}/images/button_help.png" alt="" /></a>
-  </label>
-  <select name="file">
-    <option value="">-- {$LANG_LIB['select_file']} --</option>
-    {file_selection}
-  </select>
-</p>
-
-<p>
-  <label>{$LANG_LIB['or_upload_new']}:
-    <a href="#" onclick="popupWindow('{doc_url}#desc_upload_file', 'Help', 640, 480, 1)" class="toolbar">
-    <img src="{layout_url}/images/button_help.png" alt="" /></a>
-  </label>
-  <input type="file" name="uploadfile">
-</p>
-</div>
-
-<div id="type_physical">
-<p>
-  <label>{$LANG_LIB['weight']}:
-    <a href="#" onclick="popupWindow('{doc_url}#desc_weight', 'Help', 640, 480, 1)" class="toolbar">
-    <img src="{layout_url}/images/button_help.png" alt="" /></a>
-  </label>
-  <input type="text" name="weight" value="{weight}">
-</p>
-
-<p>
-  <label>{$LANG_LIB['shipping_type']}:
-    <a href="#" onclick="popupWindow('{doc_url}#desc_shipping_type', 'Help', 640, 480, 1)" class="toolbar">
-    <img src="{layout_url}/images/button_help.png" alt="" /></a>
-  </label>
-  <select name="shipping_type" onchange="PP_changeShippingType(this.value);">
-    <option value="0" {ship_sel_0}>{$LANG_LIB['no_shipping']}</option>
-    <option value="1" {ship_sel_1}>{$LANG_LIB['pp_profile']}</option>
-    <option value="2" {ship_sel_2}>{$LANG_LIB['fixed']}</option>
-  </select>
-  <span id="shipping_amount">
-    &nbsp;&nbsp;{$LANG_LIB['shipping_amt']} ({$LANG_LIB['per_item']}):
-    <input type="text" name="shipping_amt" value="{shipping_amt}">
-  </span>
-</p>
-</div>
-
-</fieldset>
-<font color="red">*</font>{$LANG_LIB['indicate_req_fld']}
+<font color="red">*</font> {$LANG_LIB['indicate_req_fld']}
 
 <div align="center">
-  <input type="submit" class="lgButton green" name="saveproduct"
+  <input type="submit" class="lgButton green" name="saveitem"
     value="{$LANG_LIB['saveitem']}" />
-  <input type="submit" class="lgButton grey" name="clearform"
+  <input type="reset" class="lgButton grey" name="clearform"
     value="{$LANG_LIB['clearform']}" />
   {!if candelete}
-  <input type="submit" class="lgButton red" name="deleteproduct"
+  <input type="submit" class="lgButton red" name="deleteitem"
     value="{$LANG_LIB['deleteitem']}" />
   {!endif}
 </div>

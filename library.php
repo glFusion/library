@@ -24,7 +24,7 @@ global $_CONF_LIB;
 $_CONF_LIB['pi_name']            = 'library';
 $_CONF_LIB['pi_display_name']    = 'Library';
 $_CONF_LIB['pi_version']         = '0.0.1';
-$_CONF_LIB['gl_version']         = '1.5.0';
+$_CONF_LIB['gl_version']         = '1.7.0';
 $_CONF_LIB['pi_url']             = 'http://www.glfusion.org';
 
 $_LIB_table_prefix = $_DB_table_prefix . 'library_';

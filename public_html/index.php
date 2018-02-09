@@ -109,8 +109,7 @@ case 'history':
     break;
 
 case 'detail':
-    USES_library_class_item();
-    $P = new LibraryItem($_REQUEST['id']);
+    $P = new Library\Item($_REQUEST['id']);
     $params = array();
     if (isset($_GET['query'])) $params[] = 'query=' . $_GET['query'];
     if (isset($_GET['sortdir'])) $params[] = 'sortdir=' . $_GET['sortdir'];
@@ -124,10 +123,10 @@ case 'detail':
 
 case 'itemlist':
 default:
-    $content .= LIBRARY_ItemList($_REQUEST['category']);
+    $cat = isset($_GET['category']) ? $_GET['category'] : 0;
+    $content .= LIBRARY_ItemList($cat);
     $menu_opt = $LANG_LIB['item_list'];
     break;
-
 }
 
 // Create the user menu

@@ -38,6 +38,9 @@ define ('LIB_STATUS_AVAIL', 0);
 /** Define status code: item checked out */
 define ('LIB_STATUS_OUT', 1);
 
+// Store the private image path in a conf var so it's available
+$_CONF_LIB['image_dir'] = $_CONF['path'] . 'data/library/images/items';
+
 //  Additional config items and table definitions are added here
 if (file_exists(LIBRARY_PI_PATH . '/config.php')) {
     /** Include local configuration overrides */
@@ -68,27 +71,20 @@ if (empty($_USER['uid'])) {
 function USES_library_functions()
 {   require_once LIBRARY_PI_PATH . '/library_functions.inc.php';  }
 
-/** Import product class */
-function USES_library_class_item()
-{   require_once LIBRARY_PI_PATH . '/classes/LibraryItem.class.php';  }
-
-/** Import category class */
-/*function USES_library_class_category()
-{   require_once LIBRARY_PI_PATH . '/classes/LibraryCategory.class.php';  }
-*/
-
-/** Import item type class */
-function USES_library_class_media()
-{   require_once LIBRARY_PI_PATH . '/classes/MediaType.class.php';  }
-
-/** Import image handling class for products */
-function USES_library_class_image()
-{   require_once LIBRARY_PI_PATH . '/classes/LibraryImage.class.php';   }
-
 /** Upgrade functions */
 function USES_library_upgrade()
 {   require_once LIBRARY_PI_PATH . '/upgrade.inc.php';   }
 
+spl_autoload_register(function ($class)
+{
+    if (strpos($class, 'Library\\') === 0) {
+        $class = str_replace('Library\\', '', $class);
+        $path = __DIR__ . '/classes/' . $class . '.class.php';
+        if (file_exists($path)) {
+            include $path;
+        }
+    }
+});
 
 /**
 *   Upgrade the plugin to the currently-installed version.
@@ -858,12 +854,12 @@ function plugin_canuserrate_library($item_id, $uid)
 {
     global $_CONF_LIB;
 
+    $_CONF_LIB['anon_can_rate'] = 0;    // TODO
     if ($_CONF_LIB['anon_can_rate'] == 0 && COM_isAnonUser()) {
         return false;
     } else {
         return true;
     }
-
 }
 
 
@@ -895,7 +891,6 @@ function plugin_runScheduledTask_library()
         COM_errorLog('LIBRARY: delete waitlist, ' .
             "user {$A['username']}, item {$A['item_id']} dated {$A['dt']}");
     }
-
 }
 
 
@@ -973,7 +968,7 @@ function LIBRARY_siteHeader($subject='', $meta='')
 
     $retval = '';
 
-    $title = $LANG_LIB['blocktitle'];
+    $title = $LANG_LIB['main_title'];
     if ($subject != '')
         $title = $subject . ' : ' . $title;
 
@@ -1025,5 +1020,44 @@ function LIBRARY_siteFooter()
 
 }
 
+
+/**
+*   Shortcut to get the current date object
+*
+*   @return object  Date object for current timestamp
+*/
+function LIBRARY_now()
+{
+    global $_CONF;
+    static $now = NULL;
+    if ($now === NULL) {
+        $now = new \Date('now', $_CONF['timezone']);
+    }
+    return $now;
+}
+
+
+/**
+*   Shortcut function to get the SQL-formatted date
+*
+*   @return string  Today's date as "YYYY-MM-DD"
+*/
+function LIBRARY_today()
+{
+    return LIBRARY_now()->format('Y-m-d', true);
+}
+
+
+/**
+*   Calculate and return the expiration date for an item
+*
+*   @return Object      Expiration date
+*/
+function LIBRARY_dueDate($days = 0)
+{
+    global $_CONF_LIB;
+    if ($days == 0) $days = $_CONF_LIB['maxcheckout'];
+    return LIBRARY_now()->add(new \DateInterval("P{$days}D"));
+}
 
 ?>

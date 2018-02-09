@@ -141,6 +141,8 @@ $LANG_LIB = array (
 'next_on_list'      => 'Next on waiting list',
 'subj_item_avail'   => 'Your requested library item is available',
 'in_use'            => 'In Use',
+'item_updated'  => 'Item has been updated.',
+'item_nochange' => 'Item has not been changed.',
 );
 
 

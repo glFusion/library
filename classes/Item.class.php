@@ -10,13 +10,13 @@
 *               GNU Public License v2 or later
 *   @filesource
 */
-
+namespace Library;
 
 /**
 *   Class for library item
 *   @package library
 */
-class LibraryItem
+class Item
 {
     /** Property fields.  Accessed via Set() and Get()
     *   @var array */
@@ -97,13 +97,8 @@ class LibraryItem
     {
         switch ($var) {
         case 'id':
-            $this->properties[$var] = COM_sanitizeID($value, false);
-            break;
-        
         case 'oldid':
             $this->properties[$var] = COM_sanitizeID($value, false);
-            if ($this->properties[$var] != '') 
-                $this->isNew = false;
             break;
 
         case 'views':
@@ -170,7 +165,7 @@ class LibraryItem
     *   @param  array   $row        Array of values, from DB or $_POST
     *   @param  boolean $fromDB     True if read from DB, false if from $_POST
     */
-    public function SetVars($row, $fromDB=false)
+    public function setVars($row, $fromDB=false)
     {
         if (!is_array($row)) return;
 
@@ -179,7 +174,7 @@ class LibraryItem
         $this->short_description = $row['short_description'];
         $this->publisher = $row['publisher'];
         $this->author = $row['author'];
-        $this->enabled = $row['enabled'];
+        $this->enabled = isset($row['enabled']) ? 1 : 0;
         $this->name = $row['name'];
         $this->cat_id = $row['cat_id'];
         $this->daysonhold = $row['daysonhold'];
@@ -227,11 +222,11 @@ class LibraryItem
         $result = DB_query("SELECT * 
                     FROM {$_TABLES['library.items']} 
                     WHERE id='$id'");
-        if (!$result || DB_numRows($result != 1)) {
+        if (!$result || DB_numRows($result) != 1) {
             return false;
         } else {
             $row = DB_fetchArray($result, false);
-            $this->SetVars($row, true);
+            $this->setVars($row, true);
             return true;
         }
     }
@@ -247,43 +242,53 @@ class LibraryItem
     public function Save($A = '')
     {
         global $_TABLES;
-        USES_library_class_image();
 
         if (is_array($A)) {
-            $this->SetVars($A);
+            $this->setVars($A);
         }
 
         // Insert or update the record, as appropriate.  Make sure the new ID
         // being inserted or changed to doesn't already exist.
-        if (!$this->isNew) {
-            if ($this->oldid != '' && $this->id != $this->oldid &&
-                DB_count($_TABLES['library.items'], 'id', $this->id) > 0) {
-                $this->Error[] = 'Duplicate ID ' . $this->id;
-            } else {
-                $status = $this->Update();
-            }
+        $allowed = ($this->isNew || $this->id != $this->oldid) ? 0 : 1;
+        $num1 = DB_count($_TABLES['library.items'], 'id', $this->id);
+        if ($num1 > $allowed) {
+            $this->Error[] = 'Duplicate ID ' . $this->id;
         } else {
-            if (DB_count($_TABLES['library.items'], 'id', $this->id) > 0) {
-                $this->Error[] = 'Duplicate ID ' . $this->id;
+            if ($this->isNew) {
+                $sql1 = "INSERT INTO {$_TABLES['library.items']} SET ";
+                $sql3 = '';
             } else {
-                $status = $this->Insert();
+                $sql1 = "UPDATE {$_TABLES['library.items']} SET ";
+                $sql3 = " WHERE id = '" . DB_escapeString($this->oldid) . "'";
             }
-        }
-        $item_id = $this->id;
-
-        if (!$status) {
-            $this->Error[] = "Failed to insert or update record";
-        } else {
-            // Handle image uploads.  This is done last because we need
-            // the product id to name the images filenames.
-            $U = new LibraryImage($item_id, 'images');
-            $U->uploadFiles();
-
-            if ($U->areErrors() > 0) {
-                $this->Error[] = $U->printErrors(false);
+            $sql2 = "id = '" . DB_escapeString($this->id) . "',
+                name='" . DB_escapeString($this->name) . "',
+                cat_id='{$this->cat_id}',
+                type='{$this->type}',
+                description='" . DB_escapeString($this->description) . "',
+                publisher='" . DB_escapeString($this->publisher) . "',
+                author='" . DB_escapeString($this->author) . "',
+                short_description='" . 
+                            DB_escapeString($this->short_description) . "',
+                keywords='" . DB_escapeString($this->keywords) . "',
+                daysonhold='{$this->daysonhold}',
+                maxcheckout='{$this->maxcheckout}',
+                enabled='{$this->enabled}',
+                views='{$this->views}'";
+            $sql = $sql1 . $sql2 . $sql3;
+            DB_query($sql, 1);
+            if (DB_error()) {
+                $this->Error[] = "Failed to insert or update record";
+            } else {
+                // Handle image uploads.  This is done last because we need
+                // the product id to name the images filenames.
+                $U = new Image($this->id, 'images');
+                $U->uploadFiles();
+                if ($U->areErrors() > 0) {
+                    $this->Error[] = $U->printErrors(false);
+                }
             }
-        }
-            
+        }    
         if (empty($this->Error)) {
             return true;
         } else {
@@ -352,7 +357,7 @@ class LibraryItem
     *
     *   @return boolean     True on success, False on failure
     */
-    private function Insert()
+    private function XXInsert()
     {
         global $_TABLES;
 
@@ -398,7 +403,7 @@ class LibraryItem
     *
     *   @return boolean     True on success, False on Failure
     */
-    private function Update()
+    private function XXUpdate()
     {
         global $_TABLES;
 
@@ -467,7 +472,7 @@ class LibraryItem
         }
         $id = $this->id;
 
-        $T = new Template(LIBRARY_PI_PATH . '/templates');
+        $T = new \Template(LIBRARY_PI_PATH . '/templates');
         $T->set_file(array('product' => "item_form.thtml"));
         $action_url = LIBRARY_ADMIN_URL . '/index.php';
         if ($this->oldid != '') {
@@ -478,6 +483,7 @@ class LibraryItem
 
         $T->set_var(array(
             'oldid'         => $this->oldid,
+            'dt_add'        => $this->dt_add,
             'id'            => $this->id,
             'name'          => htmlspecialchars($this->name),
             'category'      => $this->cat_id,
@@ -490,10 +496,7 @@ class LibraryItem
             'maxcheckout'   => $this->maxcheckout,
             'pi_admin_url'  => LIBRARY_ADMIN_URL,
             'keywords'      => htmlspecialchars($this->keywords),
-            //'cat_select'    => LIBRARY_recurseCats(
-            //                    'LIBRARY_callbackCatOptionList', 
-                                //$this->properties['categories'][0]),
-            //                    $this->cat_id), 
+            'cat_select'    => Category::buildSelection($this->cat_id),
             'pi_url'        => LIBRARY_URL,
             'doc_url'       => LIBRARY_getDocURL('product_form.html', 
                                             $_CONF['language']),
@@ -587,65 +590,47 @@ class LibraryItem
 
 
     /**
-    *  Sets the "enabled" field to the specified value.
+    *   Toggles the value of a field.
     *
-    *  @param  integer $id ID number of element to modify
-    *  @param  integer $value New value to set
+    *   @param  integer $oldval     Original value to change
+    *   @param  string  $varname    Name of field
+    *   @param  string  $id         ID number of element to modify
     *  @return         New value, or old value upon failure
     */
-    private function _toggle($oldvalue, $varname, $id = '')
+    private static function _toggle($oldvalue, $varname, $id)
     {
         global $_TABLES;
 
-        if ($id == '') {
-            if (is_object($this))
-                $id = $this->id;
-            else
-                return;
-        }
-
-        // If it's still an invalid ID, return the old value
-        if ($id == '')
-            return $oldvalue;
-
-        $id = COM_sanitizeID($id, false);
-
         // Determing the new value (opposite the old)
         $newvalue = $oldvalue == 1 ? 0 : 1;
+        $id = COM_sanitizeID($id, false);
 
         $sql = "UPDATE {$_TABLES['library.items']}
                 SET $varname=$newvalue
                 WHERE id='$id'";
         //COM_errorLog($sql);
-        DB_query($sql);
-
-        return $newvalue;
+        DB_query($sql, 1);
+        return DB_error() ? $oldvalue : $newvalue;
     }
 
 
     /**
     *   Sets the "enabled" field to the specified value.
     *
-    *   @param  integer $id ID number of element to modify
-    *   @param  integer $value New value to set
+    *   @param  integer $oldvalue   Original value to be changed
+    *   @param  string  $id         ID number of element to modify
     *   @return         New value, or old value upon failure
     */
-    public function toggleEnabled($oldvalue, $id = '')
+    public static function toggleEnabled($oldvalue, $id)
     {
         $oldvalue = $oldvalue == 0 ? 0 : 1;
-        if ($id == '') {
-            if (is_object($this))
-                $id = $this->id;
-            else
-                return $oldvalue;
-        }
         if ($id == '') return $oldval;
-        return LibraryItem::_toggle($oldvalue, 'enabled', $id);
+        return self::_toggle($oldvalue, 'enabled', $id);
     }
 
 
     /**
-    *   Determine if this product is mentioned in any purchase records.
+    *   Determine if this item has any transaction or waitlist records.
     *   Typically used to prevent deletion of product records that have
     *   dependencies.
     *
@@ -683,7 +668,7 @@ class LibraryItem
 
         $retval = COM_startBlock();
 
-        $T = new Template(LIBRARY_PI_PATH . '/templates');
+        $T = new \Template(LIBRARY_PI_PATH . '/templates');
         $T->set_file(array('item' => 'item_detail.thtml',
         ));
 
@@ -700,19 +685,13 @@ class LibraryItem
             $l_desc = $this->description;
             $s_desc = $this->short_description;
         }
-
         $T->set_var(array(
-            'site_url'          => $_CONF['site_url'],
-            'library_url'        => 'https://' . $_CONF_LIB['library_url'],
             'user_id'           => $_USER['uid'],
-            'business'          => $_CONF_LIB['receiver_email'][0],
-            'currency'          => $_CONF_LIB['currency'],
             'id'                => $this->id,
             'name'              => $name,
             'description'       => $l_desc,
             'short_description' => $s_desc,
             'img_cell_width'    => ($_CONF_LIB['max_thumb_size'] + 20),
-            'return'            => LIBRARY_URL . '/index.php?mode=thanks',
             'pi_url'            => LIBRARY_URL,
             'avail_blk'         => $this->AvailBlock(),
             'publisher'     => $this->publisher,
@@ -799,7 +778,7 @@ class LibraryItem
             if (in_array($this->id, $PP_ratedIds)) {
                 $static = true;
                 $voted = 1;
-            } elseif (plugin_canuserrate_library($A['id'], $_USER['uid'])) {
+            } elseif (plugin_canuserrate_library($this->id, $_USER['uid'])) {
                 $static = 0;
                 $voted = 0;
             } else {
@@ -876,7 +855,7 @@ class LibraryItem
     }
 
 
-    function CheckOut($to, $id = '')
+    public function CheckOut($to, $due='')
     {
         global $_TABLES, $_USER;
 
@@ -887,50 +866,29 @@ class LibraryItem
             return;
         $me = (int)$_USER['uid'];
 
-        if ($id == '') {
-            if (is_object($this)) {
-                $id = $this->id;
-                $maxcheckout = $this->maxcheckout;
-            } else
-                return;
-        } else {
-            $id = COM_sanitizeID($id, false);
-            $A = DB_fetchArray(DB_query("SELECT id, maxcheckout
-                    FROM {$_TABLES['library.items']} WHERE id='$id'"));
-            if (empty($A))
-                return;
-            $maxcheckout = $A['maxcheckout'];
+        if (empty($due)) {
+            $due = LIBRARY_dueDate($this->maxcheckout)->toUnix();
         }
 
         // Set the due date from the POSTed variable, if present.  If not
         // present, or if an error occurs in the creation of the timestamp,
         // fall back to now + the max checkout days.  Add one to the due date
         // to get it to midnight the following day.
-        $due = -1;
-        if (isset($_POST['due']) && !empty($_POST['due'])) {
-            $due = strtotime("{$_POST['due']} 23:59:59");
-            if (!$due) $due = -1;
-        }
-        if ($due == -1)
-            $due = time() + ($maxcheckout * 86400);
-
-        DB_query("UPDATE {$_TABLES['library.items']}
-                SET 
+        DB_query("UPDATE {$_TABLES['library.items']} SET 
                     status='" . LIB_STATUS_OUT . "',
                     uid=$to,
                     due=$due
-                WHERE id='$id'");
+                WHERE id='{$this->id}'");
 
         // Delete this user from the waitlist, if applicable
         DB_delete($_TABLES['library.waitlist'], array('item_id','uid'),
-                array($id, $to));
+                array($this->id, $to));
 
         // Insert the trasaction record
         DB_query("INSERT INTO {$_TABLES['library.trans']} 
                     (item_id, dt, doneby, uid, trans_type)
                 VALUES (
-                    '$id', UNIX_TIMESTAMP(), $me, $to, 'checkout')");
-            
+                    '{$this->id}', UNIX_TIMESTAMP(), $me, $to, 'checkout')");
     }
 
 
@@ -985,7 +943,7 @@ class LibraryItem
     {
         global $_TABLES, $LANG_LIB, $_USER;
 
-        $T = new Template(LIBRARY_PI_PATH . '/templates');
+        $T = new \Template(LIBRARY_PI_PATH . '/templates');
         $T->set_file(array('avail' => 'avail_block.thtml'));
 
         // Check if we have the item reserved, and if there's a waitlist.
@@ -1038,7 +996,6 @@ class LibraryItem
             'id'            => $this->id,
             'pi_url'        =>  LIBRARY_URL,
         ) );
-
         $T->parse('output', 'avail');
         $retval = $T->finish($T->get_var('output'));
         return $retval;
@@ -1050,8 +1007,6 @@ class LibraryItem
         $this->ListingUrl = $url;
     }
 
-
-}   // class LibraryItem
-
+}   // class Item
 
 ?>

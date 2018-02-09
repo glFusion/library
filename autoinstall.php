@@ -17,9 +17,9 @@ if (!defined ('GVERSION')) {
 
 global $_DB_dbms;
 
-require_once $_CONF['path'].'plugins/library/library.php';
-require_once $_CONF['path'].'plugins/library/sql/'.$_DB_dbms.'_install.php';
-require_once $_CONF['path'].'plugins/library/install_defaults.php';
+require_once __DIR__ . '/library.php';
+require_once __DIR__ . '/sql/'.$_DB_dbms.'_install.php';
+require_once __DIR__ . '/install_defaults.php';
 
 $language = $_CONF['language'];
 if (!is_file($_CONF['path'].'plugins/library/language/' . $language . '.php')) {
@@ -47,10 +47,10 @@ $INSTALL_plugin['library'] = array(
             'table' => $_TABLES['library.items'], 
             'sql' => $_SQL['library.items']
         ),
-    /*array(  'type' => 'table', 
+    array(  'type' => 'table', 
             'table' => $_TABLES['library.categories'], 
             'sql' => $_SQL['library.categories']
-        ),*/
+        ),
     array(  'type' => 'table', 
             'table' => $_TABLES['library.trans'], 
             'sql' => $_SQL['library.trans']
@@ -109,10 +109,12 @@ $INSTALL_plugin['library'] = array(
         ),
     array('type'    => 'mkdir',
         'dirs'      => array(
-                        $_LIB_DEFAULTS['image_dir'],
-                        ),
+            $_CONF['path'] . 'data/library',
+            $_CONF['path'] . 'data/library/images',
+            $_CONF['path'] . 'data/library/images/items',
+        ),
     ),
- );
+);
 
 
 /**
@@ -125,13 +127,12 @@ function plugin_install_library()
 {
     global $INSTALL_plugin, $_CONF_LIB;
 
-    COM_errorLog("Attempting to install the {$_CONF_LIB['pi_display_namei']} plugin", 1);
+    COM_errorLog("Attempting to install the {$_CONF_LIB['pi_display_name']} plugin", 1);
 
     $ret = INSTALLER_install($INSTALL_plugin[$_CONF_LIB['pi_name']]);
     if ($ret > 0) {
         return false;
     }
-
     return true;
 }
 

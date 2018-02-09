@@ -1,5 +1,4 @@
 <?php
-//  $Id:: index.php 36 2009-12-05 19:58:51Z root
 /**
 *   Admin index page for the library plugin.  
 *   By default, lists products available for editing.
@@ -23,13 +22,7 @@ USES_lib_admin();
 // Check for required permissions
 library_access_check('library.admin');
 
-/*$vars = array('msg', 'text', 'mode');
-library_filterVars($vars, $_REQUEST);*/
-
 $content = '';
-//$mode = isset($_REQUEST['mode']) ? $_REQUEST['mode'] : '';
-//$page = isset($_REQUEST['page']) ? $_REQUEST['page'] : $mode;
-
 $expected = array(
     // actions:
     'mode', 'checkout', 'checkin', 'deleteitem',
@@ -57,21 +50,20 @@ if ($action == 'mode') $action = $actionval;
 
 switch ($action) {
 case 'checkout':
-    USES_library_class_item();
-    $I = new LibraryItem($_POST['id']);
+    $I = new Library\Item($_POST['id']);
     $I->Checkout($_POST['uid']);
+    COM_refresh(LIBRARY_ADMIN_URL);
     break;
 
 case 'checkin':
-    USES_library_class_item();
-    $I = new LibraryItem($_REQUEST['id']);
+    $I = new Library\Item($_REQUEST['id']);
     $I->CheckIn();
     LIBRARY_notifyWaitlist($_REQUEST['id']);
+    COM_refresh(LIBRARY_ADMIN_URL);
     break;
     
 case 'deleteitem':
-    USES_library_class_item();
-    $P = new LibraryItem($_REQUEST['id']);
+    $P = new Library\Item($_REQUEST['id']);
     if (!$P->isUsed()) {
         $P->Delete();
     } else {
@@ -80,10 +72,9 @@ case 'deleteitem':
     break;
 
 case 'deletecatimage':
-    USES_library_class_category();
     $id = isset($_GET['cat_id']) ? (int)$_GET['cat_id'] : 0;
     if ($id > 0) {
-        $C = new LibraryCategory($id);
+        $C = new Library\Category($id);
         $C->DeleteImage();
         $page = 'editcat';
         $_REQUEST['id'] = $id;
@@ -92,10 +83,9 @@ case 'deletecatimage':
     }
     break;
 
-case $LANG_LIB['deletecat']:
+case 'deletecat':
     if (!empty($LANG_LIB['deletecat'])) {
-        USES_library_class_category();
-        $C = new Category($_REQUEST['id']);
+        $C = new Library\Category($_REQUEST['id']);
         if (!$C->isUsed()) {
             $C->Delete();
         } else {
@@ -106,22 +96,19 @@ case $LANG_LIB['deletecat']:
     break;
 
 case 'delete_img':
-    USES_library_class_item();
     $img_id = (int)$_REQUEST['img_id'];
-    Product::DeleteImage($img_id);
+    Library\Item::DeleteImage($img_id);
     $page = 'edititem';
     break;
 
 case 'savemedia':
-    USES_library_class_media();
-    $M = new MediaType($_POST['name']);
+    $M = new Library\MediaType($_POST['name']);
     $M->Save($_POST);
     $page = 'medialist';
     break;
 
 case 'saveitem':
-    USES_library_class_item();
-    $P = new LibraryItem($_POST['oldid']);
+    $P = new Library\Item($_POST['oldid']);
     if (!$P->Save($_POST)) {
         $content .= LIBRARY_errMsg($P->PrintErrors());
         $page = 'edititem';
@@ -130,16 +117,13 @@ case 'saveitem':
     }
     break;
 
-case $LANG_LIB['savecat']:
-    if (!empty($LANG_LIB['savecat'])) {
-        USES_library_class_category();
-        $C = new LibraryCategory($_POST['cat_id']);
-        if (!$C->Save($_POST)) {
-            $content .= LIBRARY_popupMsg($LANG_LIB['invalid_form']);
-            $page = 'editcat';
-        } else {
-            $page = 'catlist';
-        }
+case 'savecat':
+    $C = new Library\Category($_POST['cat_id']);
+    if (!$C->Save($_POST)) {
+        $content .= LIBRARY_popupMsg($LANG_LIB['invalid_form']);
+        $page = 'editcat';
+    } else {
+        $page = 'catlist';
     }
     break;
 
@@ -163,8 +147,7 @@ case 'history':
 case 'edititem':
     $page='itemlist';
     $id = isset($_REQUEST['id']) ? $_REQUEST['id'] : '';
-    USES_library_class_item();
-    $P = new LibraryItem($id);
+    $P = new Library\Item($id);
     // Pick any field.  If it exists, then this is probably a rejected save
     // so pre-populate the fields.
     if ($id == '' && isset($_POST['name'])) {
@@ -175,8 +158,7 @@ case 'edititem':
 
 case 'editcat':
     $id = isset($_REQUEST['id']) ? (int)$_REQUEST['id'] : 0;
-    USES_library_class_category();
-    $C = new LibraryCategory($id);
+    $C = new Library\Category($id);
     if ($id == 0 && isset($_POST['description'])) {
         // Pick a field.  If it exists, then this is probably a rejected save
         $C->SetVars($_POST);
@@ -187,8 +169,7 @@ case 'editcat':
 case 'editmedia':
     $page='medialist';
     $id = isset($_REQUEST['id']) ? (int)$_REQUEST['id'] : 0;
-    USES_library_class_media();
-    $C = new MediaType($id);
+    $C = new Library\MediaType($id);
     if ($id == 0 && isset($_POST['name'])) {
         // Pick a field.  If it exists, then this is probably a rejected save
         $C->SetVars($_POST);
@@ -204,13 +185,8 @@ case 'medialist':
     $content .= LIBRARY_adminlist_MediaType();
     break;
 
-case 'other':
-    $content .= '<a href="' . LIBRARY_ADMIN_URL . 
-            '/index.php?mode=resetbuttons' . '">Reset All Buttons</a>' . "\n";
-    break;
-
 case 'pending':
-    $content .= LIBRARY_adminlist_Items(true);
+    $content .= LIBRARY_adminlist_Items(0, true);
     break;
 
 case 'itemlist':
@@ -239,14 +215,14 @@ exit;
 *
 *   @param  integer $cat_id     Optional category to restrict view
 */
-//function LIBRARY_adminlist_Items($cat_id=0)
-function LIBRARY_adminlist_Items($pending = false)
+function LIBRARY_adminlist_Items($cat_id = 0, $pending = false)
 {
     global $_CONF, $_CONF_LIB, $_TABLES, $LANG_LIB, $_USER, $LANG_ADMIN;
 
+    $display = '';
     $sql1 = "SELECT 
-                p.id, p.name, 
-                p.type, p.enabled, p.status, p.uid, 
+                p.id, p.name,
+                p.type, p.enabled, p.status, p.uid,
                 FROM_UNIXTIME(p.due) AS due,
                 c.cat_id, c.cat_name,
                 t.name AS typename,
@@ -339,19 +315,21 @@ function LIBRARY_adminlist_Items($pending = false)
     if ($cat_id > 0) {
         $def_filter = "WHERE c.cat_id='$cat_id'";
     } else {
-        //$def_filter = 'WHERE 1=1';
+        $def_filter = 'WHERE 1=1';
     }
-    $query_arr = array('table' => 'library.items',
+    $query_arr = array(
+        'table' => 'library.items',
         'sql' => $sql,
         'query_fields' => array('p.name', 
                             'p.description'),
         'default_filter' => $def_filter,
     );
-
     $text_arr = array(
-        'has_extras' => $pending ? false: true,
+        //'has_extras' => $pending ? false: true,
         'form_url' => LIBRARY_ADMIN_URL . '/index.php',
     );
+    $form_arr = array();
+    $filter = '';
 
     if (!isset($_REQUEST['query_limit']))
         $_GET['query_limit'] = 20;
@@ -362,7 +340,6 @@ function LIBRARY_adminlist_Items($pending = false)
 
     $display .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
     return $display;
-
 }
 
 
@@ -399,7 +376,8 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
         $retval .= COM_createLink($icon_arr['delete'],
             LIBRARY_ADMIN_URL. '/index.php?deleteitem=x&amp;id=' . $A['id'],
             array('onclick'=>'return confirm(\''.$LANG_LIB['conf_delitem'].'\');',
-                'title' => $LANG_ADMIN['delete'],
+                'title' => $LANG_LIB['deleteitem'],
+                'data-uk-tooltip' => '',
             )
         );
         break;
@@ -426,8 +404,7 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
             }
             $retval .= "<input type=\"checkbox\" $switch value=\"1\" name=\"ena_check\" 
                 id=\"togenabled{$A['id']}\"
-                onclick='LIBRARY_toggle(this,\"{$A['id']}\",\"enabled\",".
-                "\"item\",\"".LIBRARY_ADMIN_URL."\");'>".LB;
+                onclick='LIBR_toggle(this,\"{$A['id']}\",\"enabled\",\"item\");'>".LB;
             break;
         break;
 
@@ -447,15 +424,14 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
 
     case 'status':
         if ($fieldvalue == LIB_STATUS_OUT) {
-            if ($A['due'] < date('Y-m-d H:i:s')) {
+            if ($A['due'] < LIBRARY_now()) {
                 $icon = 'red.png';
                 $msg = $LANG_LIB['overdue'];
             } else {
                 $icon = 'off.png';
                 $msg = $LANG_LIB['not_available'];
             }
-        //} elseif (DB_count($_TABLES['library.waitlist'], 'item_id', $A['id']) > 0) {
-        } elseif ($A['wait_count'] > 0) {
+        } elseif (isset($A['wait_count']) && $A['wait_count'] > 0) {
             $icon = 'yellow.png';
             $msg = $LANG_LIB['waitlisted'];
         } elseif ($fieldvalue == LIB_STATUS_AVAIL) {
@@ -463,10 +439,12 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
             $msg = $LANG_LIB['available'];
         }
         $retval .= "<img src=\"" . LIBRARY_URL . "/images/{$icon}\"" .
-            "class=\"gl_mootip\" title=\"$msg\">\n";
+            "class=\"gl_mootip\" title=\"$msg\" data-uk-tooltip />\n";
         break;
 
     case 'due':
+        //$dt = new \Date($fieldvalue, $_CONF['timezone']);
+        //$retval .= $dt->toMySQL(true);
         if ($fieldvalue > '1970-01-01') {
             $retval .= $fieldvalue;
         }
@@ -539,7 +517,7 @@ function LIBRARY_adminMenu($mode='')
                     'text' => sprintf($new_item_span, $LANG_LIB['new_item']));
     }
 
-    /*if ($mode == 'catlist') {
+    if ($mode == 'catlist') {
         $menu_arr[] = array(
                     'url'  => LIBRARY_ADMIN_URL . '/index.php?mode=editcat',
                     'text' => $LANG_LIB['new_category']);
@@ -547,7 +525,7 @@ function LIBRARY_adminMenu($mode='')
         $menu_arr[] = array(
                     'url'  => LIBRARY_ADMIN_URL . '/index.php?mode=catlist',
                     'text' => $LANG_LIB['category_list']);
-    }*/
+    }
 
     if ($mode == 'medialist') {
         $menu_arr[] = array(
@@ -572,13 +550,11 @@ function LIBRARY_adminMenu($mode='')
 /**
 *   Category Admin List View.
 */
-function X_LIBRARY_adminlist_Category()
+function LIBRARY_adminlist_Category()
 {
     global $_CONF, $_CONF_LIB, $_TABLES, $LANG_LIB, $_USER, $LANG_ADMIN;
 
-    // Actually used by LIBRARY_getAdminField_Category()
-    USES_library_class_category();
- 
+    $display = ''; 
     $sql = "SELECT 
                 cat.cat_id, cat.cat_name, cat.description, cat.enabled,
                 parent.cat_name as pcat
@@ -591,30 +567,32 @@ function X_LIBRARY_adminlist_Category()
                 'field' => 'cat_id', 'sort' => true),
         array('text' => $LANG_ADMIN['edit'], 
                 'field' => 'edit', 'sort' => false),
+        array('text' => $LANG_ADMIN['enabled'], 
+                'field' => 'enabled', 'sort' => false),
         array('text' => $LANG_LIB['category'], 
                 'field' => 'cat_name', 'sort' => true),
         array('text' => $LANG_LIB['description'],
                 'field' => 'description', 'sort' => true),
         array('text' => $LANG_LIB['parent_cat'],
                 'field' => 'pcat', 'sort' => true),
+        array('text' => $LANG_ADMIN['delete'], 
+                'field' => 'delete', 'sort' => false),
     );
+    $display .= COM_startBlock('', '', COM_getBlockTemplate('_admin_block', 'header'));
 
     $defsort_arr = array('field' => 'cat_id',
             'direction' => 'asc');
-
-    $display .= COM_startBlock('', '', COM_getBlockTemplate('_admin_block', 'header'));
-
     $query_arr = array('table' => 'library.categories',
         'sql' => $sql,
         'query_fields' => array('cat.name', 'cat.description'),
         'default_filter' => 'WHERE 1=1',
     );
-
     $text_arr = array(
         'has_extras' => true,
         'form_url' => LIBRARY_ADMIN_URL . '/index.php',
     );
-
+    $form_arr = array();
+    $filter = '';
     if (!isset($_REQUEST['query_limit']))
         $_GET['query_limit'] = 20;
 
@@ -624,7 +602,6 @@ function X_LIBRARY_adminlist_Category()
 
     $display .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
     return $display;
-
 }
 
 
@@ -650,28 +627,36 @@ function LIBRARY_getAdminField_Category($fieldname, $fieldvalue, $A, $icon_arr)
                 $icon_arr['edit'],
                 LIBRARY_ADMIN_URL . "/index.php?mode=editcat&amp;id={$A['cat_id']}"
             ) . "</span>\n";
-        if ($A['enabled'] == 1) {
+        break;
+
+    case 'enabled':
+        $chk = $fieldvalue == 1 ? 'checked="checked"' : '';
+        /*if ($A['enabled'] == 1) {
             $ena_icon = 'on.png';
             $enabled = 1;
         } else {
             $ena_icon = 'off.png';
             $enabled = 0;
-        }
-        $retval .= "<span id=togenabled{$A['cat_id']}>\n" .
+        }*/
+        $retval .= "<input type=\"checkbox\" $chk value=\"1\" name=\"ena_check\" 
+                id=\"togenabled{$A['cat_id']}\" class=\"tooltip\" title=\"Enable/Disable\"
+                onclick='LIBR_toggle(this,\"{$A['cat_id']}\",\"{$fieldname}\",".
+                "\"category\");' />" . LB;
+         /*$retval .= "<input type=\"checkbox\" $chk  span id=togenabled{$A['cat_id']}>\n" .
                 "<img src=\"" . LIBRARY_URL . "/images/{$ena_icon}\" " .
-                "onclick='PP_toggle({$enabled}, \"{$A['cat_id']}\", " .
-                    "\"enabled\", \"category\", \"" . LIBRARY_ADMIN_URL . "\");'>\n" .
-                "</span>\n";
-        if (!Category::isUsed($A['cat_id'])) {
-            $retval .= COM_createLink(COM_createImage(
-                    LIBRARY_URL . '/images/deleteitem.png',
-                    'Delete this item',
+                "onclick='LIBR_toggle({$fieldvalue}, \"{$A['cat_id']}\", " .
+                    "\"enabled\", \"category\");'>" .
+                "</span>\n";*/
+        break;
+
+    case 'delete':
+        if (!Library\Category::isUsed($A['cat_id'])) {
+            $retval .= COM_createLink($icon_arr['delete'],
+                LIBRARY_ADMIN_URL. '/index.php?deletecat&id=' . $A['cat_id'],
                 array('class'=>'gl_mootip',
                     'onclick'=>'return confirm(\'Do you really want to delete this item?\');',
                     'title' => 'Delete this item',
-                )),
-                LIBRARY_ADMIN_URL. '/index.php?mode=deletecat&id=' . $A['cat_id']
-            );
+                ));
         }
         break;
 
@@ -679,7 +664,6 @@ function LIBRARY_getAdminField_Category($fieldname, $fieldvalue, $A, $icon_arr)
         $retval = htmlspecialchars($fieldvalue);
         break;
     }
-
     return $retval;
 }
 
@@ -691,9 +675,7 @@ function LIBRARY_adminlist_MediaType()
 {
     global $_CONF, $_CONF_LIB, $_TABLES, $LANG_LIB, $_USER, $LANG_ADMIN;
 
-    // Actually used by LIBRARY_getAdminField_Category()
-    USES_library_class_media();
- 
+    $display = '';
     $sql = "SELECT  *
             FROM {$_TABLES['library.types']} ";
 
@@ -725,12 +707,12 @@ function LIBRARY_adminlist_MediaType()
         'query_fields' => array('name'),
         'default_filter' => 'WHERE 1=1',
     );
-
     $text_arr = array(
         'has_extras' => true,
         'form_url' => LIBRARY_ADMIN_URL . '/index.php',
     );
-
+    $form_arr = array();
+    $filter = '';
     if (!isset($_REQUEST['query_limit']))
         $_GET['query_limit'] = 20;
 
@@ -768,7 +750,7 @@ function LIBRARY_getAdminField_MediaType($fieldname, $fieldvalue, $A, $icon_arr)
         break;
 
     case 'delete':
-        if (!MediaType::isUsed($A['id'])) {
+        if (!Library\MediaType::isUsed($A['id'])) {
             $retval .= COM_createLink($icon_arr['delete'],
                 LIBRARY_ADMIN_URL. '/index.php?deletemedia=x&id=' . $A['id'],
             array('onclick'=>'return confirm(\''.$LANG_LIB['conf_delitem'].'\');',
@@ -791,13 +773,9 @@ function LIBRARY_getAdminField_MediaType($fieldname, $fieldvalue, $A, $icon_arr)
 
 function LIBRARY_checkoutForm($id)
 {
-    global $_CONF, $_EV_CONF;
+    global $_CONF, $LANG_LIB, $_CONF_LIB;
 
-    USES_library_class_item();
-
-    $retval = '';
-
-    $I = new LibraryItem($id);
+    $I = new Library\Item($id);
     $item_id = $I->id;
     if ($item_id == '') {
         return 'Invalid Item Selected';
@@ -807,10 +785,11 @@ function LIBRARY_checkoutForm($id)
     // the calendar popup, so make sure a corresponding language file
     // exists.  Default to English if not found.
     $iso_lang = $_CONF['iso_lang'];
-    if (!is_file($_CONF['path_html'] . $_EV_CONF['pi_name'] . 
+    if (!is_file($_CONF['path_html'] . $_CONF_LIB['pi_name'] . 
         '/js/calendar/lang/calendar-' . $iso_lang . '.js')) {
         $iso_lang = 'en';
     }
+    if ($I->maxcheckout < 1) $I->maxcheckout = (int)$_CONF_LIB['maxcheckout'];
     $T = new Template(LIBRARY_PI_PATH . '/templates');
     $T->set_file('form', 'checkout_form.thtml');
     $T->set_var(array(
@@ -821,13 +800,11 @@ function LIBRARY_checkoutForm($id)
         'item_name'     => $I->name,
         'item_desc'     => $I->description,
         'user_select'   => LIBRARY_userSelect($item_id),
-        'due'           => date('Y-m-d', 
-                            time() + ($I->maxcheckout * 86400)),
+        'due'           => LIBRARY_dueDate($I->maxcheckout),
         'iso_lang'      => $iso_lang,
     ) );
-    
-    $retval .= $T->parse('', 'form');
-    return $retval;
+    $T->parse('output', 'form');
+    return $T->finish($T->get_var('output'));
 }
 
 
@@ -881,8 +858,7 @@ function LIBRARY_history($item_id)
 {
     global $_CONF, $_CONF_LIB, $_TABLES, $LANG_LIB, $_USER;
 
-    USES_lib_admin();
-
+    $display = '';
     $item_id = COM_sanitizeId($item_id, false);
     $sql = "SELECT 
             t.*, 
@@ -931,22 +907,20 @@ function LIBRARY_history($item_id)
             'query_fields' => array(),
             'default_filter' => '',
         );
-
     $text_arr = array(
         'has_extras' => false,
-        'form_url' => $base_url . '/index.php?mode=history',
+        'form_url' => $base_url . '/index.php?history',
     );
-
+    $form_arr = array();
+    $filter = '';
     if (!isset($_REQUEST['query_limit']))
         $_GET['query_limit'] = 20;
 
     $display .= ADMIN_list('library', 'LIBRARY_getTransHistoryField',
             $header_arr, $text_arr, $query_arr, $defsort_arr,
-            $filter, $this, '', $form_arr);
-
+            $filter, '', '', $form_arr);
     $display .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
     return $display;
-
 }
 
 
@@ -998,8 +972,5 @@ function LIBRARY_getTransHistoryField($fieldname, $fieldvalue, $A, $icon_arr)
 
     return $retval;
 }
-
-
-
 
 ?>

@@ -1,6 +1,6 @@
 <?php
 /**
-*   Class to manage product categories
+*   Class to manage library item categories
 *
 *   @author     Lee Garner <lee@leegarner.com>
 *   @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
@@ -10,13 +10,13 @@
 *               GNU Public License v2 or later
 *   @filesource
 */
-
+namespace Library;
 
 /**
 *   Class for categories
 *   @package library
 */
-class LibraryCategory
+class Category
 {
     /** Property fields.  Accessed via Set() and Get()
     *   @var array */
@@ -42,7 +42,7 @@ class LibraryCategory
     *
     *   @param integer $id Optional type ID
     */
-    public function __construct($id=0)
+    public function __construct($id=0, $data=NULL)
     {
         $this->properties = array();
         //$this->button_types = array('buy_now', 'add_cart'); // TODO
@@ -61,15 +61,20 @@ class LibraryCategory
             $this->perm_group = 3;
             $this->perm_members = 2;
             $this->perm_anon = 2;
-            $this->image = '';
+            //$this->image = '';
             $this->enabled = 1;
         } else {
             $this->cat_id = $id;
-            if (!$this->Read()) {
+            if ($data !== NULL) {
+                $this->SetVars($data, true);
+                $this->isNew = false;
+            } elseif ($this->Read()) {
+                $this->isNew = false;
+            } else {
                 $this->cat_id = 0;
+                $this->isNew = true;
             }
         }
-
         $this->isAdmin = SEC_hasRights('library.admin') ? 1 : 0;
     }
 
@@ -97,8 +102,9 @@ class LibraryCategory
             break;
 
         case 'cat_name':
+        case 'disp_name':
         case 'description':
-        case 'image':
+        //case 'image':
             // String values
             $this->properties[$var] = trim($value);
             break;
@@ -136,7 +142,7 @@ class LibraryCategory
     *
     *   @param array $row Array of values, from DB or $_POST
     */
-    public function SetVars($row)
+    public function setVars($row)
     {
         if (!is_array($row)) return;
 
@@ -145,14 +151,15 @@ class LibraryCategory
         $this->description = $row['description'];
         $this->enabled = $row['enabled'];
         $this->cat_name = $row['cat_name'];
-        $this->perm_owner = $row['perm_owner'];
-        $this->perm_group = $row['perm_group'];
-        $this->perm_members = $row['perm_members'];
-        $this->perm_anon = $row['perm_anon'];
-        $this->keywords = $row['keywords'];
-        $this->image = $row['image'];
-        $this->group_id = $row['group_id'];
-        $this->owner_id = $row['owner_id'];
+        $this->disp_name = isset($row['disp_name']) ? $row['disp_name'] : $row['cat_name'];
+        //$this->perm_owner = $row['perm_owner'];
+        //$this->perm_group = $row['perm_group'];
+        //$this->perm_members = $row['perm_members'];
+        //$this->perm_anon = $row['perm_anon'];
+        //$this->keywords = $row['keywords'];
+        //$this->image = $row['image'];
+        //$this->group_id = $row['group_id'];
+        //$this->owner_id = $row['owner_id'];
     }
 
 
@@ -176,11 +183,11 @@ class LibraryCategory
         $result = DB_query("SELECT * 
                     FROM {$_TABLES['library.categories']} 
                     WHERE cat_id='$id'");
-        if (!$result || DB_numRows($result != 1)) {
+        if (!$result || DB_numRows($result) != 1) {
             return false;
         } else {
             $row = DB_fetchArray($result, false);
-            $this->SetVars($row);
+            $this->setVars($row);
             $this->isNew = false;
             return true;
         }
@@ -196,17 +203,16 @@ class LibraryCategory
     public function Save($A = array())
     {
         global $_TABLES, $_CONF_LIB;
-        //USES_library_class_categoryimage();
 
         if (is_array($A)) {
-            $this->SetVars($A);
+            $this->setVars($A);
         }
 
         // Handle image uploads.
         // We don't want to delete the existing image if one isn't 
         // uploaded, we should leave it unchanged.  So we'll first 
         // retrieve the existing image filename, if any.
-        if (!$this->isNew) {
+        /*if (!$this->isNew) {
             $img_filename = DB_getItem($_TABLES['library.categories'], 
                         'image', "cat_id={$this->cat_id}");
         } else {
@@ -229,27 +235,42 @@ class LibraryCategory
             }
         }
         $this->image = $img_filename;
+        */
 
         // Insert or update the record, as appropriate, as long as a
         // previous error didn't occur.
         if (empty($this->Errors)) {
-            if (!$this->isNew) {
-                $status = $this->Update();
+            if ($this->isNew) {
+                $sql1 = "INSERT INTO {$_TABLES['library.categories']} SET ";
+                $sql3 = '';
             } else {
-                $status = $this->Insert();
+                $sql1 = "UPDATE {$_TABLES['library.categories']} SET ";
+                $sql3 = " WHERE cat_id = {$this->cat_id}";
             }
-
-            if (!$status) {
+            $sql2 = "parent_id='{$this->parent_id}',
+                cat_name='" . DB_escapeString($this->cat_name) . "',
+                description='" . DB_escapeString($this->description) . "',
+                enabled='{$this->enabled}',
+                owner_id='{$this->owner_id}',
+                group_id='{$this->group_id}',
+                perm_owner='{$this->perm_owner}',
+                perm_group='{$this->pern_group}',
+                perm_members='{$this->perm_members}',
+                perm_anon='{$this->perm_anon}'";
+//                image='" . DB_escapeString($this->image) . "'";
+            DB_query($sql1 . $sql2 . $sql3, 1);
+            if (DB_error()) {
                 $this->AddError('Failed to insert or update record');
             }
         }
 
         if (empty($this->Errors)) {
+            self::rebuildTree(1, 1);
+            PLG_itemSaved($this->cat_id, 'classifieds_category');
             return true;
         } else {
             return false;
         }
-
     }
 
 
@@ -260,14 +281,13 @@ class LibraryCategory
     {
         global $_TABLES;
 
-        if ($this->cat_id <= 0)
+        // Can't delete root category
+        if ($this->cat_id <= 1)
             return false;
 
         $this->DeleteImage();
-
         DB_delete($_TABLES['library.categories'],
                 'cat_id', $this->cat_id);
-
         $this->cat_id = 0;
         return true;
     }
@@ -292,80 +312,6 @@ class LibraryCategory
                 SET image=''
                 WHERE cat_id='{$this->cat_id}'");
         $this->image = '';
-    }
-
-
-    /**
-    *   Adds the current values to the databae as a new record
-    *
-    *   @return boolean     True on success, False on failure
-    */
-    public function Insert()
-    {
-        global $_TABLES;
-
-        if (!$this->isValidRecord()) {
-            return false;
-        }
-
-        $sql = "INSERT INTO
-                {$_TABLES['library.categories']}
-                (parent_id, cat_name, description,  enabled,
-                owner_id, group_id,
-                perm_owner, perm_group, perm_members, perm_anon,
-                image)
-            VALUES (
-                '{$this->parent_id}', 
-                '" . glfPrepareForDB($this->cat_name) . "', 
-                '" . glfPrepareForDB($this->description) . "', 
-                '" . glfPrepareForDB($this->enabled) . "', 
-                '{$this->owner_id}',
-                '{$this->group_id}',
-                '{$this->perm_owner}',
-                '{$this->perm_group}',
-                '{$this->perm_members}',
-                '{$this->perm_anon}',
-                '" . glfPrepareForDB($this->image) . "'
-            )";
-        //echo $sql;die;
-        DB_query($sql);
-        $this->cat_id = DB_insertID();
-        return true;
-    }
-
-
-    /**
-    *   Updates the database for the current product
-    *
-    *   @return boolean     True on success, False on Failure
-    */
-    public function Update()
-    {
-        global $_TABLES;
-
-        // Make sure the record has all necessary fields.
-        if (!$this->isValidRecord())
-            return false;
-
-        $sql = "UPDATE 
-                {$_TABLES['library.categories']}
-            SET
-                parent_id='{$this->parent_id}',
-                cat_name='" . glfPrepareForDB($this->cat_name) . "',
-                description='" . glfPrepareForDB($this->description) . "',
-                enabled='{$this->enabled}',
-                owner_id='{$this->owner_id}',
-                group_id='{$this->group_id}',
-                perm_owner='{$this->perm_owner}',
-                perm_group='{$this->pern_group}',
-                perm_members='{$this->perm_members}',
-                perm_anon='{$this->perm_anon}',
-                image='" . glfPrepareForDB($this->image) . "'
-            WHERE
-                cat_id='{$this->cat_id}'";
-        //echo $sql;die;
-        DB_query($sql);
-        return true;
     }
 
 
@@ -395,42 +341,21 @@ class LibraryCategory
     {
         global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB;
 
-        $T = new Template(LIBRARY_PI_PATH . '/templates');
-        $T->set_file(array('category' => 'category_form.thtml'));
-
-        $id = $this->cat_id;
-
-        // If we have a nonzero category ID, then we edit the existing record.
-        // Otherwise, we're creating a new item.  Also set the $not and $items
-        // values to be used in the parent category selection accordingly.
-        if ($id > 0) {
-            //if (!$this->Read($id)) {
-            //    return LIBRARY_errorMessage($LANG_LIB['invalid_category_id'], 'info');
-            //}
-            //$id = $this->cat_id;
+        if ($this->cat_id > 0) {
             $retval = COM_startBlock($LANG_LIB['edit'] . ': ' . $this->cat_name);
-            $T->set_var('cat_id', $id);
-            $not = 'NOT';
-            $items = $id;
         } else {
-            //$id = $this->Get('cat_id');
             $retval = COM_startBlock($LANG_LIB['create_category']);
-            $T->set_var('cat_id', '');
-            $not = '';
-            $items = '';
         }
 
+        $T = new \Template(LIBRARY_PI_PATH . '/templates');
+        $T->set_file(array('category' => 'category_form.thtml'));
         $T->set_var(array(
-            'site_url'      => $_CONF['site_url'],
+            'cat_id'        => $this->cat_id,
             'action_url'    => LIBRARY_ADMIN_URL,
             'cat_name'      => $this->cat_name,
             'description'   => $this->description,
-            'ena_chk'       => $this->enabled == 1 ? 
-                                    'checked="checked"' : '',
-            'parent_sel'    => LIBRARY_recurseCats(
-                                    'LIBRARY_callbackCatOptionList',
-                                    $this->parent_id, 0, '', 
-                                    $not, $items),
+            'ena_chk'       => $this->enabled == 1 ? 'checked="checked"' : '',
+            'parent_sel' => self::buildSelection(self::getParent($this->cat_id), $this->cat_id),
         ) );
 
         if ($this->image != '') {
@@ -472,8 +397,7 @@ class LibraryCategory
 
         $retval .= COM_endBlock();
         return $retval;
-
-    }   // function showForm()
+    }
 
 
     /**
@@ -483,7 +407,7 @@ class LibraryCategory
     *   @param  integer $value New value to set
     *   @return         New value, or old value upon failure
     */
-    private function _toggle($oldvalue, $varname, $id=0)
+    private static function _toggle($oldvalue, $varname, $id=0)
     {
         global $_TABLES;
 
@@ -519,17 +443,14 @@ class LibraryCategory
     *   @param  integer $value New value to set
     *   @return         New value, or old value upon failure
     */
-    public function toggleEnabled($oldvalue, $id=0)
+    public static function toggleEnabled($oldvalue, $id=0)
     {
         $oldvalue = $oldvalue == 0 ? 0 : 1;
         $id = (int)$id;
         if ($id == 0) {
-            if (is_object($this))
-                $id = $this->cat_id;
-            else
-                return $oldvalue;
+            return $oldvalue;
         }
-        return LibraryCategory::_toggle($oldvalue, 'enabled', $id);
+        return self::_toggle($oldvalue, 'enabled', $id);
     }
 
 
@@ -540,28 +461,18 @@ class LibraryCategory
     *
     *   @return boolean True if used, False if not
     */
-    function isUsed($cat_id=0)
+    public static function isUsed($cat_id=0)
     {
         global $_TABLES;
 
-        if ($cat_id == 0 && is_object($this)) {
-            $cat_id = $this->cat_id;
-        } else {
-            $cat_id = (int)$cat_id;
-        }
+        // Always treat root category as in_use
+        if ($cat_id == 1) return true;
 
         // Check if any products are under this category
         //if (DB_count($_TABLES['library.prodXcat'], 'cat_id', $cat_id) > 0) {
         if (DB_count($_TABLES['library.items'], 'cat_id', $cat_id) > 0) {
             return true;
         }
-
-        // Check if any categories are under this one.
-        if (DB_count($_TABLES['library.categories'], 
-                        'parent_id', $cat_id) > 0) {
-            return true;
-        }
-
         return false;
     }
 
@@ -593,8 +504,148 @@ class LibraryCategory
         return $retval;
     }
 
- 
-}   // class LibraryCategory
 
+    /**
+    *   Get the ID of the immediate parent for a given category.
+    *
+    *   @param  integer $cat_id     Current category ID
+    *   @return integer     ID of parent category.
+    */
+    public static function getParent($cat_id)
+    {
+        global $_TABLES;
+
+        $cat_id = (int)$cat_id;
+        $parent_id = 0;
+        $res = DB_query("SELECT parent.cat_id, parent.cat_name
+                FROM {$_TABLES['library.categories']} AS node,
+                    {$_TABLES['library.categories']} AS parent
+                WHERE node.lft BETWEEN parent.lft AND parent.rgt
+                AND node.cat_id = $cat_id
+                ORDER BY parent.lft DESC LIMIT 2");
+        while ($A = DB_fetchArray($res, false)) {
+            $parent_id = $A['cat_id'];
+        }
+        return ($parent_id == $cat_id) ? NULL : $parent_id;
+    }
+ 
+
+    /**
+    *   Recurse through the category table building an option list
+    *   sorted by id.
+    *
+    *   @param integer  $sel        Category ID to be selected in list
+    *   @param integer  $root       Root category ID
+    *   @param string   $char       Indenting characters
+    *   @param string   $not        'NOT' to exclude $items, '' to include
+    *   @param string   $items      Optional comma-separated list of items to include or exclude
+    *   @return string              HTML option list, without <select> tags
+    */
+    public static function buildSelection($sel=0, $self=0)
+    {
+        global $_TABLES;
+
+        $str = '';
+        $root = 1;
+        $Cats = self::getTree($root);
+        foreach ($Cats as $Cat) {
+            if ($Cat->cat_id == $root) {
+                continue;       // Don't include the root category
+            } elseif ($self == $Cat->cat_id) {
+                // Exclude self when building parent list
+                $disabled = 'disabled="disabled"';
+            } elseif (SEC_hasAccess($Cat->owner_id, $Cat->group_id,
+                    $Cat->perm_owner, $Cat->perm_group,
+                    $Cat->perm_members, $Cat->perm_anon) < 3) {
+                $disabled = 'disabled="disabled"';
+            } else {
+                $disabled = '';
+            }
+            $selected = $Cat->cat_id == $sel ? 'selected="selected"' : '';
+            $str .= "<option value=\"{$Cat->cat_id}\" $selected $disabled>";
+            $str .= $Cat->disp_name;
+            $str .= "</option>\n";
+        }
+        return $str;
+    }
+
+
+    /**
+    *   Read all the categories into a static array.
+    *
+    *   @param  integer $root   Root category ID
+    *   @return array           Array of category objects
+    */
+    public static function getTree($root=0, $prefix='&nbsp;')
+    {
+        global $_TABLES;
+
+        $All = array();
+
+        if (!empty($root)) {
+            $result = DB_query("SELECT lft, rgt FROM {$_TABLES['library.categories']}
+                        WHERE cat_id = $root");
+            $row = DB_fetchArray($result, false);
+            $between = ' AND parent.lft BETWEEN ' . (int)$row['lft'] .
+                        ' AND ' . (int)$row['rgt'];
+        } else {
+            $between = '';
+        }
+
+        $prefix = DB_escapeString($prefix);
+        $sql = "SELECT node.*, CONCAT( REPEAT( '$prefix', (COUNT(parent.cat_name) - 1) ), node.cat_name) AS disp_name
+            FROM {$_TABLES['library.categories']} AS node,
+                {$_TABLES['library.categories']} AS parent
+            WHERE node.lft BETWEEN parent.lft AND parent.rgt
+            $between
+            GROUP BY node.cat_name
+            ORDER BY node.lft";
+        //echo $sql;die;
+        $res = DB_query($sql);
+        while ($A = DB_fetchArray($res, false)) {
+            $All[$A['cat_id']] = new self($A['cat_id'], $A);
+        }
+        return $All;
+    }
+
+
+    /**
+    *   Rebuild the MPT tree starting at a given parent and "left" value
+    *
+    *   @param  integer $parent     Starting category ID
+    *   @param  integer $left       Left value of the given category
+    *   @return integer         New Right value (only when called recursively)
+    */
+    public static function rebuildTree($parent, $left)
+    {
+        global $_TABLES;
+
+        // the right value of this node is the left value + 1
+        $right = $left + 1;
+
+        // get all children of this node
+        $sql = "SELECT cat_id FROM {$_TABLES['library.categories']}
+                WHERE parent_id ='$parent'";
+        $result = DB_query($sql);
+        while ($row = DB_fetchArray($result, false)) {
+            // recursive execution of this function for each
+            // child of this node
+            // $right is the current right value, which is
+            // incremented by the rebuild_tree function
+            $right = self::rebuildTree($row['cat_id'], $right);
+        }
+
+        // we've got the left value, and now that we've processed
+        // the children of this node we also know the right value
+        $sql1 = "UPDATE {$_TABLES['library.categories']}
+                SET lft = '$left', rgt = '$right'
+                WHERE cat_id = '$parent'";
+        DB_query($sql1);
+
+        // return the right value of this node + 1
+        return $right + 1;
+    }
+
+}   // class Category
 
 ?>

@@ -75,7 +75,7 @@ function X_LIBRARY_history($admin = false, $uid = '')
     $defsort_arr = array('field' => 'p.purchase_date',
             'direction' => 'asc');
 
-    $display .= COM_startBlock('', '', 
+    $display = COM_startBlock('', '', 
                 COM_getBlockTemplate('_admin_block', 'header'));
 
     $query_arr = array('table' => 'library.trans',
@@ -172,13 +172,11 @@ function LIBRARY_ItemList()
 {
     global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB, $_USER, $_PLUGINS;
 
-    USES_library_class_item();
-
     $T = new Template(LIBRARY_PI_PATH . '/templates');
     $T->set_file('item', 'item_list.thtml');
 
     $sortby = 'name';
-    $sortdir = $_REQUEST['sortdir'] == 'DESC' ? 'DESC' : 'ASC';
+    $sortdir = isset($_GET['sortdir']) && $_GET['sortdir'] == 'DESC' ? 'DESC' : 'ASC';
     $url_opts = '&sortdir=' . $sortdir;
     $med_type = isset($_REQUEST['type']) ? (int)$_REQUEST['type'] : 0;
     $url_opts .= '&type=' . $med_type;
@@ -236,10 +234,7 @@ function LIBRARY_ItemList()
             $count = 0;
 
         // Make sure page requested is reasonable, if not, fix it
-        if ($_REQUEST['page'] <= 0) {
-            $_REQUEST['page'] = 1;
-        }
-        $page = (int)$_REQUEST['page'];
+        $page = isset($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
         $start_limit = ($page - 1) * $_CONF_LIB['items_per_page'];
         if ($start_limit > $count) {
             $page = ceil($count / $_CONF_LIB['items_per_page']);
@@ -253,7 +248,7 @@ function LIBRARY_ItemList()
     // Re-execute query with the limit clause in place
     $res = DB_query('SELECT DISTINCT p.* ' . $sql);
 
-    $T->set_var('sortby_options', $sortby_options);
+    //$T->set_var('sortby_options', $sortby_options);
     if ($sortdir == 'DESC') {
         $T->set_var('sortdir_desc_sel', ' selected="selected"');
     } else {
@@ -265,7 +260,7 @@ function LIBRARY_ItemList()
     ) );
 
     // Create an empty product object
-    $P = new LibraryItem();
+    $P = new Library\Item();
 
     if ($_CONF_LIB['ena_ratings'] == 1) {
         $PP_ratedIds = RATING_getRatedIds('library');
@@ -350,10 +345,7 @@ function LIBRARY_ItemList()
     }
 
     $T->parse('output', 'item');
-    $display .= $T->finish($T->get_var('output'));
-
-    return $display;
-
+    return $T->finish($T->get_var('output'));
 }
 
 
@@ -369,7 +361,6 @@ function LIBRARY_popupMsg($msg)
     $msg = htmlspecialchars($msg);
     $popup = COM_showMessageText($msg);
     return $popup;
-
 }
 
 
@@ -516,27 +507,21 @@ function LIBRARY_notifyWaitlist($id = '')
     if ($id == '')
         return;
 
-    // retrieve the ad info.
-    $result = DB_query("SELECT 
-            w.id, w.uid, w.item_id,
-            i.name, i.daysonhold,
-            u.email, u.language
-        FROM 
-            {$_TABLES['library.waitlist']} w
-        LEFT JOIN
-            {$_TABLES['library.items']} i
-            ON i.id = w.item_id
-        LEFT JOIN
-            {$_TABLES['users']} u
-            ON u.uid = w.uid
-        WHERE 
-            w.item_id='$id'
-        LIMIT 1");
+    // retrieve the first waitlisted user info. 
+    $sql = "SELECT w.id, w.uid, w.item_id, i.name, i.daysonhold,
+                u.email, u.language
+            FROM {$_TABLES['library.waitlist']} w
+            LEFT JOIN {$_TABLES['library.items']} i
+                ON i.id = w.item_id
+            LEFT JOIN {$_TABLES['users']} u
+                ON u.uid = w.uid
+            WHERE w.item_id='$id'
+            LIMIT 1";
+    $result = DB_query($sql);
     if (!$result || DB_numrows($result) < 1)
         return;
 
     $A = DB_fetchArray($result, false);
-
     $username = COM_getDisplayName($A['uid']);
     $daysonhold = (int)$A['daysonhold'] > 0 ? (int)$A['daysonhold'] : '';
 
@@ -675,9 +660,7 @@ function LIBRARY_loadLanguage($requested='')
             break;
         }
     }
-
     return $LANG_LIB;
 }
-
 
 ?>

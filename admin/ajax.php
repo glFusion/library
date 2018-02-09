@@ -1,16 +1,15 @@
 <?php
-//  $Id: ajax.php 2 2009-12-30 04:11:52Z root $
 /**
- *  Common AJAX functions.
- *
- *  @author     Lee Garner <lee@leegarner.com>
- *  @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
- *  @package    library
- *  @version    0.0.1
- *  @license    http://opensource.org/licenses/gpl-2.0.php 
- *  GNU Public License v2 or later
- *  @filesource
- */
+*   Common AJAX functions.
+*
+*   @author     Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
+*   @package    library
+*   @version    0.0.1
+*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*               GNU Public License v2 or later
+*   @filesource
+*/
 
 /** Include required glFusion common functions */
 require_once '../../../lib-common.php';
@@ -21,76 +20,50 @@ if (!SEC_hasRights('library.admin')) {
     COM_accessLog("User {$_USER['username']} tried to illegally access the classifieds admin ajax function.");
     exit;
 }
-
-switch ($_GET['action']) {
+$newval = NULL;
+switch ($_POST['action']) {
 case 'toggle':
-    switch ($_GET['component']) {
+    switch ($_POST['component']) {
     case 'item':
-        USES_library_class_item();
-
-        switch ($_GET['type']) {
+        switch ($_POST['type']) {
         case 'enabled':
-            $newval = LibraryItem::toggleEnabled($_REQUEST['oldval'], $_REQUEST['id']);
+            $newval = Library\Item::toggleEnabled($_POST['oldval'], $_POST['id']);
             break;
-
          default:
             exit;
         }
-
-        $img_url = LIBRARY_URL . '/images/';
-        $img_url .= $newval == 1 ? 'on.png' : 'off.png';
-
-        header('Content-Type: text/xml');
-        header("Cache-Control: no-cache, must-revalidate");
-        //A date in the past
-        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-
-        echo '<?xml version="1.0" encoding="ISO-8859-1"?>
-        <info>'. "\n";
-        echo "<newval>$newval</newval>\n";
-        echo "<id>{$_REQUEST['id']}</id>\n";
-        echo "<type>{$_REQUEST['type']}</type>\n";
-        echo "<component>{$_REQUEST['component']}</component>\n";
-        echo "<imgurl>$img_url</imgurl>\n";
-        echo "<baseurl>" . LIBRARY_ADMIN_URL . "</baseurl>\n";
-        echo "</info>\n";
         break;
-
     case 'category':
-        USES_library_class_category();
-
-        switch ($_GET['type']) {
+        switch ($_POST['type']) {
         case 'enabled':
-            $newval = Category::toggleEnabled($_REQUEST['oldval'], $_REQUEST['id']);
+            $newval = Library\Category::toggleEnabled($_POST['oldval'], $_POST['id']);
             break;
-
          default:
             exit;
         }
-
-        $img_url = LIBRARY_URL . '/images/';
-        $img_url .= $newval == 1 ? 'on.png' : 'off.png';
-
-        header('Content-Type: text/xml');
-        header("Cache-Control: no-cache, must-revalidate");
-        //A date in the past
-        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
-
-        echo '<?xml version="1.0" encoding="ISO-8859-1"?>
-        <info>'. "\n";
-        echo "<newval>$newval</newval>\n";
-        echo "<id>{$_REQUEST['id']}</id>\n";
-        echo "<type>{$_REQUEST['type']}</type>\n";
-        echo "<component>{$_REQUEST['component']}</component>\n";
-        echo "<imgurl>$img_url</imgurl>\n";
-        echo "<baseurl>" . LIBRARY_ADMIN_URL . "</baseurl>\n";
-        echo "</info>\n";
         break;
-
     default:
         exit;
     }
+}
 
+if ($newval !== NULL) {
+    if ($newval != $_POST['oldval']) {
+        $message = $LANG_LIB['item_updated'];
+    } else {
+        $message = $LANG_LIB['item_nochange'];
+    }
+    $retval = array(
+            'id'    => $_POST['id'],
+            'newval' => $newval,
+            'statusMessage' => $message,
+    );
+
+    header('Content-Type: application/json; charset=utf-8');
+    header('Cache-Control: no-cache, must-revalidate');
+    //A date in the past
+    header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+    echo json_encode($retval);
 }
 
 ?>

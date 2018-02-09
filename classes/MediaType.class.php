@@ -10,7 +10,7 @@
 *               GNU Public License v2 or later
 *   @filesource
 */
-
+namespace Library;
 
 /**
 *   Class for media types
@@ -137,7 +137,7 @@ class MediaType
         $result = DB_query("SELECT * 
                     FROM {$_TABLES['library.types']} 
                     WHERE id='$id'");
-        if (!$result || DB_numRows($result != 1)) {
+        if (!$result || DB_numRows($result) != 1) {
             return false;
         } else {
             $row = DB_fetchArray($result, false);
@@ -214,7 +214,7 @@ class MediaType
     {
         global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB;
 
-        $T = new Template(LIBRARY_PI_PATH . '/templates');
+        $T = new \Template(LIBRARY_PI_PATH . '/templates');
         $T->set_file(array('type' => 'mediatype_form.thtml'));
 
         $id = $this->id;
@@ -239,8 +239,7 @@ class MediaType
         $retval .= $T->parse('output', 'type');
         $retval .= COM_endBlock();
         return $retval;
-
-    }   // function showForm()
+    }
 
 
     /**
@@ -250,23 +249,15 @@ class MediaType
     *
     *   @return boolean True if used, False if not
     */
-    public function isUsed($id = 0)
+    public static function isUsed($id = 0)
     {
         global $_TABLES;
-
-        if ($id == 0 && is_object($this)) {
-            $id = $this->id;
-        } else {
-            $id = (int)$id;
-        }
 
         // Check if any products are under this media type 
         if (DB_count($_TABLES['library.items'], 'type', $id) > 0) {
             return true;
         }
-
         return false;
-
     }
 
 
