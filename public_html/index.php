@@ -28,35 +28,35 @@ USES_library_functions();
 // Ensure sufficient privs to read this page 
 library_access_check();
 
-/*$vars = array('msg' => 'text',
-              'category' => 'number' );
-library_filterVars($vars, $_REQUEST);*/
-
 $content = '';
-$expected = array('mode', 'addwait', 'rmvwait', 'thanks',
-    'history', 'detail', 'itemlist',
-);
-$action = 'view';       // Default action
-$view = '';
-foreach($expected as $provided) {
-    if (isset($_POST[$provided])) {
-        $action = $provided;
-        $actionval = $_POST[$provided];
-        break;
-    } elseif (isset($_GET[$provided])) {
-        $action = $provided;
-        $actionval = $_GET[$provided];
-        break;
+COM_setArgNames(array('action', 'id'));
+$action = COM_getArgument('action');
+$actionval = '';
+if (!empty($action)) {
+    $id = COM_sanitizeID(COM_getArgument('id'));
+} else {
+    $expected = array('mode', 'addwait', 'rmvwait', 'thanks',
+        'history', 'detail', 'itemlist',
+    );
+    $action = 'view';       // Default action
+    $view = '';
+    $id = isset($_REQUEST['id']) ? COM_sanitizeId($_REQUEST['id']) : '';
+    foreach($expected as $provided) {
+        if (isset($_POST[$provided])) {
+            $action = $provided;
+            $actionval = $_POST[$provided];
+            break;
+        } elseif (isset($_GET[$provided])) {
+            $action = $provided;
+            $actionval = $_GET[$provided];
+            break;
+        }
     }
 }
-
 if ($action == 'mode') $action = $actionval;
-//$mode = isset($_REQUEST['mode']) ? $_REQUEST['mode'] : 'list';
-//$page = isset($_REQUEST['page']) ? $_REQUEST['page'] : $mode;
-
 switch ($action) {
 case 'addwait':
-    $id = COM_sanitizeID($_REQUEST['id'], false);
+    $id = COM_sanitizeID($id, false);
     $uid = (int)$_USER['uid'];
     if (!empty($id) || $uid > 1) {
         $status = DB_query("INSERT INTO {$_TABLES['library.waitlist']}
@@ -70,7 +70,7 @@ case 'addwait':
     break;
 
 case 'rmvwait':
-    $id = COM_sanitizeID($_REQUEST['id'], false);
+    $id = COM_sanitizeID($id, false);
     $uid = (int)$_USER['uid'];
     if (!empty($id) || $uid > 1) {
         $status = DB_delete($_TABLES['library.waitlist'],
@@ -109,7 +109,7 @@ case 'history':
     break;
 
 case 'detail':
-    $P = new Library\Item($_REQUEST['id']);
+    $P = new Library\Item($id);
     $params = array();
     if (isset($_GET['query'])) $params[] = 'query=' . $_GET['query'];
     if (isset($_GET['sortdir'])) $params[] = 'sortdir=' . $_GET['sortdir'];
