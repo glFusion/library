@@ -20,14 +20,14 @@
   </div>
   <div style="clear:left;">
     {description}
-
+    <div style="clear:left;"></div>
     <!-- BEGIN Thumbnail -->
     <div style="float:left; width:{img_cell_width}px;">
-      <a href="{img_url}" target="_blank" rel="slimbox[product]">
+      <a href="{main_img_url}" target="_blank" rel="slimbox[product]" data-uk-lightbox="{group:'a'}">
         <img src="{tn_url}" border="0" 
             alt="{$LANG_LIB[click_to_enlarge]}" 
             title="{$LANG_LIB[click_to_enlarge]}"
-            class="gl_mootip">
+            class="gl_mootip" />
       </a>
     </div>
     <!-- END Thumbnail -->

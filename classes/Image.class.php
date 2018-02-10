@@ -79,112 +79,23 @@ class Image extends \upload
         global $_TABLES;
 
         parent::uploadFiles();
-
-        //$this->MakeThumbs();
-
-        foreach ($this->goodfiles as $filename) {
-            $sql = "INSERT INTO {$_TABLES['library.images']}
-                        (item_id, filename)
-                    VALUES (
-                        '{$this->item_id}', '".
-                        DB_escapeString($filename)."'
-                    )";
-            $result = DB_query($sql);
-            if (!$result) {
-                $this->addError("MakeThumbs() : Failed to insert {$filename}");
+        foreach ($this->_uploadedFiles as $idx=>$filepath) {
+            $filename = isset($this->_fileNames[$idx]) ? $this->_fileNames[$idx] : '';
+            if (!empty($filename)) {
+                $sql = "INSERT INTO {$_TABLES['library.images']}
+                            (item_id, filename)
+                        VALUES (
+                            '{$this->item_id}', '".
+                            DB_escapeString($filename)."'
+                        )";
+                $result = DB_query($sql);
+                if (!$result) {
+                    $this->addError("uploadFiles() : Failed to insert {$filename}");
+                }
             }
         }
  
     }
-
-
-    /**
-    *   Calculate the new dimensions needed to keep the image within
-    *   the provided width & height while preserving the aspect ratio.
-    *
-    *   @deprecated
-    *   @param string  $srcfile     Source filepath/name
-    *   @param integer $width       New width, in pixels
-    *   @param integer $height      New height, in pixels
-    *   @return array  $newwidth, $newheight
-    */
-    private function XreDim($srcfile, $width=0, $height=0)
-    {
-        list($s_width, $s_height) = @getimagesize($srcfile);
-
-        // get both sizefactors that would resize one dimension correctly
-        if ($width > 0 && $s_width > $width)
-            $sizefactor_w = (double) ($width / $s_width);
-        else
-            $sizefactor_w = 1;
-
-        if ($height > 0 && $s_height > $height)
-            $sizefactor_h = (double) ($height / $s_height);
-        else
-            $sizefactor_h = 1;
-
-        // Use the smaller factor to stay within the parameters
-        $sizefactor = min($sizefactor_w, $sizefactor_h);
-
-        $newwidth = (int)($s_width * $sizefactor);
-        $newheight = (int)($s_height * $sizefactor);
-
-        return array($newwidth, $newheight);
-    }
-
-    /**
-    *   Resize an image to the specified dimensions, placing the resulting
-    *   image in the specified location.  At least one of $newWidth or
-    *   $newHeight must be specified.
-    *
-    *   @deprecated
-    *   @return string      Blank if successful, error message otherwise.
-    */
-    private function X_MakeThumbs()
-    {
-        global $_CONF_LIB;
-
-        $thumbsize = (int)$_CONF_LIB['max_thumb_size'];
-        if ($thumbsize < 50) $thumbsize = 100;
-
-        if (!is_array($this->_fileNames))
-            return '';
-
-        foreach ($this->_fileNames as $filename) {
-            $src = "{$this->pathImage}/{$filename}";
-            $dst = "{$this->pathThumb}/{$filename}";
-
-            // If  parent::upload() dropped the file due to some restriction,
-            // then the source won't be there even though the file info is.
-            if (!file_exists($src))
-                continue;
-
-            // Calculate the new dimensions
-            list($dWidth,$dHeight) = 
-                $this->reDim($src, $thumbsize, $thumbsize);
-
-            if ($dWidth == 0 || $dHeight == 0) {
-                $this->_addError("MakeThumbs() $filename could not get dimensions");
-
-                return '';
-            }
-
-            // Returns an array, with [0] either true/false and [1] 
-            // containing a message.  For older versions of glFusion,
-            // we call Media Gallery's _mg_resizeImage() as a backup.  This
-            // won't work if MG isn't enabled.
-            list($retval, $msg) = IMG_resizeImage($src, $dst,  
-                                $dHeight, $dWidth, "image/jpeg", 0);
-
-            if ($retval != true)
-                $this->_addError("MakeThumbs() : $filename - $msg");
-            else
-                $this->goodfiles[] = $filename;
-        }
-
-        return '';
-
-    }   // function MakeThumbs()
 
 
     /**
@@ -198,10 +109,9 @@ class Image extends \upload
         if ($this->filename == '') {
             return;
         }
-
         $this->_deleteOneImage($this->pathImage);
-        //$this->_deleteOneImage($this->pathThumb);
     }
+
 
     /**
     *   Delete a single image using the current name and supplied path
@@ -213,6 +123,7 @@ class Image extends \upload
         if (file_exists($imgpath . '/' . $this->filename))
             unlink($imgpath . '/' . $this->filename);
     }
+
 
     /**
     *   Handles the physical file upload and storage.
@@ -240,8 +151,7 @@ class Image extends \upload
         // aren't good, but aren't fatal.
         $this->ReSize('thumb');
         $this->ReSize('disp');
-
-    }   // function Upload()
+    }
 
 
     /**

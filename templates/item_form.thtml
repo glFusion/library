@@ -108,7 +108,7 @@
     <!-- BEGIN PhotoRow -->
     <tr>
       <td align="left">
-        <a href="{img_url}" rel="slimbox[ad]"">
+        <a href="{img_url}" rel="slimbox[ad]" data-uk-lightbox="{group:'a'}">
           <img src="{thumb_url}">
         </a>
       </td>

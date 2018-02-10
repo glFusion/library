@@ -555,16 +555,18 @@ class Item
         if ($photocount > 0) {
             while ($prow = DB_fetchArray($photo)) {
                 $i++;
-                $T->set_var('img_url', 
-                    LIBRARY_URL . "/images/items/{$prow['filename']}");
-                $T->set_var('thumb_url', 
-                    LIBRARY_URL . "/images/items/thumbs/{$prow['filename']}");
-                $T->set_var('seq_no', $i);
-                $T->set_var('ad_id', $A['ad_id']);
-                $T->set_var('del_img_url', LIBRARY_ADMIN_URL . '/index.php' .
+                $filepath = $_CONF_LIB['image_dir'] . '/' . $prow['filename'];
+                $T->set_var(array(
+                    'img_url'   => LGLIB_ImageUrl($filepath, 800, 600), // todo
+                    'thumb_url' => LGLIB_ImageUrl($filepath,
+                            $_CONF_LIB['max_thumb_size'], $_CONF_LIB['max_thumb_size']),
+                    'seq_no'    => $i,
+                    'id'        => $this->id,
+                    'del_img_url' => LIBRARY_ADMIN_URL . '/index.php' .
                         '?mode=delete_img' .
                         "&img_id={$prow['img_id']}".
-                        "&id={$this->id}" );
+                        "&id={$this->id}",
+                ) );
                 $T->parse('PRow', 'PhotoRow', true);
             }
         } else {
@@ -576,9 +578,7 @@ class Item
         for ($j = $i; $j < $_CONF_LIB['max_images']; $j++) {
             $T->parse('UFLD', 'UploadFld', true);
         }
-
         $retval .= $T->parse('output', 'product');
-
         @setcookie($_CONF['cookie_name'].'fckeditor', 
                 SEC_createTokenGeneral('advancededitor'),
                 time() + 1200, $_CONF['cookie_path'],
@@ -748,12 +748,13 @@ class Item
         $T->set_var('have_photo', '');     // assume no photo available
         for ($i = 0; $prow = DB_fetchArray($img_res, false); $i++) {
             $img_file = "{$_CONF_LIB['image_dir']}/{$prow['filename']}";
-            $tn_url = LGLIB_ImageUrl($img_file, $_CONF_LIB['max_thumb_sise'],
+            $tn_url = LGLIB_ImageUrl($img_file, $_CONF_LIB['max_thumb_size'],
                     $_CONF_LIB['max_thumb_size']);
             if ($tn_url !== '') {
                 if ($i == 0) {
                     $T->set_var('main_img_url', LGLIB_ImageUrl($img_file,
-                        $_CONF_LIB['max_img_width'], $_CONF_LIB['max_img_height']));
+                        //$_CONF_LIB['max_img_width'], $_CONF_LIB['max_img_height']));
+                        800, 600));
                 }
                 $T->set_block('item', 'Thumbnail', 'PBlock');
                 $T->set_var('tn_url', $tn_url);
