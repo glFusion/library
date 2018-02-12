@@ -54,7 +54,7 @@ class Category
             $this->cat_id = 0;
             $this->parent_id = 0;
             $this->cat_name = '';
-            $this->description = '';
+            $this->dscp = '';
             $this->group_id = '';
             $this->owner_id = 0;
             $this->perm_owner = 3;
@@ -103,7 +103,7 @@ class Category
 
         case 'cat_name':
         case 'disp_name':
-        case 'description':
+        case 'dscp':
         //case 'image':
             // String values
             $this->properties[$var] = trim($value);
@@ -148,7 +148,7 @@ class Category
 
         $this->cat_id = $row['cat_id'];
         $this->parent_id = $row['parent_id'];
-        $this->description = $row['description'];
+        $this->dscp = $row['dscp'];
         $this->enabled = $row['enabled'];
         $this->cat_name = $row['cat_name'];
         $this->disp_name = isset($row['disp_name']) ? $row['disp_name'] : $row['cat_name'];
@@ -248,16 +248,17 @@ class Category
                 $sql3 = " WHERE cat_id = {$this->cat_id}";
             }
             $sql2 = "parent_id='{$this->parent_id}',
-                cat_name='" . DB_escapeString($this->cat_name) . "',
-                description='" . DB_escapeString($this->description) . "',
-                enabled='{$this->enabled}',
-                owner_id='{$this->owner_id}',
-                group_id='{$this->group_id}',
-                perm_owner='{$this->perm_owner}',
-                perm_group='{$this->pern_group}',
-                perm_members='{$this->perm_members}',
-                perm_anon='{$this->perm_anon}'";
+                cat_name = '" . DB_escapeString($this->cat_name) . "',
+                dscp = '" . DB_escapeString($this->dscp) . "',
+                enabled = '{$this->enabled}',
+                owner_id = '{$this->owner_id}',
+                group_id = '{$this->group_id}',
+                perm_owner = '{$this->perm_owner}',
+                perm_group = '{$this->pern_group}',
+                perm_members = '{$this->perm_members}',
+                perm_anon = '{$this->perm_anon}'";
 //                image='" . DB_escapeString($this->image) . "'";
+            //echo $sql1.$sql2.$sql3;die;
             DB_query($sql1 . $sql2 . $sql3, 1);
             if (DB_error()) {
                 $this->AddError('Failed to insert or update record');
@@ -266,7 +267,6 @@ class Category
 
         if (empty($this->Errors)) {
             self::rebuildTree(1, 1);
-            PLG_itemSaved($this->cat_id, 'classifieds_category');
             return true;
         } else {
             return false;
@@ -353,7 +353,7 @@ class Category
             'cat_id'        => $this->cat_id,
             'action_url'    => LIBRARY_ADMIN_URL,
             'cat_name'      => $this->cat_name,
-            'description'   => $this->description,
+            'dscp'          => $this->dscp,
             'ena_chk'       => $this->enabled == 1 ? 'checked="checked"' : '',
             'parent_sel' => self::buildSelection(self::getParent($this->cat_id), $this->cat_id),
             'candelete'     => !self::isUsed($this->cat_id),
@@ -614,6 +614,7 @@ class Category
         // get all children of this node
         $sql = "SELECT cat_id FROM {$_TABLES['library.categories']}
                 WHERE parent_id ='$parent'";
+COM_errorLog($sql);
         $result = DB_query($sql);
         while ($row = DB_fetchArray($result, false)) {
             // recursive execution of this function for each

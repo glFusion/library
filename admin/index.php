@@ -171,7 +171,7 @@ case 'edititem':
 case 'editcat':
     $id = isset($_REQUEST['id']) ? (int)$_REQUEST['id'] : 0;
     $C = new Library\Category($id);
-    if ($id == 0 && isset($_POST['description'])) {
+    if ($id == 0 && isset($_POST['dscp'])) {
         // Pick a field.  If it exists, then this is probably a rejected save
         $C->SetVars($_POST);
     }
@@ -333,7 +333,7 @@ function LIBRARY_adminlist_Items($cat_id = 0, $pending = false)
         'table' => 'library.items',
         'sql' => $sql,
         'query_fields' => array('p.name',
-                            'p.description'),
+                            'p.dscp'),
         'default_filter' => $def_filter,
     );
     $text_arr = array(
@@ -547,7 +547,7 @@ function LIBRARY_adminlist_Category()
 
     $display = '';
     $sql = "SELECT
-                cat.cat_id, cat.cat_name, cat.description, cat.enabled,
+                cat.cat_id, cat.cat_name, cat.dscp, cat.enabled,
                 parent.cat_name as pcat
             FROM {$_TABLES['library.categories']} cat
             LEFT JOIN {$_TABLES['library.categories']} parent
@@ -562,8 +562,8 @@ function LIBRARY_adminlist_Category()
                 'field' => 'enabled', 'sort' => false, 'align' => 'center'),
         array('text' => $LANG_LIB['category'],
                 'field' => 'cat_name', 'sort' => true),
-        array('text' => $LANG_LIB['description'],
-                'field' => 'description', 'sort' => true),
+        array('text' => $LANG_LIB['dscp'],
+                'field' => 'dscp', 'sort' => true),
         array('text' => $LANG_LIB['parent_cat'],
                 'field' => 'pcat', 'sort' => true),
         array('text' => $LANG_ADMIN['delete'],
@@ -575,7 +575,7 @@ function LIBRARY_adminlist_Category()
             'direction' => 'asc');
     $query_arr = array('table' => 'library.categories',
         'sql' => $sql,
-        'query_fields' => array('cat.name', 'cat.description'),
+        'query_fields' => array('cat.name', 'cat.dscp'),
         'default_filter' => 'WHERE 1=1',
     );
     $text_arr = array(
@@ -788,7 +788,7 @@ function LIBRARY_checkoutForm($id)
         'pi_url'        => LIBRARY_URL,
         'item_id'       => $item_id,
         'item_name'     => $I->name,
-        'item_desc'     => $I->description,
+        'item_desc'     => $I->dscp,
         'user_select'   => LIBRARY_userSelect($item_id),
         'due'           => LIBRARY_dueDate($I->maxcheckout)->format('Y-m-d'),
         'iso_lang'      => $iso_lang,

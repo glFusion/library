@@ -595,7 +595,7 @@ return;
 
     $search = new SearchCriteria($_CONF_LIB['pi_name'], $LANG_LIB['srchtitle']);
     $columns = array('p.name', 'p.dscp',
-                    'p.keywords', 'c.cat_name', 'c.description');
+                    'p.keywords', 'c.cat_name', 'c.dscp');
     list($sql, $ftsql) = $search->buildSearchSQL($keyType, $query, $columns, $sql);
     $search->setSQL($sql);
     return $search;
