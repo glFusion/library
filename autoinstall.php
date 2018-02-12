@@ -105,6 +105,9 @@ $INSTALL_plugin['library'] = array(
             'log' => 'Adding feature to the Logged-in Users group'
         ),
     array('type' => 'sql',
+            'sql' => $_DEFDATA['library.categories']
+        ),
+    array('type' => 'sql',
             'sql' => $_DEFDATA['library.types']
         ),
     array('type'    => 'mkdir',
