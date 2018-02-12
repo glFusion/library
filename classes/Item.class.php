@@ -859,7 +859,7 @@ class Item
     */
     public function AvailBlock()
     {
-        global $_TABLES, $LANG_LIB, $_USER;
+        global $_TABLES, $LANG_LIB, $_USER, $_CONF_LIB;
 
         $T = LIBRARY_getTemplate('avail_block', 'avail');
 
@@ -869,6 +869,8 @@ class Item
                     array($this->id, $_USER['uid'])) == 1;
         $waitlist = DB_count($_TABLES['library.waitlist'],
                     'item_id', $this->id);
+        $user_wait_items = DB_count($_TABLES['library.waitlist'],
+                    'uid', $_USER['uid']);
 
         $reserve_txt = sprintf($LANG_LIB['has_waitlist'], $waitlist);
         if ($on_waitlist) {
@@ -879,7 +881,7 @@ class Item
             //$wait_action_txt = $LANG_LIB['on_waitlist'] . '<br />' .
             //                        $LANG_LIB['click_to_remove'];
         } else {
-            $can_reserve = true;
+            $can_reserve = $user_wait_items < $_CONF_LIB['max_wait_items'] ? true : false;
             $is_reserved = false;
             //$wait_action = 'add';
             //$wait_confirm_txt = $LANG_LIB['conf_addwaitlist'];
@@ -888,12 +890,10 @@ class Item
 
         switch ($this->status) {
         case LIB_STATUS_AVAIL:
-            $avail_txt = $LANG_LIB['available'];
-            if ($waitlist > 0) {
-                $avail_icon = 'yellow.png';
-            } else {
-                $avail_icon = 'on.png';
-            }
+            if ($user_wait_items < $_CONF_LIB['max_wait_items'])
+                $avail_txt = $LANG_LIB['available'];
+            elseif (!$is_reserved)
+                $avail_txt = $LANG_LIB['max_wait_items'];
             break;
 
         case LIB_STATUS_OUT:
@@ -910,6 +910,7 @@ class Item
         $T->set_var(array(
             'can_reserve'   => $can_reserve,
             'is_reserved'   => $is_reserved,
+            'wait_limit_reached' => $user_wait_items >= $_CONF_LIB['max_wait_items'],
             //'avail_icon'    => $avail_icon,
             'avail_txt'     => $avail_txt,
             'due_dt'        => '',

@@ -475,6 +475,21 @@ function library_access_check($rights = 'library.user,library.admin')
 
 
 /**
+*   Determine if the current user is a plugin administrator
+*
+*   @return boolean     True if is a moderator, False if not.
+*/
+function plugin_ismoderator_library()
+{
+    static $retval = NULL;
+    if ($retval  === NULL) {
+        $retval = SEC_hasRights('library.admin');
+    }
+    return $retval;
+}
+
+
+/**
 *   Filter submitted variables.
 *
 *   Uses glFusion functions to filter submitted variables for illegal content.

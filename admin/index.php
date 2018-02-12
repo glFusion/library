@@ -16,11 +16,23 @@
 /** Import Required glFusion libraries */
 require_once('../../../lib-common.php');
 
-USES_library_functions();
-USES_lib_admin();
+// Make sure the plugin is installed and enabled
+if (!in_array('library', $_PLUGINS)) {
+    COM_404();
+    exit;
+}
 
 // Check for required permissions
-library_access_check('library.admin');
+if (!plugin_ismoderator_library()) {
+    COM_accessLog("Unauthorized user {$_USER['username']} from "
+                . "IP {$_SERVER['REMOTE_ADDR']} attempted to access the "
+                . "library plugin at {$_SERVER['REQUEST_URI']}");
+    COM_404();
+    exit;
+}
+
+USES_library_functions();
+USES_lib_admin();
 
 $content = '';
 $expected = array(

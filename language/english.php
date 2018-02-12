@@ -1,11 +1,9 @@
 <?php
 /**
 *   English language file for the LIbrary plugin
-*   Array Format:
-*   $LANG_LIB[YY]: $LANG - variable name
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2010 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2010-2018 Lee Garner <lee@leegarner.com>
 *   @package    library
 *   @version    0.0.1
 *   @license    http://opensource.org/licenses/gpl-2.0.php 
@@ -13,6 +11,7 @@
 *   @filesource
 */
 
+global $_CONF_LIB;
 
 /**
 *   Global array to hold all plugin-specific configuration items.
@@ -143,6 +142,7 @@ $LANG_LIB = array (
 'item_updated'  => 'Item has been updated.',
 'item_nochange' => 'Item has not been changed.',
 'search_openlib' => 'Search for the ISBN at openlibrary.org',
+'max_wait_items' => 'You can reserve up to ' . $_CONF_LIB['max_wait_items'] . ' items at a time.',
 );
 
 $LANG_LIB_HELP = array(
@@ -161,6 +161,7 @@ $LANG_LIB_HELP = array(
 'daysonhold' => 'Enter the grace period, in days, to redeem a waitlisted item once it becomes available.',
 'enabled' => 'Check if this item is enabled. Disabling an item can be used to temporarily remove an item from the catalog.',
 'comments' => 'Select whether comments are enabled for this item.',
+'max_wait_items' => 'You can reserve up to ' . $_CONF_LIB['max_wait_items'] . ' items at a time.',
 );
 
 /** Message indicating plugin version is up to date */

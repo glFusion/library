@@ -23,34 +23,39 @@
 <div style="text-align:left;">
   <div class="libListItem">
     <div class="libListItemImage">
-      {!if small_pic}
+{!if small_pic}
       <a href="{pi_url}/index.php?detail=x&id={id}{url_opts}">
         <img src="{small_pic}" alt="{name}" style="border: none" />
       </a>
-      {!else}
+{!else}
         &nbsp;
-      {!endif}
+{!endif}
     </div>
-
 
     <div style="float:left;width:80%;">
       {avail_blk}
       <a class="lib_itemlist" href="{pi_url}/index.php?detail=x&id={id}{url_opts}">
-        <b><large>{hi_name}</large></b><br />
+        <b><large>{hi_name}</large></b>
       </a>
+{!if can_edit}
+      <a href="{site_admin_url}/plugins/library/index.php?edititem=x&id={id}">
+        <i class="uk-icon uk-icon-edit" data-uk-tooltip title="{$LANG_ADMIN['edit']}"></i>
+      </a>
+{!endif}
+      <br />
       {#<small>{id}</small><br />#}
-      {!if hi_short_description}
-        {hi_short_description}<br />
-      {!endif}
-      {!if publisher}
+{!if short_dscp}
+        {short_dscp}<br />
+{!endif}
+{!if publisher}
         {publisher}<br />
-      {!endif}
-      {!if author}
+{!endif}
+{!if author}
         {author}
-      {!endif}
-      {!if rating_bar}
+{!endif}
+{!if rating_bar}
         <div>{rating_bar}</div>
-      {!endif}
+{!endif}
     </div>
   </div>
 

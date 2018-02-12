@@ -317,6 +317,7 @@ function LIBRARY_ItemList()
             'author'    => $P->author,
             'publisher' => $P->publisher,
             'url_opts'  => $url_opts,
+            'can_edit'  => plugin_ismoderator_library(),
         ) );
 
         $pic_filename = DB_getItem($_TABLES['library.images'], 'filename',
