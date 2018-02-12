@@ -708,7 +708,7 @@ function plugin_autouninstall_library()
                 'library.items',
                 'library.trans',
                 'library.images',
-                //'library.categories',
+                'library.categories',
                 'library.waitlist',
                 'library.types',
         ),
@@ -1060,6 +1060,29 @@ function plugin_profilevariablesdisplay_library($uid, &$T)
     $LT->parse('output', 'block');
     $T->set_var('plugin_fields',
         $existingFields . $LT->finish($LT->get_var('output')));
+}
+
+
+/**
+*   Select the Librarian group.
+*   'All Users' is not allowed
+*
+*   @return array       Array of groups
+*/
+function plugin_configmanager_select_grp_librarians_library()
+{
+    global $_TABLES;
+
+    $A = array();
+    $sql = "SELECT grp_id, grp_name FROM {$_TABLES['groups']}";
+    $res = DB_query($sql);
+    if ($res) {
+        while ($row = DB_fetchArray($res, false)) {
+            $row['grp_name'] = htmlspecialchars($row['grp_name']);
+            $A[$row['grp_name']] = $row['grp_id'];
+        }
+    }
+    return $A;
 }
 
 

@@ -63,13 +63,13 @@ if ($action == 'mode') $action = $actionval;
 switch ($action) {
 case 'checkout':
     $I = new Library\Item($_POST['id']);
-    $I->Checkout($_POST['uid']);
+    $I->checkOut($_POST['uid']);
     COM_refresh(LIBRARY_ADMIN_URL);
     break;
 
 case 'checkin':
     $I = new Library\Item($_REQUEST['id']);
-    $I->CheckIn();
+    $I->checkIn();
     LIBRARY_notifyWaitlist($_REQUEST['id']);
     COM_refresh(LIBRARY_ADMIN_URL);
     break;

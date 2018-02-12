@@ -467,20 +467,15 @@ function LIBRARY_notifyLibrarian($item_id, $uid)
     //echo $sql;die;
     $res = DB_query($sql, 1);
     if (DB_numRows($res) == 0) return;
-    $sql = "SELECT * 
-            FROM {$_TABLES['library.items']}
-            WHERE id = '$item_id'";
-    //echo $sql;die;
-    $item = DB_fetchArray(DB_query($sql, 1), false);
-    if (empty($item)) return;
+    $Item = new Library\Item($item_id);
+    if ($Item->isNew) return;   // invalid item id
 
     $msg = '<p>Someone has requested a library item.</p>' . LB .
-        '<p>Item Name: ' . $item['name'] . '</p>' . LB .
+        '<p>Item Name: ' . $Item->name . '</p>' . LB .
         '<p>Requested By: ' . $user . '</p>' . LB;
 
     while ($A = DB_fetchArray($res, false)) {
-        if (empty($A['email']))
-            continue;
+        if (empty($A['email'])) continue;
         COM_mail(
             $A['email'],
             'Library Checkout Request',

@@ -6,7 +6,7 @@
 *   @copyright  Copyright (c) 2010-2018 Lee Garner <lee@leegarner.com>
 *   @package    library
 *   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -200,6 +200,8 @@ $LANG_confignames['library'] = array(
     'maxcheckout'   => 'Maximum number of days an item may be checked out',
     'displayblocks'  => 'Display glFusion Blocks',
     'menuitem'      => 'Show on user menu?',
+    'grp_librarians' => 'Librarian Group',
+    'notify_checkout' => 'Notify Librarians on item reservation?',
 );
 
 /** Language strings for the subgroup names in the config section */
@@ -210,14 +212,11 @@ $LANG_configsubgroups['library'] = array(
 /** Language strings for the field set names in the config section */
 $LANG_fs['library'] = array(
     'fs_main'   => 'General Settings',
-    'fs_images' => 'Image Settings',
     'fs_paths'  => 'Images and Paths',
-    'fs_encbtn' => 'Encrypted Button Support',
-    'fs_prod_defaults' => 'New Product Defaults',
-
+    'fs_notifications' => 'Notifications',
 );
 
-/** 
+/**
  *  Language strings for the selection option names in the config section
  *  Note: entries 0, 1, and 12 are the same as in $LANG_configselects['Core']
  */
@@ -231,6 +230,5 @@ $LANG_configselects['library'] = array(
     12 => array('No access' => 0, 'Read-Only' => 2, 'Read-Write' => 3),
     13 => array('None' => 0, 'Left' => 1, 'Right' => 2, 'Both' => 3),
 );
-
 
 ?>

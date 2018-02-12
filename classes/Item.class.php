@@ -812,28 +812,14 @@ class Item
     }
 
 
-    function CheckIn($id = '')
+    /**
+    *   Check in an item.
+    */
+    public function checkIn()
     {
         global $_TABLES, $_USER;
 
         $me = (int)$_USER['uid'];
-
-        if ($id == '') {
-            if (is_object($this)) {
-                $id = $this->id;
-                $uid = $this->uid;
-                $due = $this->due;
-            } else
-                return;
-        } else {
-            $id = COM_sanitizeID($id, false);
-            $A = DB_fetchArray(DB_query("SELECT id, uid, due
-                    FROM {$_TABLES['library.items']} WHERE id='$id'"));
-            if (empty($A))
-                return;
-            $uid = (int)$A['uid'];
-            $due = (int)$A['due'];
-        }
 
         DB_query("UPDATE {$_TABLES['library.items']} SET
                     status='" . LIB_STATUS_AVAIL . "',
@@ -846,7 +832,7 @@ class Item
             DB_query("INSERT INTO {$_TABLES['library.trans']}
                     (item_id, dt, doneby, uid, trans_type)
                 VALUES (
-                    '$id', UNIX_TIMESTAMP(), $me, $uid, 'checkin')");
+                    '{$this->id}', UNIX_TIMESTAMP(), $me, {$this->uid}, 'checkin')");
         }
     }
 

@@ -21,11 +21,12 @@ if (!defined ('GVERSION')) {
 *   @global array */
 global $_LIB_DEFAULTS;
 $_LIB_DEFAULTS = array(
-    'menuitem'      => 1,        // Show on the plugin menu?
-    'daysonhold'    => 3,      // Waiting list grace period
-    'items_per_page' => 10, // Items shown per page when browsing the library
+    'grp_librarians' => 1,      // Default group for librarians (Root)
+    'menuitem'      => 1,       // Show on the plugin menu?
+    'daysonhold'    => 3,       // Waiting list grace period
+    'items_per_page' => 10,     // Items shown per page when browsing the library
     // Image-related values
-    'max_images']   => 3,       // Max number of images
+    'max_images'    => 3,       // Max number of images
     'image_dir'     => $_CONF['path'] . 'data/library/images/items',
     'max_thumb_size' => 100,    // Max thumbnail dimension
     'img_max_width' => 800,
@@ -102,14 +103,12 @@ function plugin_initconfig_library($group_id = 0)
 
         $c->add('fs_notifications', NULL, 'fieldset', 0, 20, NULL, 0, true,
                 $_CONF_LIB['pi_name']);
-        /*$c->add('grpcontest', $_LIB_DEFAULTS['grp_librarians'], 'select',
-                0, 4, 0, 10, true, $_CONF_LIB['pi_name']);*/
+        $c->add('grp_librarians', $group_id, 'select',
+                0, 20, 0, 10, true, $_CONF_LIB['pi_name']);
         $c->add('notify_checkout', $_LIB_DEFAULTS['notify_checkout'],
-                'select', 0, 0, 2, 10, true, $_CONF_LIB['pi_name']);
+                'select', 0, 20, 2, 20, true, $_CONF_LIB['pi_name']);
      }
-
     return true;
-
 }
 
 ?>
