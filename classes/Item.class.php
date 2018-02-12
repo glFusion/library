@@ -58,8 +58,9 @@ class Item
             $this->oldid = '';
             $this->name = '';
             $this->cat_id = '';
-            $this->description = '';
+            $this->dscp= '';
             $this->publisher = '';
+            $this->pub_date = '';
             $this->author = '';
             $this->daysonhold = $_CONF_LIB['daysonhold'];
             $this->type = 0;
@@ -121,11 +122,12 @@ class Item
             $this->properties[$var] = (float)$value;
             break;
 
-        case 'description':
-        case 'short_description':
+        case 'dscp':
+        case 'short_dscp':
         case 'name':
         case 'keywords':
         case 'publisher':
+        case 'pub_date':
         case 'author':
             // String values
             $this->properties[$var] = trim($value);
@@ -170,9 +172,10 @@ class Item
         if (!is_array($row)) return;
 
         $this->id   = $row['id'];
-        $this->description  = $row['description'];
-        $this->short_description = $row['short_description'];
+        $this->dscp = $row['dscp'];
+        $this->short_dscp = $row['short_dscp'];
         $this->publisher = $row['publisher'];
+        $this->pub_date = $row['pub_date'];
         $this->author = $row['author'];
         $this->enabled = isset($row['enabled']) ? 1 : 0;
         $this->name = $row['name'];
@@ -263,13 +266,13 @@ class Item
             }
             $sql2 = "id = '" . DB_escapeString($this->id) . "',
                 name='" . DB_escapeString($this->name) . "',
-                cat_id='{$this->cat_id}',
-                type='{$this->type}',
-                description='" . DB_escapeString($this->description) . "',
-                publisher='" . DB_escapeString($this->publisher) . "',
-                author='" . DB_escapeString($this->author) . "',
-                short_description='" .
-                            DB_escapeString($this->short_description) . "',
+                cat_id = '{$this->cat_id}',
+                type = '{$this->type}',
+                dscp = '" . DB_escapeString($this->dscp) . "',
+                publisher = '" . DB_escapeString($this->publisher) . "',
+                pub_date = '" . DB_escapeString($this->pub_date) . "',
+                author = '" . DB_escapeString($this->author) . "',
+                short_dscp = '" . DB_escapeString($this->short_dscp) . "',
                 keywords='" . DB_escapeString($this->keywords) . "',
                 daysonhold='{$this->daysonhold}',
                 maxcheckout='{$this->maxcheckout}',
@@ -402,10 +405,11 @@ class Item
             'id'            => $this->id,
             'name'          => htmlspecialchars($this->name),
             'category'      => $this->cat_id,
-            'description'   => htmlspecialchars($this->description),
-            'short_description' =>
-                            htmlspecialchars($this->short_description),
+            'dscp'          => htmlspecialchars($this->dscp),
+            'short_dscp'    =>
+                            htmlspecialchars($this->short_dscp),
             'publisher'     => $this->publisher,
+            'pub_date'      => $this->pub_date,
             'author'        => $this->author,
             'daysonhold'    => $this->daysonhold,
             'maxcheckout'   => $this->maxcheckout,
@@ -588,27 +592,28 @@ class Item
         if (isset($_REQUEST['query']) && !empty($_REQUEST['query'])) {
             $name = COM_highlightQuery($this->name,
                         $_REQUEST['query']);
-            $l_desc = COM_highlightQuery($this->description,
+            $l_desc = COM_highlightQuery($this->dscp,
                         $_REQUEST['query']);
-            $s_desc = COM_highlightQuery($this->short_description,
+            $s_desc = COM_highlightQuery($this->short_dscp,
                         $_REQUEST['query']);
         } else {
             $name = $this->name;
-            $l_desc = $this->description;
-            $s_desc = $this->short_description;
+            $l_desc = $this->dscp;
+            $s_desc = $this->short_dscp;
         }
         $T->set_var(array(
             'user_id'           => $_USER['uid'],
             'id'                => $this->id,
             'name'              => $name,
-            'description'       => $l_desc,
-            'short_description' => $s_desc,
+            'dscp'              => $l_desc,
+            'short_dscp'        => $s_desc,
             'img_cell_width'    => ($_CONF_LIB['max_thumb_size'] + 20),
             'pi_url'            => LIBRARY_URL,
             'avail_blk'         => $this->AvailBlock(),
-            'publisher'     => $this->publisher,
-            'author'        => $this->author,
-            'listing_url'   => $this->ListingUrl,
+            'publisher'         => $this->publisher,
+            'pub_date'          => $this->pub_date,
+            'author'            => $this->author,
+            'listing_url'       => $this->ListingUrl,
         ) );
 
         /*$on_waitlist = DB_count($_TABLES['library.waitlist'],

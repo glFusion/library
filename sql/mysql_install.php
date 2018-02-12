@@ -3,10 +3,10 @@
 *   Database creation and update statements for the Library plugin.
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
 *   @package    library
 *   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -21,11 +21,12 @@ $_SQL['library.items'] = "CREATE TABLE {$_TABLES['library.items']} (
   `id` varchar(255) NOT NULL DEFAULT '',
   `name` varchar(255) NOT NULL,
   `cat_id` int(11) unsigned NOT NULL DEFAULT '0',
-  `short_description` varchar(255) NOT NULL DEFAULT '',
-  `description` text,
+  `short_dscp` varchar(255) NOT NULL DEFAULT '',
+  `dscp` text,
   `keywords` varchar(255) DEFAULT '',
   `author` varchar(255) DEFAULT '',
   `publisher` varchar(255) DEFAULT '',
+  `pub_date` varchar(20) DEFAULT '',
   `type` tinyint(2) DEFAULT '0',
   `qoh` int(4) DEFAULT '1',
   `daysonhold` int(4) DEFAULT '0',
@@ -97,7 +98,7 @@ $_SQL['library.types'] = "CREATE TABLE {$_TABLES['library.types']} (
   PRIMARY KEY (`id`)
 )";
 
-$_DEFDATA['library.types'] = "INSERT INTO {$_TABLES['library.types']} VALUES 
+$_DEFDATA['library.types'] = "INSERT INTO {$_TABLES['library.types']} VALUES
     (1,'Book'),(2,'CD'),(3,'DVD')";
 
 $_DEFDATA['library.categories'] = "INSERT INTO {$_TABLES['library.categories']} (

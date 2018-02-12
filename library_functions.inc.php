@@ -33,7 +33,7 @@ function X_LIBRARY_history($admin = false, $uid = '')
     $isAdmin = $admin == true ? 1 : 0;
 
     $sql = "SELECT p.*, UNIX_TIMESTAMP(p.expiration) AS time, 
-                d.name, d.short_description, d.file, d.prod_type,
+                d.name, d.short_dscp, d.file, d.prod_type,
                 $isAdmin as isAdmin, 
                 u.uid, u.username
             FROM  {$_TABLES['library.trans']} AS p 
@@ -55,8 +55,8 @@ function X_LIBRARY_history($admin = false, $uid = '')
                 'field' => 'name', 'sort' => true),
         array('text' => $LANG_LIB['qty'], 
                 'field' => 'quantity', 'sort' => true),
-        array('text' => $LANG_LIB['description'],
-                'field' => 'short_description', 'sort' => true),
+        array('text' => $LANG_LIB['dscp'],
+                'field' => 'short_dscp', 'sort' => true),
         array('text' => $LANG_LIB['purch_date'],
                 'field' => 'purchase_date', 'sort' => true),
         array('text' => $LANG_LIB['txn_id'],
@@ -80,7 +80,7 @@ function X_LIBRARY_history($admin = false, $uid = '')
 
     $query_arr = array('table' => 'library.trans',
             'sql' => $sql,
-            'query_fields' => array('d.name', 'd.short_description', 'p.txn_id'),
+            'query_fields' => array('d.name', 'd.short_dscp', 'p.txn_id'),
             'default_filter' => $where,
         );
 
@@ -98,7 +98,6 @@ function X_LIBRARY_history($admin = false, $uid = '')
 
     $display .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
     return $display;
-
 }
 
 
@@ -216,7 +215,7 @@ function LIBRARY_ItemList()
     if (!empty($_REQUEST['query'])) {
         $query = DB_escapeString($_REQUEST['query']);
         $sql .= " AND (p.name like '%$query%' 
-                OR p.description like '%$query%')";
+                OR p.dscp like '%$query%')";
         $T->set_var('query', htmlspecialchars($_REQUEST['query']));
     }
 
@@ -297,22 +296,22 @@ function LIBRARY_ItemList()
             $url_opts .= '&query=' . urlencode($query);
             $hi_name = COM_highlightQuery(htmlspecialchars($P->name),
                         $query);
-            $l_desc = COM_highlightQuery(htmlspecialchars($P->description), 
+            $l_desc = COM_highlightQuery(htmlspecialchars($P->dscp), 
                         $query);
-            $s_desc = COM_highlightQuery(htmlspecialchars($P->short_description), 
+            $s_desc = COM_highlightQuery(htmlspecialchars($P->short_dscp), 
                         $query);
         } else {
             $hi_name = htmlspecialchars($P->name);
-            $l_desc = htmlspecialchars($P->description);
-            $s_desc = htmlspecialchars($P->short_description);
+            $l_desc = htmlspecialchars($P->dscp);
+            $s_desc = htmlspecialchars($P->short_dscp);
         }
 
         $T->set_var(array(
             'id'        => $A['id'],
             'name'      => $P->name,
             'hi_name'   => $hi_name,
-            'description' => PLG_replacetags($l_desc),
-            'short_description' => $s_desc,
+            'dscp' => PLG_replacetags($l_desc),
+            'short_dscp' => $s_desc,
             'img_cell_width' => ($_CONF_LIB['max_thumb_size'] + 20),
             'avail_blk' => $P->AvailBlock(),
             'author'    => $P->author,
@@ -370,126 +369,6 @@ function LIBRARY_errMsg($msg)
     $retval .= "<ul>$msg</ul>\n";
     $retval .= "</span>\n";
     return $retval;
-}
-
-
-/**
-*   Recurse through the category table building an option list
-*   sorted by id.
-*
-*   @param integer  $sel        Category ID to be selected in list
-*   @param integer  $parent_id  Parent category ID
-*   @param string   $char       Separator characters
-*   @param string   $not        'NOT' to exclude $items, '' to include
-*   @param string   $items      Optional comma-separated list of items to include or exclude
-*   @return string              HTML option list, without <select> tags
-*/
-function X_LIBRARY_recurseCats(
-        $function, $sel=0, $parent_id=0, $char='', $not='', $items='', 
-        $level=0, $maxlevel=0, $prepost = array())
-{
-    global $_TABLES, $_GROUPS;
-
-    $str = '';
-    if (empty($prepost)) {
-        $prepost = array('', '');
-    }
-
-    // Locate the parent category of this one, or the root categories
-    // if papa_id is 0.
-    $sql = "
-        SELECT
-            cat_id, cat_name, parent_id, description,
-            owner_id, group_id,
-            perm_owner, perm_group, perm_members, perm_anon
-        FROM
-            {$_TABLES['library.categories']}
-        WHERE
-            parent_id = $parent_id";
-
-    if (!empty($items)) {
-        $sql .= " AND cat_id $not IN ($items) ";
-    }
-//    $sql .= COM_getPermSQL('AND'). "
-    $sql .= "
-        ORDER BY
-            cat_name
-                ASC
-    ";
-    //echo $sql;die;
-    $result = DB_query($sql);
-    // If there is no top-level category, just return.
-    if (!$result)
-        return '';
-
-    while ($row = DB_fetchArray($result, false)) {
-        $txt = $char . $row['cat_name'];
-        $selected = $row['cat_id'] == $sel ? 'selected="selected"' : '';
-        if ($row['parent_id'] == 0) {
-            $style = 'style="background-color:lightblue"';
-        } else {
-            $style = '';
-        }
-
-        //$str .= "<option value=\"{$row['cat_id']}\" $style $selected $disabled>";
-        //$str .= $txt;
-        //$str .= "</option>\n";
-        if (!function_exists($function))
-            $function = 'LIBRARY_callbackCatOptionList';
-        $str .= $function($row, $sel, $parent_id, $txt);
-        if ($maxlevel == 0 || $level < $maxlevel) {
-            $str .= $prepost[0] . 
-                    LIBRARY_recurseCats($function, $sel, $row['cat_id'], 
-                        $char."-", $not, $items, $level++, $maxlevel) .
-                    $prepost[1];
-        }
-    }
-
-    //echo $str;die;
-    return $str;
-
-}   // function LIBRARY_recurseCats()
-
-
-/**
-*   Callback function to create text for option list items.
-*
-*   @param  array   $A      Complete category record
-*   @param  integer $sel    Selectd item (optional)
-*   @param  integer $parent_id  Parent ID from which we've started searching
-*   @param  string  $txt    Different text to use for category name.
-*   @return string          Option list element for a category
-*/
-function X_LIBRARY_callbackCatOptionList($A, $sel=0, $parent_id=0, $txt='')
-{
-    if ($sel > 0 && $A['cat_id'] == $sel) {
-        $selected = 'selected="selected"';
-    } else {
-        $selected = '';
-    }
-
-    if ($A['parent_id'] == 0) {
-        $style = 'style="background-color:lightblue"';
-    } else {
-        $style = '';
-    }
-
-    if ($txt == '')
-        $txt = $A['cat_name'];
-
-    /*if (SEC_hasAccess($row['owner_id'], $row['group_id'],
-                $row['perm_owner'], $row['perm_group'], 
-                $row['perm_members'], $row['perm_anon']) < 3) {
-            $disabled = 'disabled="true"';
-    } else {
-        $disabled = '';
-    }*/
-
-    $str = "<option value=\"{$A['cat_id']}\" $style $selected $disabled>";
-    $str .= $txt;
-    $str .= "</option>\n";
-    return $str;
-
 }
 
 
@@ -554,8 +433,7 @@ function LIBRARY_notifyWaitlist($id = '')
             "{$_CONF['site_name']} <{$_CONF['site_mail']}>",
             true
         );
-
-}   // function LIBRARY_waitlistNotify()
+}
 
 
 /**

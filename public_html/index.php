@@ -1,15 +1,15 @@
 <?php
 /**
- *  Index page for users of the Library plugin
- *
- *  By default displays available items along with links to check out and
- *  detailed item views
- *
+*   Index page for users of the Library plugin
+*
+*   By default displays available items along with links to check out and
+*   detailed item views
+*
 *   @author     Lee Garner <lee@leegarner.com>
 *   @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
 *   @package    library
 *   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -25,8 +25,13 @@ if (!in_array('library', $_PLUGINS)) {
 // Import plugin-specific functions
 USES_library_functions();
 
-// Ensure sufficient privs to read this page 
-library_access_check();
+// Only logged-in uses can view items
+if (COM_isAnonUser()) {
+    echo LIBRARY_siteHeader();
+    echo SEC_loginRequiredForm();
+    echo LIBRARY_siteFooter();
+    exit;
+}
 
 $content = '';
 COM_setArgNames(array('action', 'id'));
@@ -90,8 +95,8 @@ case 'thanks':
         'mc_gross'      => $_POST['mc_gross'],
         'library_url'    => $_CONF_LIB['library_url'],
     ) );
-    
-    $content .= COM_showMessageText($T->parse('output', 'msg'), 
+
+    $content .= COM_showMessageText($T->parse('output', 'msg'),
                 $LANG_LIB['thanks_title']);
     $page = 'productlist';
     break;

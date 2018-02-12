@@ -28,11 +28,11 @@
 </p>
 
 <p>
-  <label>{$LANG_LIB['short_description']}:
+  <label>{$LANG_LIB['short_dscp']}:
     <a href="#" onclick="popupWindow('{doc_url}#desc_short_descrip', 'Help', 640, 480, 1)" class="toolbar">
     <img src="{layout_url}/images/button_help.png" alt="" /></a>
   </label>
-  <input type="text" name="short_description" value="{short_description}" 
+  <input type="text" name="short_dscp" value="{short_dscp}" 
       size="40" maxlength="255">
 </p>
 
@@ -71,13 +71,13 @@
 </p>
 
 <p id="html_editarea">
-  <label>{$LANG_LIB['description']}:
-    <a href="#" onclick="popupWindow('{doc_url}#desc_description', 'Help', 640, 480, 1)" class="toolbar">
+  <label>{$LANG_LIB['dscp']}:
+    <a href="#" onclick="popupWindow('{doc_url}#desc_dscp', 'Help', 640, 480, 1)" class="toolbar">
     <img src="{layout_url}/images/button_help.png" alt="" /></a>
   </label>
   <textarea id="html_content" 
-      name="description" cols="35" rows="10" 
-      style="width:70%">{description}</textarea>
+      name="dscp" cols="35" rows="10" 
+      style="width:70%">{dscp}</textarea>
 </p>
 
 <p>

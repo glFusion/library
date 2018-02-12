@@ -554,7 +554,7 @@ return;
     $query = trim(DB_escapeString(htmlspecialchars($query)));
 
     $sql_X = "SELECT
-                p.id, p.name as title, p.description as description,
+                p.id, p.name as title, p.dscp as description,
                 dt_add as date,  views as hits,
                 CONCAT('/{$_CONF_LIB['pi_name']}/index.php?mode=detail&id=',p.id,'&query=$htmlquery') as url
             FROM
@@ -569,7 +569,7 @@ return;
             ";
 
     $sql = "SELECT
-                p.id, p.name as title, p.description as description,
+                p.id, p.name as title, p.dscp as description,
                 dt_add as date,  views as hits,
                 CONCAT('/{$_CONF_LIB['pi_name']}/index.php?detail=x&id=',p.id,'&query=$htmlquery') as url
             FROM
@@ -579,7 +579,7 @@ return;
             ";
 
     $search = new SearchCriteria($_CONF_LIB['pi_name'], $LANG_LIB['srchtitle']);
-    $columns = array('p.name', 'p.description',
+    $columns = array('p.name', 'p.dscp',
                     'p.keywords', 'c.cat_name', 'c.description');
     list($sql, $ftsql) = $search->buildSearchSQL($keyType, $query, $columns, $sql);
     $search->setSQL($sql);
@@ -767,13 +767,13 @@ function plugin_getiteminfo_library($id, $what, $uid=0, $options=array())
             break;
         case 'content':
         case 'description':
-            $fields[] = 'short_description';
-            $fields[] = 'description';
+            $fields[] = 'short_dscp';
+            $fields[] = 'dscp';
             break;
         case 'searchidx':
             $fields[] = 'name';
-            $fields[] = 'short_description';
-            $fields[] = 'description';
+            $fields[] = 'short_dscp';
+            $fields[] = 'dscp';
             $fields[] = 'keywords';
             break;
         case 'author':
@@ -809,11 +809,11 @@ function plugin_getiteminfo_library($id, $what, $uid=0, $options=array())
                 $props[$p] = $A['id'];
                 break;
             case 'description':
-                $props[$p] = $A['description'];
+                $props[$p] = $A['dscp'];
                 break;
             case 'excerpt':
             case 'content':
-                $props[$p] = $A['name'] . ' ' . $A['short_description'] . ' ' . $A['description'];
+                $props[$p] = $A['name'] . ' ' . $A['short_dscp'] . ' ' . $A['dscp'];
                 break;
             case 'title':
                 $props[$p] = $A['name'];
@@ -826,8 +826,8 @@ function plugin_getiteminfo_library($id, $what, $uid=0, $options=array())
                 $props[$p] = $A['dt_add'];
                 break;
             case 'searchidx':
-                $props[$p] = $A['name'] . ' ' . $A['short_description'] . ' ' .
-                        $A['description'] . ' ' . $A['keywords'];
+                $props[$p] = $A['name'] . ' ' . $A['short_dscp'] . ' ' .
+                        $A['dscp'] . ' ' . $A['keywords'];
                 break;
             case 'url':
                 $props[$p] = COM_buildUrl($_CONF['site_url'] .
@@ -1013,7 +1013,7 @@ function plugin_profilevariablesdisplay_library($uid, &$T)
         return;
     }
 
-    $sql = "SELECT id, name, short_description, due
+    $sql = "SELECT id, name, short_dscp, due
             FROM {$_TABLES['library.items']}
             WHERE uid='$uid'";
     //echo $sql;die;
@@ -1034,7 +1034,7 @@ function plugin_profilevariablesdisplay_library($uid, &$T)
         $LT->set_block('block', 'profile_row', 'prow');
         $LT->set_var(array(
             'name'  => $A['name'],
-            'short_description' => $A['short_description'],
+            'short_dscp' => $A['short_dscp'],
             'id'    => $A['id'],
             'due_date' => $fmt_dt_due,
         ) );

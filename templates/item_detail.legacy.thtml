@@ -2,7 +2,7 @@
 <div style="margin:0px 40px 0px 40px;">
   <div style="float:left;">
     <h1>{name}</h1>
-    <strong>{short_description}</strong><br />
+    <strong>{short_dscp}</strong><br />
     {!if publisher}
     <strong>{$LANG_LIB['publisher']}:</strong>&nbsp;&nbsp;{publisher}<br />
     {!endif}
@@ -19,7 +19,7 @@
     {avail_blk}
   </div>
   <div style="clear:left;">
-    {description}
+    {dscp}
     <div style="clear:left;"></div>
     <!-- BEGIN Thumbnail -->
     <div style="float:left; width:{img_cell_width}px;">
