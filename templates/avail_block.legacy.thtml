@@ -1,0 +1,35 @@
+{# begin {templatelocation} #}
+      <div style="float:right;position:relative;background-color:#CCC;">
+        {!if use_image}
+          <img src="{pi_url}/images/{avail_icon}"
+            class="gl_mootip" title="{avail_txt}">
+        {!else}
+          {avail_txt}
+        {!endif}
+        {!if have_checkout}
+        {!else}
+          <a href="{pi_url}/index.php?{wait_action}wait=x&id={id}" 
+             onclick="return confirm('{wait_confirm_txt}');">
+             {!if use_image}
+               <img src="{pi_url}/images/list-{wait_action}.png" 
+                    alt="{wait_action_txt}" 
+                    title="{wait_action_txt}"
+                    class="gl_mootip">
+             {!else}
+                {!if wait_action_txt}
+                   <br />{wait_action_txt}
+                {!endif}
+             {!endif}
+          </a>
+            {!if reserve_txt}
+             <br />{reserve_txt}
+            {!endif}
+        {!endif}
+      </div>
+
+      {!if due_dt}
+      <div style="clear:both;">
+        <small>Due: {due_dt}</small>
+      </div>
+      {!endif}
+{# end {templatelocation} #}

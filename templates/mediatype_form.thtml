@@ -1,31 +1,26 @@
 {# begin {templatelocation} #}
-<form action="{action_url}/index.php" method="POST" 
-    enctype="multipart/form-data">
-
-{!if cat_id}
+<form action="{action_url}/index.php" method="post" 
+    enctype="multipart/form-data" class="uk-form-horizontal">
   <input type="hidden" name="id" value="{id}">
+
+  <div class="uk-form-row">
+    <label for="item_name" class="uk-form-label">
+      {$LANG_LIB['type']}:
+      <i class="uk-icon uk-icon-question-circle tooltip" title="help here"></i>
+    </label>
+    <div class="uk-form-controls">
+      <input required type="text" id="item_name" name="name" value="{name}" size="40" maxlength="255" />
+    </div>
+  </div>
+
+  <div class="uk-form-row">
+    <div class="uk-form-controls">
+      <button type="submit" name="savemedia" class="uk-button uk-button-success">{$LANG_ADMIN['save']}</button>
+{!if candelete}
+      <button type="submit" name="deletemedia" class="uk-button uk-button-danger">{$LANG_ADMIN['delete']}</button>
 {!endif}
-
- <table>
-
-  <tr>
-   <td><font color="red">*</font>{$LANG_LIB['name']}:</td>
-   <td><input type="text" name="name" value="{name}" size="40" maxlength="255"></td>
-  </tr>
-
-  <tr>
-   <td style="text-align: center" colspan="2">
-    <input type="submit" name="savemedia" value="{$LANG_ADMIN['save']}">
-    <input type="submit" name="deletemedia" value="{$LANG_ADMIN['delete']}">
-   </td>
-  </tr>
-
-  <tr>
-   <td>
-    <font color="red">*</font> Indicates required field
-   </td>
-  </tr>
- </table>
-
+      <button type="submit" name="medialist" class="uk-button">{$LANG_ADMIN['cancel']}</button>
+    </div>
+  </div>
 </form>
 {# end {templatelocation} #}

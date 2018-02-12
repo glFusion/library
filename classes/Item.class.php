@@ -6,7 +6,7 @@
 *   @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
 *   @package    library
 *   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -42,7 +42,7 @@ class Item
 
     /**
     *  Constructor.
-    *  Reads in the specified class, if $id is set.  If $id is empty, 
+    *  Reads in the specified class, if $id is set.  If $id is empty,
     *  then a new entry is being created.
     *
     *  @param integer $id  Optional item ID
@@ -219,8 +219,8 @@ class Item
             return false;
         }
         $id = COM_sanitizeId($id);
-        $result = DB_query("SELECT * 
-                    FROM {$_TABLES['library.items']} 
+        $result = DB_query("SELECT *
+                    FROM {$_TABLES['library.items']}
                     WHERE id='$id'");
         if (!$result || DB_numRows($result) != 1) {
             return false;
@@ -268,7 +268,7 @@ class Item
                 description='" . DB_escapeString($this->description) . "',
                 publisher='" . DB_escapeString($this->publisher) . "',
                 author='" . DB_escapeString($this->author) . "',
-                short_description='" . 
+                short_description='" .
                             DB_escapeString($this->short_description) . "',
                 keywords='" . DB_escapeString($this->keywords) . "',
                 daysonhold='{$this->daysonhold}',
@@ -288,7 +288,7 @@ class Item
                     $this->Error[] = $U->printErrors(false);
                 }
             }
-        }    
+        }
         if (empty($this->Error)) {
             PLG_itemSaved($this->id, $_CONF_LIB['pi_name']);
             return true;
@@ -318,7 +318,7 @@ class Item
         while ($prow = DB_fetchArray($photo)) {
             $this->DeleteImage($prow['img_id']);
         }
- 
+
         PLG_itemDeleted($this->id, $_CONF_LIB['pi_name']);
         DB_delete($_TABLES['library.items'], 'id', $this->id);
         $this->id = 0;
@@ -354,91 +354,6 @@ class Item
 
 
     /**
-    *   Adds the current values to the databae as a new record
-    *
-    *   @return boolean     True on success, False on failure
-    */
-    private function XXInsert()
-    {
-        global $_TABLES;
-
-        if (!$this->isValidRecord()) {
-            return false;
-        }
-
-        $sql = "INSERT INTO
-                {$_TABLES['library.items']} (
-                id, name, cat_id, type, short_description, description, 
-                keywords, daysonhold, maxcheckout,
-                enabled, dt_add, views,
-                comments_enabled, publisher, author
-            ) VALUES (
-                '{$this->id}',
-                '" . DB_escapeString($this->name) . "', 
-                '{$this->cat_id}',
-                '{$this->type}',
-                '" . DB_escapeString($this->short_description) . "', 
-                '" . DB_escapeString($this->description) . "', 
-                '" . DB_escapeString($this->keywords) . "', 
-                '{$this->daysonhold}',
-                '{$this->maxcheckout}',
-                '{$this->enabled}',
-                " . time() . ",
-                '{$this->views}',
-                '{$this->comments_enabled}',
-                '" . DB_escapeString($this->publisher) . "',
-                '" . DB_escapeString($this->author) . "'
-            )";
-        //echo $sql;die;
-        //COM_errorLog($sql);
-        DB_query($sql, 1);
-        if (!DB_error())
-            return true;
-        else
-            return false;
-    }
-
-
-    /**
-    *   Updates the database for the current product
-    *
-    *   @return boolean     True on success, False on Failure
-    */
-    private function XXUpdate()
-    {
-        global $_TABLES;
-
-        // Make sure the record has all necessary fields.
-        if (!$this->isValidRecord()) {
-            return false;
-        }
-
-        $sql = "UPDATE 
-                {$_TABLES['library.items']}
-            SET
-                id = '{$this->id}',
-                name='" . DB_escapeString($this->name) . "',
-                cat_id='{$this->cat_id}',
-                type='{$this->type}',
-                description='" . DB_escapeString($this->description) . "',
-                publisher='" . DB_escapeString($this->publisher) . "',
-                author='" . DB_escapeString($this->author) . "',
-                short_description='" . 
-                            DB_escapeString($this->short_description) . "',
-                keywords='" . DB_escapeString($this->keywords) . "',
-                daysonhold='{$this->daysonhold}',
-                maxcheckout='{$this->maxcheckout}',
-                enabled='{$this->enabled}',
-                views='{$this->views}'
-            WHERE
-                id='{$this->oldid}'";
-        //COM_errorLog($sql);
-        $status = DB_query($sql, 1);
-        return $status;
-    }
-
-
-    /**
     *   Determines if the current record is valid.
     *
     *   @return boolean     True if ok, False when first test fails.
@@ -462,7 +377,7 @@ class Item
     */
     public function showForm($id = 0)
     {
-        global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB, $LANG24, 
+        global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB, $LANG24,
                 $LANG_postmodes;
 
         if ($id != '') {
@@ -473,8 +388,7 @@ class Item
         }
         $id = $this->id;
 
-        $T = new \Template(LIBRARY_PI_PATH . '/templates');
-        $T->set_file(array('product' => "item_form.thtml"));
+        $T = LIBRARY_getTemplate('item_form', 'product');
         $action_url = LIBRARY_ADMIN_URL . '/index.php';
         if ($this->oldid != '') {
             $retval = COM_startBlock($LANG_LIB['edit'] . ': ' . $this->name);
@@ -489,7 +403,7 @@ class Item
             'name'          => htmlspecialchars($this->name),
             'category'      => $this->cat_id,
             'description'   => htmlspecialchars($this->description),
-            'short_description' => 
+            'short_description' =>
                             htmlspecialchars($this->short_description),
             'publisher'     => $this->publisher,
             'author'        => $this->author,
@@ -499,7 +413,7 @@ class Item
             'keywords'      => htmlspecialchars($this->keywords),
             'cat_select'    => Category::buildSelection($this->cat_id),
             'pi_url'        => LIBRARY_URL,
-            'doc_url'       => LIBRARY_getDocURL('product_form.html', 
+            'doc_url'       => LIBRARY_getDocURL('product_form.html',
                                             $_CONF['language']),
             'type'          => $this->type,
         ) );
@@ -510,21 +424,21 @@ class Item
             $T->set_var(array(
                 'type_id'   => $A['id'],
                 'type_name' => $A['name'],
-                'selected'  => $A['id'] == $this->type ? 
+                'selected'  => $A['id'] == $this->type ?
                                 'selected="selected"' : '',
             ) );
             $T->parse('TypeSel', 'TypeSelBlock', true);
         }
 
-        $T->set_var('ena_chk', 
+        $T->set_var('ena_chk',
                 $this->enabled == 1 ? ' checked="checked"' : '');
 
-        if (!$this->isUsed()) {
+        if (!$this->isNew && !$this->isUsed()) {
             $T->set_var('candelete', 'true');
         }
 
-        // Set up the photo fields.  Use $photocount defined above.  
-        // If there are photos, read the $photo result.  Otherwise, 
+        // Set up the photo fields.  Use $photocount defined above.
+        // If there are photos, read the $photo result.  Otherwise,
         // or if this is a new ad, just clear the photo area
         $T->set_block('product', 'PhotoRow', 'PRow');
         $i = 0;
@@ -533,14 +447,14 @@ class Item
         // existing product entry.
         $photocount = 0;
         if ($this->id != NULL) {
-            $sql = "SELECT img_id, filename 
-                    FROM {$_TABLES['library.images']} 
+            $sql = "SELECT img_id, filename
+                    FROM {$_TABLES['library.images']}
                     WHERE item_id='{$this->id}'";
             $photo = DB_query($sql);
 
             // save the count of photos for later use
             if ($photo)
-                $photocount = DB_numRows($photo); 
+                $photocount = DB_numRows($photo);
             else
                 $photocount = 0;
 
@@ -551,7 +465,7 @@ class Item
             $T->set_var('product_id', '');
         }
 
-        // If there are any images, retrieve and display the thumbnails. 
+        // If there are any images, retrieve and display the thumbnails.
         if ($photocount > 0) {
             while ($prow = DB_fetchArray($photo)) {
                 $i++;
@@ -579,7 +493,7 @@ class Item
             $T->parse('UFLD', 'UploadFld', true);
         }
         $retval .= $T->parse('output', 'product');
-        @setcookie($_CONF['cookie_name'].'fckeditor', 
+        @setcookie($_CONF['cookie_name'].'fckeditor',
                 SEC_createTokenGeneral('advancededitor'),
                 time() + 1200, $_CONF['cookie_path'],
                 $_CONF['cookiedomain'], $_CONF['cookiesecure']);
@@ -640,10 +554,10 @@ class Item
     public function isUsed()
     {
         global $_TABLES;
-        if (DB_count($_TABLES['library.trans'], 'id', 
+        if (DB_count($_TABLES['library.trans'], 'id',
                 $this->id) > 0) {
             return true;
-        } elseif (DB_count($_TABLES['library.waitlist'], 'id', 
+        } elseif (DB_count($_TABLES['library.waitlist'], 'id',
                 $this->id) > 0) {
             return true;
         } else {
@@ -668,18 +582,15 @@ class Item
         }
 
         $retval = COM_startBlock();
-
-        $T = new \Template(LIBRARY_PI_PATH . '/templates');
-        $T->set_file(array('item' => 'item_detail.thtml',
-        ));
+        $T = LIBRARY_getTemplate('item_detail', 'item');
 
         // Highlight the query terms if coming from a search
         if (isset($_REQUEST['query']) && !empty($_REQUEST['query'])) {
-            $name = COM_highlightQuery($this->name, 
+            $name = COM_highlightQuery($this->name,
                         $_REQUEST['query']);
-            $l_desc = COM_highlightQuery($this->description, 
+            $l_desc = COM_highlightQuery($this->description,
                         $_REQUEST['query']);
-            $s_desc = COM_highlightQuery($this->short_description, 
+            $s_desc = COM_highlightQuery($this->short_description,
                         $_REQUEST['query']);
         } else {
             $name = $this->name;
@@ -700,11 +611,11 @@ class Item
             'listing_url'   => $this->ListingUrl,
         ) );
 
-        /*$on_waitlist = DB_count($_TABLES['library.waitlist'], 
-                    array('item_id', 'uid'), 
+        /*$on_waitlist = DB_count($_TABLES['library.waitlist'],
+                    array('item_id', 'uid'),
                     array($this->Get('id'), $_USER['uid'])) == 1;
-        $waitlist = DB_count($_TABLES['library.waitlist'], 
-                    array('item_id'), 
+        $waitlist = DB_count($_TABLES['library.waitlist'],
+                    array('item_id'),
                     array($this->Get('id')));
 
         if ($this->Get('status') == LIB_STATUS_AVAIL) {
@@ -740,7 +651,7 @@ class Item
 
         // Retrieve the photos and put into the template
         $sql = "SELECT img_id, filename
-                FROM {$_TABLES['library.images']} 
+                FROM {$_TABLES['library.images']}
                 WHERE item_id='{$this->id}'";
         //echo $sql;die;
         $img_res = DB_query($sql);
@@ -750,6 +661,7 @@ class Item
             $img_file = "{$_CONF_LIB['image_dir']}/{$prow['filename']}";
             $tn_url = LGLIB_ImageUrl($img_file, $_CONF_LIB['max_thumb_size'],
                     $_CONF_LIB['max_thumb_size']);
+            $img_url = LGLIB_ImageUrl($img_file, 800, 600);
             if ($tn_url !== '') {
                 if ($i == 0) {
                     $T->set_var('main_img_url', LGLIB_ImageUrl($img_file,
@@ -758,12 +670,13 @@ class Item
                 }
                 $T->set_block('item', 'Thumbnail', 'PBlock');
                 $T->set_var('tn_url', $tn_url);
+                $T->set_var('img_url', $img_url);
                 $T->parse('PBlock', 'Thumbnail', true);
                 $T->set_var('have_photo', 'true');
             }
         }
         // Show the user comments
-        if (plugin_commentsupport_library() && 
+        if (plugin_commentsupport_library() &&
             $this->comments_enabled < 2) {
             if ($_CONF['commentsloginrequired'] == 1 && COM_isAnonUser()) {
                 $mode = -1;
@@ -787,8 +700,8 @@ class Item
                 $static = 1;
                 $voted = 0;
             }
-            $rating_box = RATING_ratingBar('library', $this->id, 
-                    $this->votes, $this->rating, 
+            $rating_box = RATING_ratingBar('library', $this->id,
+                    $this->votes, $this->rating,
                     $voted, 5, $static, 'sm');
             $T->set_var('rating_bar', $rating_box);
         } else {
@@ -823,7 +736,7 @@ class Item
         return $retval;
     }
 
-        
+
     /**
     *   Hightlight keywords found in text string.
     *   Credits: http://www.bitrepository.com/
@@ -834,7 +747,7 @@ class Item
     */
     private function highlight($str = '', $keywords = '')
     {
-        $patterns = Array(); 
+        $patterns = Array();
         $replaces = Array();
         $style = 'background: #66FF66;';
 
@@ -851,7 +764,7 @@ class Item
 
         }
 
-        return preg_replace($patterns, $replaces, $str); 
+        return preg_replace($patterns, $replaces, $str);
 
         return $str;
     }
@@ -861,7 +774,7 @@ class Item
     {
         global $_TABLES, $_USER;
 
-        $to = (int)$to; 
+        $to = (int)$to;
         if ($to == 1)           // Can't check out to anonymous
             return;
         if ($to == 0 && empty($_POST['co_username']))
@@ -876,7 +789,7 @@ class Item
         // present, or if an error occurs in the creation of the timestamp,
         // fall back to now + the max checkout days.  Add one to the due date
         // to get it to midnight the following day.
-        DB_query("UPDATE {$_TABLES['library.items']} SET 
+        DB_query("UPDATE {$_TABLES['library.items']} SET
                     status='" . LIB_STATUS_OUT . "',
                     uid=$to,
                     due=$due
@@ -887,7 +800,7 @@ class Item
                 array($this->id, $to));
 
         // Insert the trasaction record
-        DB_query("INSERT INTO {$_TABLES['library.trans']} 
+        DB_query("INSERT INTO {$_TABLES['library.trans']}
                     (item_id, dt, doneby, uid, trans_type)
                 VALUES (
                     '{$this->id}', UNIX_TIMESTAMP(), $me, $to, 'checkout')");
@@ -917,8 +830,7 @@ class Item
             $due = (int)$A['due'];
         }
 
-        DB_query("UPDATE {$_TABLES['library.items']}
-                SET 
+        DB_query("UPDATE {$_TABLES['library.items']} SET
                     status='" . LIB_STATUS_AVAIL . "',
                     uid = 0,
                     due = 0
@@ -926,12 +838,11 @@ class Item
 
         // Insert the trasaction record, only if it's checked out.
         if ($uid > 1) {
-            DB_query("INSERT INTO {$_TABLES['library.trans']} 
+            DB_query("INSERT INTO {$_TABLES['library.trans']}
                     (item_id, dt, doneby, uid, trans_type)
                 VALUES (
                     '$id', UNIX_TIMESTAMP(), $me, $uid, 'checkin')");
         }
-            
     }
 
 
@@ -941,30 +852,33 @@ class Item
     *
     *   @return string      HTML for block.
     */
-    function AvailBlock()
+    public function AvailBlock()
     {
         global $_TABLES, $LANG_LIB, $_USER;
 
-        $T = new \Template(LIBRARY_PI_PATH . '/templates');
-        $T->set_file(array('avail' => 'avail_block.thtml'));
+        $T = LIBRARY_getTemplate('avail_block', 'avail');
 
         // Check if we have the item reserved, and if there's a waitlist.
-        $on_waitlist = DB_count($_TABLES['library.waitlist'], 
-                    array('item_id', 'uid'), 
+        $on_waitlist = DB_count($_TABLES['library.waitlist'],
+                    array('item_id', 'uid'),
                     array($this->id, $_USER['uid'])) == 1;
-        $waitlist = DB_count($_TABLES['library.waitlist'], 
+        $waitlist = DB_count($_TABLES['library.waitlist'],
                     'item_id', $this->id);
 
         $reserve_txt = sprintf($LANG_LIB['has_waitlist'], $waitlist);
         if ($on_waitlist) {
-            $wait_action = 'rmv';
-            $wait_confirm_txt = $LANG_LIB['conf_rmvwaitlist'];
-            $wait_action_txt = $LANG_LIB['on_waitlist'] . '<br />' .
-                                    $LANG_LIB['click_to_remove'];
+            $can_reserve = false;
+            $is_reserved = true;
+            //$wait_action = 'rmv';
+            //$wait_confirm_txt = $LANG_LIB['conf_rmvwaitlist'];
+            //$wait_action_txt = $LANG_LIB['on_waitlist'] . '<br />' .
+            //                        $LANG_LIB['click_to_remove'];
         } else {
-            $wait_action = 'add';
-            $wait_confirm_txt = $LANG_LIB['conf_addwaitlist'];
-            $wait_action_txt = $LANG_LIB['add_waitlist'];
+            $can_reserve = true;
+            $is_reserved = false;
+            //$wait_action = 'add';
+            //$wait_confirm_txt = $LANG_LIB['conf_addwaitlist'];
+            //$wait_action_txt = $LANG_LIB['add_waitlist'];
         }
 
         switch ($this->status) {
@@ -982,19 +896,22 @@ class Item
             $avail_icon = 'red.png';
             if ($this->uid == $_USER['uid']) {
                 $avail_txt .= ' ' . $LANG_LIB['by_you'];
+                $can_reserve = false;
                 $wait_action_txt = '';
             }
             break;
         }
 
         $T->set_var(array(
-            'avail_icon'    => $avail_icon,
+            'can_reserve'   => $can_reserve,
+            'is_reserved'   => $is_reserved,
+            //'avail_icon'    => $avail_icon,
             'avail_txt'     => $avail_txt,
             'due_dt'        => '',
-            'wait_action' => $wait_action,
-            'wait_confirm_txt' => $wait_confirm_txt,
-            'wait_action_txt' => $wait_action_txt,
-            'reserve_txt' => $reserve_txt,
+            //'wait_action' => $wait_action,
+            //'wait_confirm_txt' => $wait_confirm_txt,
+            //'wait_action_txt' => $wait_action_txt,
+            //'reserve_txt' => $reserve_txt,
             'id'            => $this->id,
             'pi_url'        =>  LIBRARY_URL,
         ) );
@@ -1004,7 +921,12 @@ class Item
     }
 
 
-    function SetListUrl($url)
+    /**
+    *   Allow the listing URL to be overridden with parameters, etc.
+    *
+    *   @param  string  $url    New complete listing URL
+    */
+    public function SetListUrl($url)
     {
         $this->ListingUrl = $url;
     }

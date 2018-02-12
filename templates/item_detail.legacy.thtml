@@ -2,19 +2,15 @@
 <div style="margin:0px 40px 0px 40px;">
   <div style="float:left;">
     <h1>{name}</h1>
-{!if short_description}
     <strong>{short_description}</strong><br />
-{!endif}
-{!if publisher}
+    {!if publisher}
     <strong>{$LANG_LIB['publisher']}:</strong>&nbsp;&nbsp;{publisher}<br />
-{!endif}
-{!if author}
+    {!endif}
+    {!if author}
     <strong>{$LANG_LIB['author']}:</strong>&nbsp;&nbsp;{author}<br />
-{!endif}
+    {!endif}
     <div><small>{id}</small></div>
-{!if can_edit}
     &nbsp;&nbsp;{edit_icon}
-{!endif}
   </div>
   <div style="float:right;">
     {!if rating_bar}

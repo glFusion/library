@@ -38,34 +38,6 @@ display: block
     text-decoration: none;
 }
 
-.formBtnOrange, .formBtnOrange1 {
-/*    border:1px solid #d5bd98; 
-    border-right-color:#935e0d; 
-    border-bottom-color:#935e0d; 
-    background:#ffa822 url(library/images/btn_bg_sprite.gif) left 17.5% repeat-x;
-    color:#003366;
-    font-weight:bold;
-    font-style:italic;*/
-}
-
-/*.formbutton {
-    cursor:pointer;
-    border:outset 1px #ccc;
-    background:#999;
-    color:#333;
-    font-weight:bold;
-    padding: 1px 2px;
-}
-
-.formbuttonDisabled {
-    cursor:pointer;
-    border:outset 1px #ccc;
-    background:#999;
-    color:#666;
-    font-weight:bold;
-    padding: 1px 2px;
-}*/
-
 a.lib_itemlist {
     color:black;
     text-decoration:none;
@@ -84,4 +56,18 @@ a.lib_itemlist {
     font-weight: bold;
     color: red;
 }
-
+.lib-icon-ok {
+    color: #82bb42;
+}
+.lib-icon-danger {
+    color: #d32c46;
+}
+.lib-icon-warning {
+    color: #FFD300;
+}
+.lib-icon-info {
+    color: #0077dd;
+}
+.lib-icon-unknown {
+    color: #aaaaaa;
+}

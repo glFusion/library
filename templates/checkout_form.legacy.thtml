@@ -1,0 +1,53 @@
+{# begin {templatelocation} #}
+<form action="{action_url}" method="POST">
+<input type="hidden" name="id" value="{item_id}">
+
+<table border="0">
+<tr>
+  <td valign="top">{$LANG_LIB['item_id']}: </td>
+  <td>{item_id}</td>
+</tr>
+
+<tr>
+  <td valign="top">{$LANG_LIB['item_name']}: </td>
+  <td>{item_name}</td>
+</tr>
+
+<tr>
+  <td valign="top">{$LANG_LIB['description']}: </td>
+  <td>{item_desc}</td>
+</tr>
+
+<tr>
+  <td valign="top">{$LANG_LIB['checkout_user']}: </td>
+  <td>
+    <select name="uid">
+      {user_select}
+    </select>
+  </td>
+</tr>
+
+<tr>
+  <td valign="top">{$LANG_LIB['dt_due']}: </td>
+  <td>
+    <input type="text" id="f_due" name="due" value="{due}" />
+    <img src="{site_url}/images/datepicker.jpg" 
+      id="due_trigger"
+      style="cursor: pointer;"
+      title="{$LANG_LIB['date_selector']}"
+    />
+  </td>
+</tr>
+</table>
+<input type="submit" name="checkout" value="{$LANG_LIB['submit']}" />
+</form>
+
+<script type="text/javascript">
+    Calendar.setup({
+        inputField     :    "f_due",
+        ifFormat       :    "%Y-%m-%d",
+        showsTime      :    false,
+        button          :   "due_trigger"
+    });
+</script>
+{# end {templatelocation} #}

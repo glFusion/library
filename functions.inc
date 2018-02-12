@@ -3,10 +3,10 @@
 *   glFusion API functions for the Library plugin.
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2015 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
 *   @package    library
 *   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -31,7 +31,7 @@ define('LIBRARY_PI_PATH', "{$_CONF['path']}/plugins/{$_CONF_LIB['pi_name']}");
 /** Define base URL to plugin */
 define('LIBRARY_URL', "{$_CONF['site_url']}/{$_CONF_LIB['pi_name']}");
 /** Define URL to plugin admin interface */
-define('LIBRARY_ADMIN_URL', 
+define('LIBRARY_ADMIN_URL',
         "{$_CONF['site_admin_url']}/plugins/{$_CONF_LIB['pi_name']}");
 /** Define status code: item available */
 define ('LIB_STATUS_AVAIL', 0);
@@ -40,6 +40,8 @@ define ('LIB_STATUS_OUT', 1);
 
 // Store the private image path in a conf var so it's available
 $_CONF_LIB['image_dir'] = $_CONF['path'] . 'data/library/images/items';
+$_CONF_LIB['_is_uikit'] = $_SYSTEM['framework'] == 'uikit' ? 'true' : '';
+$_CONF_LIB['_iconset'] = $_CONF_LIB['_is_uikit'] ? 'uk-icon' : 'fa fa';
 
 //  Additional config items and table definitions are added here
 if (file_exists(LIBRARY_PI_PATH . '/config.php')) {
@@ -137,7 +139,6 @@ function plugin_upgrade_library()
 
     COM_errorLog("Succesfully updated the $pi_name Plugin!",1);
     return true;
-
 }
 
 
@@ -205,9 +206,9 @@ function plugin_savecomment_library($title,$comment,$id,$pid,$postmode)
                     'library', $LANG03[14], $postmode)
             . COM_siteFooter();
     } else {        // success - update the comment counter for this ad
-        $comments = DB_count($_TABLES['comments'], 
-                        array('type', 'sid'), 
-                        array('library', glfPrepareForDB($id)));
+        $comments = DB_count($_TABLES['comments'],
+                        array('type', 'sid'),
+                        array('library', DB_escapeString($id)));
 
         DB_change($_TABLES['library.items'], 'comments',  $comments,
                 'id', $id);
@@ -242,17 +243,17 @@ function plugin_displaycomment_library($id, $cid, $title, $order, $format, $page
         return $retval;
 
     // Maybe some permission check will be added later...
-    /*$sql = "SELECT 
-                COUNT(*) AS count, 
-                owner_id, 
-                group_id, 
-                perm_owner, 
-                perm_group, 
-                perm_members, 
-                perm_anon 
-            FROM 
-                {$_TABLES['library.products']} 
-            WHERE 
+    /*$sql = "SELECT
+                COUNT(*) AS count,
+                owner_id,
+                group_id,
+                perm_owner,
+                perm_group,
+                perm_members,
+                perm_anon
+            FROM
+                {$_TABLES['library.products']}
+            WHERE
                 (id = '" . DB_escapeString($id) . "')"
                 . COM_getPermSQL('AND') .
         ;
@@ -303,7 +304,7 @@ function plugin_deletecomment_library($cid, $id)
                     SET comments=$count
                     WHERE id='$id'");
             // Redirect back to the product detail page
-            return (COM_refresh(LIBRARY_URL . 
+            return (COM_refresh(LIBRARY_URL .
                     '/index.php?mode=detail&id=' . $id));
         }
     }
@@ -315,7 +316,7 @@ function plugin_deletecomment_library($cid, $id)
 
 /**
 *   Handle any post-processing for an edited comment.
-*   Just redirects back to the ad detail page.  The comment is actually 
+*   Just redirects back to the ad detail page.  The comment is actually
 *   saved in comment.php.
 *
 *   @param  integer $cid    Comment ID
@@ -352,7 +353,7 @@ function plugin_cclabel_library()
     global $_CONF_LIB;
 
     if (SEC_hasRights('library.admin')) {
-        return array($_CONF_LIB['pi_display_name'], 
+        return array($_CONF_LIB['pi_display_name'],
                     LIBRARY_ADMIN_URL . '/index.php',
                     plugin_geticon_library());
     }
@@ -369,7 +370,7 @@ function plugin_getadminoption_library()
     global $_TABLES, $_CONF_LIB;
 
     if (SEC_hasRights('library.admin')) {
-        return array($_CONF_LIB['pi_display_name'], 
+        return array($_CONF_LIB['pi_display_name'],
                     LIBRARY_ADMIN_URL . '/index.php',
                     DB_count($_TABLES['library.items']));
     }
@@ -430,7 +431,7 @@ function plugin_autotags_library ($op, $content = '', $autotag = '') {
         // Allow the author to use different text for the link.  Default
         // is the stored product name.
         if (empty($autotag['parm2'])) {
-            $linktext = stripslashes(DB_getItem($_TABLES['library.items'], 
+            $linktext = stripslashes(DB_getItem($_TABLES['library.items'],
                         'name', "id = '$id'"));
         } else {
             $linktext = $autotag['parm2'];
@@ -446,8 +447,8 @@ function plugin_autotags_library ($op, $content = '', $autotag = '') {
 /**
 *   Checks to see if the user has sufficient rights to view the page.
 *
-*   Check if the current user has rights (at least one of) specified by 
-*   $rights.  If not log the error, display a generic access denied message 
+*   Check if the current user has rights (at least one of) specified by
+*   $rights.  If not log the error, display a generic access denied message
 *   and exit.
 *
 *   @param  string  $rights     Comma-separated list of allowable rights
@@ -460,7 +461,7 @@ function library_access_check($rights = 'library.user,library.admin')
     if (!SEC_hasRights($rights, 'OR')) {
         $display .= COM_siteHeader();
         $display .= COM_startBlock('Access Denied');
-        $display .= LIBRARY_errorMessage($LANG_LIB['access_denied_msg'], 
+        $display .= LIBRARY_errorMessage($LANG_LIB['access_denied_msg'],
                     'alert', $LANG_LIB['access_denied']);
         $display .= COM_endBlock();
         $display .= COM_siteFooter();
@@ -476,7 +477,7 @@ function library_access_check($rights = 'library.user,library.admin')
 /**
 *   Filter submitted variables.
 *
-*   Uses glFusion functions to filter submitted variables for illegal content.  
+*   Uses glFusion functions to filter submitted variables for illegal content.
 *   Any editing is done in place and no value is returned.
 *
 *   @param  array   $vars   Associative array of varname => typei
@@ -553,8 +554,8 @@ return;
     $query = trim(DB_escapeString(htmlspecialchars($query)));
 
     $sql_X = "SELECT
-                p.id, p.name as title, p.description as description, 
-                dt_add as date,  views as hits, 
+                p.id, p.name as title, p.description as description,
+                dt_add as date,  views as hits,
                 CONCAT('/{$_CONF_LIB['pi_name']}/index.php?mode=detail&id=',p.id,'&query=$htmlquery') as url
             FROM
                 {$_TABLES['library.items']} p
@@ -562,23 +563,23 @@ return;
                 {$_TABLES['library.categories']} c
                 ON p.cat_id=c.cat_id
             WHERE
-                p.enabled = 1 
-            AND 
+                p.enabled = 1
+            AND
                 (c.enabled=1 OR c.enabled IS NULL)
             ";
 
     $sql = "SELECT
-                p.id, p.name as title, p.description as description, 
-                dt_add as date,  views as hits, 
+                p.id, p.name as title, p.description as description,
+                dt_add as date,  views as hits,
                 CONCAT('/{$_CONF_LIB['pi_name']}/index.php?detail=x&id=',p.id,'&query=$htmlquery') as url
             FROM
                 {$_TABLES['library.items']} p
             WHERE
-                p.enabled = 1 
+                p.enabled = 1
             ";
 
     $search = new SearchCriteria($_CONF_LIB['pi_name'], $LANG_LIB['srchtitle']);
-    $columns = array('p.name', 'p.description', 
+    $columns = array('p.name', 'p.description',
                     'p.keywords', 'c.cat_name', 'c.description');
     list($sql, $ftsql) = $search->buildSearchSQL($keyType, $query, $columns, $sql);
     $search->setSQL($sql);
@@ -591,12 +592,11 @@ return;
 *
 *   @return array   Array of filenames to import
 */
-function plugin_getheaderjs_library() 
+function plugin_getheaderjs_library()
 {
-    $files = array(
-        LIBRARY_PI_PATH . '/js/toggleEnabled.js',
+    return array(
+        LIBRARY_PI_PATH . '/js/utils.js',
     );
-    return $files;
 }
 
 
@@ -678,7 +678,7 @@ function LIBRARY_getDocURL($file='', $doclang='english')
     return $doc_url;
 }
 
-    
+
 /**
 *   Return the items that should be removed with the plugin.
 *   Can also handle any plugin-specific removal tasks.
@@ -701,8 +701,8 @@ function plugin_autouninstall_library()
         'groups' => array('library Admin'),
         // Give the full name of the feature, as in the db
         'features' => array(
-                'library.admin', 
-                'library.user', 
+                'library.admin',
+                'library.user',
         ),
         // Give the full name of the block, including 'phpblock_', etc
         'php_blocks' => array(),
@@ -753,6 +753,7 @@ function plugin_getiteminfo_library($id, $what, $uid=0, $options=array())
     $fields = array();
     $retval = array();
     $buildingSearchIndex = false;
+    $fields[] = 'id';
     foreach ($properties as $p) {
         switch ($p) {
         case 'search_index':
@@ -781,6 +782,9 @@ function plugin_getiteminfo_library($id, $what, $uid=0, $options=array())
             break;
         case 'date':
             $fields[] = 'dt_add';
+            break;
+        case 'date':
+            $fields[] = 'id';
             break;
         }
     }
@@ -870,7 +874,7 @@ function plugin_getiteminfo_library($id, $what, $uid=0, $options=array())
 *
 *   @param  string $msg     Error message to display
 *   @param  string $type    Type of message, used for style and header
-*   @param  string $header  Optional header text.  
+*   @param  string $header  Optional header text.
 *   @return string          HTML for formatted error message
 */
 function LIBRARY_errorMessage($msg = '', $type = '', $header = '')
@@ -923,7 +927,7 @@ function plugin_itemrated_library($id, $rating, $votes)
 {
     global $_TABLES;
 
-    $sql = "UPDATE {$_TABLES['library.items']} 
+    $sql = "UPDATE {$_TABLES['library.items']}
             SET rating = $rating, votes = $votes
             WHERE id='$id'";
     DB_query($sql);
@@ -1024,7 +1028,7 @@ function plugin_profilevariablesdisplay_library($uid, &$T)
     while ($A = DB_fetchArray($res, false)) {
         $fmt_dt_due = date('M d, Y', $A['due']);
         if ($A['due'] < $ts) {
-            $fmt_dt_due = '<span style="color:red;">' . 
+            $fmt_dt_due = '<span style="color:red;">' .
                 $fmt_dt_due . '</span>';
         }
         $LT->set_block('block', 'profile_row', 'prow');
@@ -1077,7 +1081,6 @@ function LIBRARY_siteHeader($subject='', $meta='')
     }
 
     return $retval;
-
 }
 
 
@@ -1148,6 +1151,64 @@ function LIBRARY_dueDate($days = 0)
     global $_CONF_LIB;
     if ($days == 0) $days = $_CONF_LIB['maxcheckout'];
     return LIBRARY_now()->add(new \DateInterval("P{$days}D"));
+}
+
+
+/**
+*   Get an icon from the CSS icon set, either UIkit or FontAwesome
+*
+*   @param  string  $name   Base name of icon, e.g. "edit" for "uk-icon-edit"
+*   @param  string  $style  Style name from local CSS
+*   @return string      Class names for icon
+*/
+function LIBRARY_getIcon($name, $style='info')
+{
+    global $_CONF_LIB;
+
+    if ($style != '')
+        $style = ' lib-icon-' . $style;
+    return $_CONF_LIB['_iconset'] . '-' . $name . $style;
+}
+
+
+/**
+*   Helper function to get a template object.
+*
+*   @param  string  $name   Base name of template file, e.g. "editor"
+*   @param  string  $id     ID of template, e.g. "editform"
+*   @param  string  $path   Optional path if not "templates/"
+*   @return string      Full filename, e.g. "editor.uikit.thtml"
+*/
+function LIBRARY_getTemplate($name, $id='', $path='')
+{
+    global $_CONF_LIB;
+
+    $templates = array();
+
+    // Put parameters into an array if not already.
+    if (!is_array($name) && !empty($id)) {
+        $templates = array($id => $name);
+    } elseif (is_array($name)) {
+        $templates = $name;
+    }
+
+    // Add additional path info if needed
+    if (substr($path, 0, 9) != 'templates') {
+        $path = 'templates/' . $path;
+    }
+
+    // May use "switch" later, for now there are only two options
+    $tpltype = $_CONF_LIB['_is_uikit'] ? '' : '.legacy';
+    foreach ($templates as $t_id =>$t_name) {
+        if (file_exists(__DIR__ . "/$path/$t_name$tpltype.thtml")) {
+            $templates[$t_id] = "$t_name$tpltype.thtml";
+        } else {
+            $templates[$t_id] = "$t_name.thtml";
+        }
+    }
+    $T = new Template(__DIR__ . '/' . $path);
+    $T->set_file($templates);
+    return $T;
 }
 
 ?>

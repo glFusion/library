@@ -3,10 +3,10 @@
 *   Class to manage library media types
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2015 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
 *   @package    library
 *   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -35,7 +35,7 @@ class MediaType
 
     /**
     *   Constructor.
-    *   Reads in the specified class, if $id is set.  If $id is zero, 
+    *   Reads in the specified class, if $id is set.  If $id is zero,
     *   then a new entry is being created.
     *
     *   @param integer $id Optional type ID
@@ -134,8 +134,8 @@ class MediaType
             return;
         }
 
-        $result = DB_query("SELECT * 
-                    FROM {$_TABLES['library.types']} 
+        $result = DB_query("SELECT *
+                    FROM {$_TABLES['library.types']}
                     WHERE id='$id'");
         if (!$result || DB_numRows($result) != 1) {
             return false;
@@ -214,28 +214,24 @@ class MediaType
     {
         global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB;
 
-        $T = new \Template(LIBRARY_PI_PATH . '/templates');
-        $T->set_file(array('type' => 'mediatype_form.thtml'));
-
-        $id = $this->id;
+        $T = LIBRARY_getTemplate('mediatype_form', 'type');
 
         // If we have a nonzero media type ID, then we edit the existing record.
         // Otherwise, we're creating a new item.  Also set the $not and $items
         // values to be used in the parent media type selection accordingly.
-        if ($id > 0) {
+        if ($this->id > 0) {
             $retval = COM_startBlock($LANG_LIB['edit'] . ': ' . $this->name);
-            $T->set_var('id', $id);
+            $T->set_var('id', $this->id);
         } else {
             $retval = COM_startBlock($LANG_LIB['create_itemtype']);
             $T->set_var('id', '');
         }
 
         $T->set_var(array(
-            'site_url'      => $_CONF['site_url'],
             'action_url'    => LIBRARY_ADMIN_URL,
             'name'          => $this->name,
+            'candelete'     => !$this->isNew && !self::isUsed($this->id),
         ) );
-
         $retval .= $T->parse('output', 'type');
         $retval .= COM_endBlock();
         return $retval;
@@ -253,7 +249,7 @@ class MediaType
     {
         global $_TABLES;
 
-        // Check if any products are under this media type 
+        // Check if any products are under this media type
         if (DB_count($_TABLES['library.items'], 'type', $id) > 0) {
             return true;
         }
@@ -288,8 +284,6 @@ class MediaType
         return $retval;
     }
 
- 
 }   // class MediaType
-
 
 ?>
