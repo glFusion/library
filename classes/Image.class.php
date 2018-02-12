@@ -3,10 +3,10 @@
 *   Class to handle images
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
 *   @package    library
 *   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -94,7 +94,6 @@ class Image extends \upload
                 }
             }
         }
- 
     }
 
 
@@ -104,7 +103,7 @@ class Image extends \upload
     */
     public function Delete()
     {
-        // If we're deleting from disk also, get the filename and 
+        // If we're deleting from disk also, get the filename and
         // delete it and its thumbnail from disk.
         if ($this->filename == '') {
             return;
@@ -190,7 +189,7 @@ class Image extends \upload
             break;
         case UPLOAD_ERR_INI_SIZE:
         case UPLOAD_ERR_FORM_SIZE:
-            $msg = "<li>upload_too_big</li>\n"; 
+            $msg = "<li>upload_too_big</li>\n";
             break;
         case UPLOAD_ERR_NO_FILE:
             $msg = "<li>upload_missing_msg</li>\n";
@@ -199,9 +198,7 @@ class Image extends \upload
             $msg = "<li>upload_failed_msg</li>\n";
             break;
         }
-
         return $msg;
-
     }
 
 }   // class Image

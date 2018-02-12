@@ -6,7 +6,7 @@
 *   @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
 *   @package    library
 *   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -37,7 +37,7 @@ class Category
 
     /**
     *   Constructor.
-    *   Reads in the specified class, if $id is set.  If $id is zero, 
+    *   Reads in the specified class, if $id is set.  If $id is zero,
     *   then a new entry is being created.
     *
     *   @param integer $id Optional type ID
@@ -180,8 +180,8 @@ class Category
             return;
         }
 
-        $result = DB_query("SELECT * 
-                    FROM {$_TABLES['library.categories']} 
+        $result = DB_query("SELECT *
+                    FROM {$_TABLES['library.categories']}
                     WHERE cat_id='$id'");
         if (!$result || DB_numRows($result) != 1) {
             return false;
@@ -209,25 +209,25 @@ class Category
         }
 
         // Handle image uploads.
-        // We don't want to delete the existing image if one isn't 
-        // uploaded, we should leave it unchanged.  So we'll first 
+        // We don't want to delete the existing image if one isn't
+        // uploaded, we should leave it unchanged.  So we'll first
         // retrieve the existing image filename, if any.
         /*if (!$this->isNew) {
-            $img_filename = DB_getItem($_TABLES['library.categories'], 
+            $img_filename = DB_getItem($_TABLES['library.categories'],
                         'image', "cat_id={$this->cat_id}");
         } else {
             // New entry, assume no image
             $img_filename = '';
         }
         if (is_uploaded_file($_FILES['imagefile']['tmp_name'])) {
-            $img_filename =  rand(100,999) .  "_" . 
+            $img_filename =  rand(100,999) .  "_" .
                      COM_sanitizeFilename($_FILES['imagefile']['name'], true);
             if (!@move_uploaded_file($_FILES['imagefile']['tmp_name'],
                             $_CONF_LIB['catimgpath']."/$img_filename")) {
                 $this->AddError('Error Moving Image');
             } else {
                 // If a new image was uploaded, and this is an existing category,
-                // then delete the old image, if any.  The DB still has the old 
+                // then delete the old image, if any.  The DB still has the old
                 // filename at this point.
                 if (!$this->isNew) {
                     $this->DeleteImage();
@@ -356,30 +356,18 @@ class Category
             'description'   => $this->description,
             'ena_chk'       => $this->enabled == 1 ? 'checked="checked"' : '',
             'parent_sel' => self::buildSelection(self::getParent($this->cat_id), $this->cat_id),
+            'candelete'     => !self::isUsed($this->cat_id),
         ) );
 
         if ($this->image != '') {
             $T->set_var(array(
-                'img_url', LIBRARY_PI_URL . '/images/categories/' . 
+                'img_url', LIBRARY_PI_URL . '/images/categories/' .
                     $this->image,
             ) );
         }
 
-        /*
-        // Might want this later to set default buttons per category
-        $T->set_block('product', 'BtnRow', 'BRow');
-        foreach ($LANG_LIB['buttons'] as $key=>$value) {
-            $T->set_var(array(
-                'btn_type'  => $key,
-                'btn_chk'   => isset($this->buttons[$key]) ? 
-                                'checked="checked"' : '',
-                'btn_name'  => $value,
-            ));
-            $T->parse('BRow', 'BtnRow', true);
-        }*/
-
         if ($this->image != '') {
-            $T->set_var('img_url', 
+            $T->set_var('img_url',
                     LIBRARY_URL . "/images/categories/{$this->image}");
             $T->set_var('txt_delete', $LANG_ADVT['delete']);
             $T->set_var('del_img_url', LIBRARY_ADMIN_URL . '/index.php' .
@@ -390,7 +378,7 @@ class Category
 
         $retval .= $T->parse('output', 'category');
 
-        @setcookie($_CONF['cookie_name'].'fckeditor', 
+        @setcookie($_CONF['cookie_name'].'fckeditor',
                 SEC_createTokenGeneral('advancededitor'),
                 time() + 1200, $_CONF['cookie_path'],
                 $_CONF['cookiedomain'], $_CONF['cookiesecure']);
@@ -528,7 +516,7 @@ class Category
         }
         return ($parent_id == $cat_id) ? NULL : $parent_id;
     }
- 
+
 
     /**
     *   Recurse through the category table building an option list

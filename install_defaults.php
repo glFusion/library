@@ -3,10 +3,10 @@
 *   Configuration defaults for the Library plugin for glFusion.
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
 *   @package    library
 *   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -79,9 +79,9 @@ function plugin_initconfig_library($group_id = 0)
 
     if (!$c->group_exists($_CONF_LIB['pi_name'])) {
 
-        $c->add('sg_main', NULL, 'subgroup', 0, 0, NULL, 0, true, 
+        $c->add('sg_main', NULL, 'subgroup', 0, 0, NULL, 0, true,
                 $_CONF_LIB['pi_name']);
-        $c->add('fs_main', NULL, 'fieldset', 0, 0, NULL, 0, true, 
+        $c->add('fs_main', NULL, 'fieldset', 0, 0, NULL, 0, true,
                 $_CONF_LIB['pi_name']);
 
         $c->add('menuitem', $_LIB_DEFAULTS['menuitem'],
@@ -99,7 +99,7 @@ function plugin_initconfig_library($group_id = 0)
         $c->add('maxcheckout', $_LIB_DEFAULTS['maxcheckout'],
                 'text', 0, 0, 0, 70, true, $_CONF_LIB['pi_name']);
 
-        $c->add('fs_paths', NULL, 'fieldset', 0, 10, NULL, 0, true, 
+        $c->add('fs_paths', NULL, 'fieldset', 0, 10, NULL, 0, true,
                 $_CONF_LIB['pi_name']);
         $c->add('max_images', $_LIB_DEFAULTS['max_images'],
                 'text', 0, 10, 0, 10, true, $_CONF_LIB['pi_name']);

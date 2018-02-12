@@ -2,14 +2,14 @@
 /**
 *   Global configuration items for the Library plugin.
 *   These are either static items, such as the plugin name and table
-*   definitions, or are items that don't lend themselves well to the 
+*   definitions, or are items that don't lend themselves well to the
 *   glFusion configuration system, such as allowed file types.
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2015 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
 *   @package    paypal
 *   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */

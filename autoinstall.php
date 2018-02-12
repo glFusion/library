@@ -3,10 +3,10 @@
 *   Automatic installation functions for the Library plugin.
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
+*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
 *   @package    library
 *   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -31,76 +31,76 @@ global $LANG_LIB;
 //  Plugin installation options
 $INSTALL_plugin['library'] = array(
     'installer' => array(
-            'type' => 'installer', 
-            'version' => '1', 
+            'type' => 'installer',
+            'version' => '1',
             'mode' => 'install'
         ),
     'plugin' => array(
-            'type' => 'plugin', 
+            'type' => 'plugin',
             'name' => $_CONF_LIB['pi_name'],
-            'ver' => $_CONF_LIB['pi_version'], 
+            'ver' => $_CONF_LIB['pi_version'],
             'gl_ver' => $_CONF_LIB['gl_version'],
-            'url' => $_CONF_LIB['pi_url'], 
+            'url' => $_CONF_LIB['pi_url'],
             'display' => $_CONF_LIB['pi_display_name']
         ),
-    array(  'type' => 'table', 
-            'table' => $_TABLES['library.items'], 
+    array(  'type' => 'table',
+            'table' => $_TABLES['library.items'],
             'sql' => $_SQL['library.items']
         ),
-    array(  'type' => 'table', 
-            'table' => $_TABLES['library.categories'], 
+    array(  'type' => 'table',
+            'table' => $_TABLES['library.categories'],
             'sql' => $_SQL['library.categories']
         ),
-    array(  'type' => 'table', 
-            'table' => $_TABLES['library.trans'], 
+    array(  'type' => 'table',
+            'table' => $_TABLES['library.trans'],
             'sql' => $_SQL['library.trans']
         ),
-    array(  'type' => 'table', 
-            'table' => $_TABLES['library.images'], 
+    array(  'type' => 'table',
+            'table' => $_TABLES['library.images'],
             'sql' => $_SQL['library.images']
         ),
-    array(  'type' => 'table', 
-            'table' => $_TABLES['library.waitlist'], 
+    array(  'type' => 'table',
+            'table' => $_TABLES['library.waitlist'],
             'sql' => $_SQL['library.waitlist']
         ),
-    array(  'type' => 'table', 
-            'table' => $_TABLES['library.types'], 
+    array(  'type' => 'table',
+            'table' => $_TABLES['library.types'],
             'sql' => $_SQL['library.types']
         ),
-    array(  'type' => 'group', 
-            'group' => 'library Admin', 
+    array(  'type' => 'group',
+            'group' => 'library Admin',
             'desc' => 'Users in this group can administer the Library plugin',
-            'variable' => 'admin_group_id', 
+            'variable' => 'admin_group_id',
             'addroot' => true
         ),
-    /*array(  'type' => 'group', 
-            'group' => 'library Librarians', 
+    /*array(  'type' => 'group',
+            'group' => 'library Librarians',
             'desc' => 'Users in this group can manage checking and checkout of library items',
-            'variable' => 'librarian_group_id', 
+            'variable' => 'librarian_group_id',
             'addroot' => true
         ),*/
-    array(  'type' => 'feature', 
-            'feature' => 'library.admin', 
+    array(  'type' => 'feature',
+            'feature' => 'library.admin',
             'desc' => 'Ability to administer the Library plugin',
             'variable' => 'admin_feature_id'
         ),
-    array(  'type' => 'feature', 
-            'feature' => 'library.user', 
+    array(  'type' => 'feature',
+            'feature' => 'library.user',
             'desc' => 'Ability to use the Library plugin',
             'variable' => 'user_feature_id'
         ),
-    array(  'type' => 'mapping', 
-            'group' => 'admin_group_id', 
+    array(  'type' => 'mapping',
+            'group' => 'admin_group_id',
             'feature' => 'admin_feature_id',
             'log' => 'Adding admin feature to the admin group'
         ),
-    /*array(  'type' => 'mapping', 
-            'group' => 'admin_group_id', 
+    /*array(  'type' => 'mapping',
+            'group' => 'admin_group_id',
             'feature' => 'librarian_feature_id',
             'log' => 'Adding librarian feature to the admin group'
         ),*/
-    array(  'type' => 'mapping', 
-            'findgroup' => 'Logged-in Users', 
+    array(  'type' => 'mapping',
+            'findgroup' => 'Logged-in Users',
             'feature' => 'user_feature_id',
             'log' => 'Adding feature to the Logged-in Users group'
         ),
