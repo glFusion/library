@@ -82,6 +82,24 @@ class Waitlist
 
 
     /**
+    *   Reset the expiration dates of all item reservations.
+    *   Used if an item is checked out to a borrower that is not the next
+    *   in line, which would cause the actual next borrower's reservation to
+    *   expire.
+    *
+    *   @param  string  $item_id    Item ID
+    */
+    public static function resetExpirations($item_id)
+    {
+        global $_TABLES;
+
+        DB_query("UPDATE {$_TABLES['library.waitlist']}
+                SET expire = 0
+                WHERE item_id = '" . DB_escapeString($item_id) . "'");
+    }
+
+
+    /**
     *   Expire waitlist records.
     *   1. Expires the current reservation that has not been claimed.
     *   2. Notifies the next reservation, if any.

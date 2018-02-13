@@ -775,7 +775,13 @@ class Item
     }
 
 
-    public function CheckOut($to, $due='')
+    /**
+    *   Check out this item to a user
+    *
+    *   @param  integer $to     User ID of the borrower
+    *   @param  string  $due    Optional due date
+    */
+    public function checkOut($to, $due='')
     {
         global $_TABLES, $_USER;
 
@@ -801,8 +807,12 @@ class Item
                 WHERE id='{$this->id}'");
 
         // Delete this user from the waitlist, if applicable
-        DB_delete($_TABLES['library.waitlist'], array('item_id','uid'),
-                array($this->id, $to));
+        Waitlist::Remove($this->id, $to);
+
+        // Reset other waitlist expirations. If this borrower was not the next
+        // in line, the actual first borrower probably has a reservation
+        // expiration that should be removed.
+        Waitlist::resetExpirations($this->id);
 
         // Insert the trasaction record
         DB_query("INSERT INTO {$_TABLES['library.trans']}
