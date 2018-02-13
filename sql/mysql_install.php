@@ -59,7 +59,8 @@ $_SQL['library.trans'] = "CREATE TABLE {$_TABLES['library.trans']} (
 
 $_SQL['library.waitlist'] = "CREATE TABLE {$_TABLES['library.waitlist']} (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `dt` datetime DEFAULT NULL,
+  `dt` int(11) unsigned NOT NULL DEFAULT '0',
+  `expire` int(11) unsigned NOT NULL DEFAULT '0',
   `item_id` varchar(255) NOT NULL,
   `uid` int(11) NOT NULL,
   PRIMARY KEY (`id`),

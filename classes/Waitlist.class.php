@@ -56,6 +56,7 @@ class Waitlist
         }
 
         $sql = "INSERT IGNORE INTO {$_TABLES['library.waitlist']} SET
+            dt = UNIX_TIMESTAMP(),
             expire = '" . $exp_dt . "',
             item_id = '{$Item->id}',
             uid = '$uid'";
