@@ -163,6 +163,8 @@ $LANG_LIB_HELP = array(
 'enabled' => 'Check if this item is enabled. Disabling an item can be used to temporarily remove an item from the catalog.',
 'comments' => 'Select whether comments are enabled for this item.',
 'max_wait_items' => 'You can reserve up to ' . $_CONF_LIB['max_wait_items'] . ' items at a time.',
+'due_dt' => 'Enter or select the due date for the item.',
+'checkout_user' => 'Select the user to check out this item. The user at the top of the waiting list is shown first.',
 );
 
 /** Message indicating plugin version is up to date */
