@@ -864,7 +864,7 @@ class Item
                     'item_id', $this->id);
             $user_wait_items = DB_count($_TABLES['library.waitlist'],
                     'uid', $_USER['uid']);
-            $reserve_txt = '';
+            $reserve_txt = $waitlist ? sprintf($LANG_LIB['has_waitlist'], $waitlist) : '';
             if ($on_waitlist) {
                 $can_reserve = false;
                 $is_reserved = true;
