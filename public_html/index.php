@@ -26,7 +26,7 @@ if (!in_array('library', $_PLUGINS)) {
 USES_library_functions();
 
 // Only logged-in uses can view items
-if (COM_isAnonUser()) {
+if (!SEC_hasRights('library.view,library.admin', 'OR')) {
     echo LIBRARY_siteHeader();
     echo SEC_loginRequiredForm();
     echo LIBRARY_siteFooter();

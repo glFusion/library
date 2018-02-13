@@ -85,24 +85,29 @@ $INSTALL_plugin['library'] = array(
             'variable' => 'admin_feature_id'
         ),
     array(  'type' => 'feature',
-            'feature' => 'library.user',
-            'desc' => 'Ability to use the Library plugin',
-            'variable' => 'user_feature_id'
+            'feature' => 'library.view',
+            'desc' => 'Ability to view the Library listings',
+            'variable' => 'view_feature_id'
+        ),
+    array(  'type' => 'feature',
+            'feature' => 'library.checkout',
+            'desc' => 'Ability to check out library items',
+            'variable' => 'checkout_feature_id'
         ),
     array(  'type' => 'mapping',
             'group' => 'admin_group_id',
             'feature' => 'admin_feature_id',
             'log' => 'Adding admin feature to the admin group'
         ),
-    /*array(  'type' => 'mapping',
-            'group' => 'admin_group_id',
-            'feature' => 'librarian_feature_id',
-            'log' => 'Adding librarian feature to the admin group'
-        ),*/
     array(  'type' => 'mapping',
             'findgroup' => 'Logged-in Users',
-            'feature' => 'user_feature_id',
-            'log' => 'Adding feature to the Logged-in Users group'
+            'feature' => 'checkout_feature_id',
+            'log' => 'Adding checkout feature to the logged-in group'
+        ),
+    array(  'type' => 'mapping',
+            'findgroup' => 'Logged-in Users',
+            'feature' => 'view_feature_id',
+            'log' => 'Adding view feature to the Logged-in Users group'
         ),
     array('type' => 'sql',
             'sql' => $_DEFDATA['library.categories']

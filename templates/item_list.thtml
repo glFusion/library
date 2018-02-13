@@ -28,7 +28,7 @@
         <img src="{small_pic}" alt="{name}" style="border: none" />
       </a>
 {!else}
-        &nbsp;
+      &nbsp;
 {!endif}
     </div>
 

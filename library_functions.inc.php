@@ -171,9 +171,7 @@ function LIBRARY_ItemList()
 {
     global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB, $_USER, $_PLUGINS;
 
-    $T = new Template(LIBRARY_PI_PATH . '/templates');
-    $T->set_file('item', 'item_list.thtml');
-
+    $T = LIBRARY_getTemplate('item_list', 'item');
     $sortby = 'name';
     $sortdir = isset($_GET['sortdir']) && $_GET['sortdir'] == 'DESC' ? 'DESC' : 'ASC';
     $url_opts = '&sortdir=' . $sortdir;
@@ -268,7 +266,6 @@ function LIBRARY_ItemList()
     // Display each product
     $T->set_block('item', 'ItemRow', 'IRow');
     while ($A = DB_fetchArray($res, false)) {
-        //$T->set_block('product', 'ProdItem', 'PItem');
 
         $P->SetVars($A, true);
 

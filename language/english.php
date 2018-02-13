@@ -77,6 +77,7 @@ $LANG_LIB = array (
 'warning'           => 'Warning',
 'error'             => 'Error',
 'alert'             => 'Alert',
+'login_req'         => 'Please log in to view options.',
 'invalid_item_id' => 'An invalid item ID was requested',
 'access_denied_msg' => 'You do not have access to this page. <p />' .
     'If you believe you have reached this message in error, ' .

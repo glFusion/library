@@ -851,29 +851,27 @@ class Item
 
         $T = LIBRARY_getTemplate('avail_block', 'avail');
 
-        // Check if we have the item reserved, and if there's a waitlist.
-        $on_waitlist = DB_count($_TABLES['library.waitlist'],
+        if (!SEC_hasRights('library.checkout,library.admin', 'OR')) {
+            $can_reserve = false;
+            $is_reserved = false;
+            $reserve_txt = $LANG_LIB['login_req'];
+        } else {
+            // Check if we have the item reserved, and if there's a waitlist.
+            $on_waitlist = DB_count($_TABLES['library.waitlist'],
                     array('item_id', 'uid'),
                     array($this->id, $_USER['uid'])) == 1;
-        $waitlist = DB_count($_TABLES['library.waitlist'],
+            $waitlist = DB_count($_TABLES['library.waitlist'],
                     'item_id', $this->id);
-        $user_wait_items = DB_count($_TABLES['library.waitlist'],
+            $user_wait_items = DB_count($_TABLES['library.waitlist'],
                     'uid', $_USER['uid']);
-
-        $reserve_txt = sprintf($LANG_LIB['has_waitlist'], $waitlist);
-        if ($on_waitlist) {
-            $can_reserve = false;
-            $is_reserved = true;
-            //$wait_action = 'rmv';
-            //$wait_confirm_txt = $LANG_LIB['conf_rmvwaitlist'];
-            //$wait_action_txt = $LANG_LIB['on_waitlist'] . '<br />' .
-            //                        $LANG_LIB['click_to_remove'];
-        } else {
-            $can_reserve = $user_wait_items < $_CONF_LIB['max_wait_items'] ? true : false;
-            $is_reserved = false;
-            //$wait_action = 'add';
-            //$wait_confirm_txt = $LANG_LIB['conf_addwaitlist'];
-            //$wait_action_txt = $LANG_LIB['add_waitlist'];
+            $reserve_txt = '';
+            if ($on_waitlist) {
+                $can_reserve = false;
+                $is_reserved = true;
+            } else {
+                $can_reserve = $user_wait_items < $_CONF_LIB['max_wait_items'] ? true : false;
+                $is_reserved = false;
+            }
         }
 
         switch ($this->status) {
@@ -899,13 +897,12 @@ class Item
             'can_reserve'   => $can_reserve,
             'is_reserved'   => $is_reserved,
             'wait_limit_reached' => $user_wait_items >= $_CONF_LIB['max_wait_items'],
-            //'avail_icon'    => $avail_icon,
             'avail_txt'     => $avail_txt,
             'due_dt'        => '',
             //'wait_action' => $wait_action,
             //'wait_confirm_txt' => $wait_confirm_txt,
             //'wait_action_txt' => $wait_action_txt,
-            //'reserve_txt' => $reserve_txt,
+            'reserve_txt' => $reserve_txt,
             'id'            => $this->id,
             'pi_url'        =>  LIBRARY_URL,
         ) );

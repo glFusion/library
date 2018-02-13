@@ -149,11 +149,10 @@ function plugin_upgrade_library()
 */
 function plugin_getmenuitems_library()
 {
-    global $_CONF, $_CONF_LIB, $LANG_LIB;
+    global $_CONF_LIB, $LANG_LIB;
 
     $menuitems = array();
-  	if ((SEC_hasRights('library.user') || SEC_hasRights('library.admin')
-            && $_CONF_LIB['menuitem'])) {
+    if ($_CONF_LIB['menuitem'] && SEC_hasRights('library.view,library.admin', 'OR')) {
       	$menuitems[$LANG_LIB['mnu_library']] = LIBRARY_URL . '/index.php';
     }
     return $menuitems;
@@ -717,7 +716,8 @@ function plugin_autouninstall_library()
         // Give the full name of the feature, as in the db
         'features' => array(
                 'library.admin',
-                'library.user',
+                'library.view',
+                'library.checkout',
         ),
         // Give the full name of the block, including 'phpblock_', etc
         'php_blocks' => array(),
