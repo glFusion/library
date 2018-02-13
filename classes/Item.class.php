@@ -834,6 +834,8 @@ class Item
                 VALUES (
                     '{$this->id}', UNIX_TIMESTAMP(), $me, {$this->uid}, 'checkin')");
         }
+        // If there's a reservation for this item, notify the reserver.
+        Waitlist::notifyNext($this);
     }
 
 

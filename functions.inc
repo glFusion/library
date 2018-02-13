@@ -978,29 +978,7 @@ function plugin_canuserrate_library($item_id, $uid)
 */
 function plugin_runScheduledTask_library()
 {
-    global $_TABLES, $_CONF_PP, $_CONF;
-
-    // Delete expired waitlist entries.  This could be done as one
-    // sql statement, but we want to log each deletion.
-    $sql = "SELECT w.id, w.dt, u.username, i.id as item_id
-            FROM {$_TABLES['library.waitlist']} w
-            LEFT JOIN {$_TABLES['library.items']} i
-                ON i.id = w.item_id
-            LEFT JOIN {$_TABLES['users']} u
-                ON u.uid = w.uid
-            WHERE
-                i.daysonhold > 0
-            AND
-                w.dt < now() - interval i.daysonhold day
-            AND
-                i.status=" . LIB_STATUS_AVAIL;
-    $result = DB_query($sql);
-
-    while ($A = DB_fetchArray($result, false)) {
-        DB_delete($_TABLES['library.waitlist'], 'id', $A['id']);
-        COM_errorLog('LIBRARY: delete waitlist, ' .
-            "user {$A['username']}, item {$A['item_id']} dated {$A['dt']}");
-    }
+    Library\Waitlist::Expire();
 }
 
 

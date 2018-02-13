@@ -70,7 +70,6 @@ case 'checkout':
 case 'checkin':
     $I = new Library\Item($_REQUEST['id']);
     $I->checkIn();
-    LIBRARY_notifyWaitlist($_REQUEST['id']);
     COM_refresh(LIBRARY_ADMIN_URL);
     break;
 
