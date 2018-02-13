@@ -765,8 +765,7 @@ function LIBRARY_checkoutForm($id)
     global $_CONF, $LANG_LIB, $_CONF_LIB;
 
     $I = new Library\Item($id);
-    $item_id = $I->id;
-    if ($item_id == '') {
+    if ($I->isNew || $I->id == '') {
         return 'Invalid Item Selected';
     }
 
@@ -785,10 +784,10 @@ function LIBRARY_checkoutForm($id)
         'title'         => $LANG_LIB['admin_title'],
         'action_url'    => LIBRARY_ADMIN_URL . '/index.php',
         'pi_url'        => LIBRARY_URL,
-        'item_id'       => $item_id,
+        'item_id'       => $I->id,
         'item_name'     => $I->name,
         'item_desc'     => $I->dscp,
-        'user_select'   => LIBRARY_userSelect($item_id),
+        'user_select'   => LIBRARY_userSelect($I->id),
         'due'           => LIBRARY_dueDate($I->maxcheckout)->format('Y-m-d'),
         'iso_lang'      => $iso_lang,
     ) );
@@ -801,35 +800,49 @@ function LIBRARY_userSelect($item_id='')
 {
     global $_TABLES, $LANG_LIB;
 
+    $retval = '';
+    $wl_users = array();
     $sel_user = '';
     if ($item_id != '') {
         // Get the next user on the waiting list
-        $sql = "SELECT uid FROM {$_TABLES['library.waitlist']}
-                WHERE item_id='" . COM_sanitizeId($item_id, false) . "'
-                ORDER BY dt ASC
-                LIMIT 1";
+        $sql = "SELECT wl.uid,u.fullname,u.username
+                FROM {$_TABLES['library.waitlist']} wl
+                LEFT JOIN {$_TABLES['users']} u
+                    ON u.uid = wl.uid
+                WHERE wl.item_id='" . COM_sanitizeId($item_id, false) . "'
+                ORDER BY wl.dt ASC";
         $res = DB_query($sql,1);
-        if (DB_numRows($res) == 1) {
-            $A = DB_fetchArray($res, false);
-            $sel_user = $A['uid'];
+        while ($A = DB_fetchArray($res, false)) {
+            $wl_users[] = $A['uid'];
+            if ($sel_user == '') {      // set the first user as selected
+                $sel_user = $A['uid'];
+                $sel = 'selected="selected"';
+            } else {
+                $sel = '';
+            }
+            $userdisplay = "{$A['fullname']} ({$A['username']}) &lt;== " . $LANG_LIB['next_on_list'];
+            $retval .= "<option value='{$A['uid']}' $sel>$userdisplay</option>\n";
         }
     }
 
     $sql = "SELECT uid, username, fullname
             FROM {$_TABLES['users']}
             WHERE uid > 1";
+    if (!empty($wl_users)) {
+        $sql .= ' AND uid NOT IN (' . implode(',', $wl_users) . ')';
+    }
     $res = DB_query($sql,1);
 
-    $retval = '';
     while ($A = DB_fetchArray($res, false)) {
         $userdisplay = "{$A['fullname']} ({$A['username']})";
-        if ($A['uid'] == $sel_user) {
-            $selected = 'selected="selected"';
+        if ($sel_user == '') {
+            $sel_user = $A['uid'];
+            $sel = 'selected="selected"';
             $userdisplay = $userdisplay . ' &lt;== ' . $LANG_LIB['next_on_list'];
         } else {
-            $selected = '';
+            $sel = '';
         }
-        $retval .= "<option value='{$A['uid']}' $selected>$userdisplay</option>\n";
+        $retval .= "<option value='{$A['uid']}' $sel>$userdisplay</option>\n";
     }
     return $retval;
 }
