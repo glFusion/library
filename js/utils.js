@@ -55,7 +55,7 @@ var LIBR_openlibLookup = function(isbn) {
                 LIBR_updateField(res.subtitle, "short_desc");
             }
             catch(err) {
-                console.log("openlibrary lookup error");
+                $.UIkit.notify("OpenLibrary lookup error", {timeout: 1000,pos:'top-center'});
             }
         },
         error: function(jqXHR, textStatus, errorThrown) {
