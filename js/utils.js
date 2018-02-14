@@ -78,3 +78,40 @@ function LIBR_updateField(value, elem_id)
     if (typeof(value) != "undefined")
         document.getElementById(elem_id).value = value;
 }
+
+var LIBR_ajaxReserve = function(item_id, action)
+{
+    var dataS = {
+        "item_id" : item_id,
+        "action" : action,
+    };
+    data = $.param(dataS);
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: glfusionSiteUrl + "/library/ajax.php",
+        data: data,
+        success: function(result, textStatus, jqXHR) {
+            try {
+                if (result.error == 0) {
+                    elem = document.getElementById("avail_" + result.item_id);
+                    if (typeof(elem) != 'undefined') {
+                        elem.innerHTML=result.html;
+                    }
+                } else {
+                    $.UIkit.notify("An error occurred", {timeout: 1000,pos:'top-center'});
+                }
+            }
+            catch(err) {
+                console.log("ajaxReserve error");
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR);
+            console.log(textStatus);
+            console.log(errorThrown);
+        },
+    });
+    return false;
+};
+

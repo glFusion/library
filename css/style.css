@@ -45,6 +45,12 @@ a.lib_itemlist {
     font-weight:bold;
 }
 
+div.libAvailBlk {
+    float:right;
+    position:relative;
+    background-color:#EEE;
+}
+
 .lib_itemlist div {
     position:relative;
     float:left;

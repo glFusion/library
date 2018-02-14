@@ -867,17 +867,35 @@ class Item
             $reserve_txt = $LANG_LIB['login_req'];
         } else {
             // Check if we have the item reserved, and if there's a waitlist.
-            $on_waitlist = DB_count($_TABLES['library.waitlist'],
+            $sql = "SELECT uid FROM {$_TABLES['library.waitlist']}
+                    WHERE item_id = '" . DB_escapeString($this->id) . "'
+                    ORDER BY id ASC";
+            $res = DB_query($sql);
+            $A = array();
+            if ($res) {
+                $A = DB_fetchAll($res, false);
+            }
+            $waitlisters = count($A);
+            $waitlist_pos = 0;
+            for ($i = 0; $i < $waitlisters; $i++) {
+                if ($A[$i]['uid'] == $_USER['uid']) {
+                    $waitlist_pos = $i + 1;
+                    break;
+                }
+            }
+            /*$on_waitlist = DB_count($_TABLES['library.waitlist'],
                     array('item_id', 'uid'),
                     array($this->id, $_USER['uid'])) == 1;
             $waitlist = DB_count($_TABLES['library.waitlist'],
-                    'item_id', $this->id);
+                    'item_id', $this->id);*/
             $user_wait_items = DB_count($_TABLES['library.waitlist'],
                     'uid', $_USER['uid']);
-            $reserve_txt = $waitlist ? sprintf($LANG_LIB['has_waitlist'], $waitlist) : '';
-            if ($on_waitlist) {
+            $reserve_txt = $waitlisters ? sprintf($LANG_LIB['has_waitlist'], $waitlisters) : '';
+            $waitlist_txt = '';
+            if ($waitlist_pos > 0) {
                 $can_reserve = false;
                 $is_reserved = true;
+                $waitlist_txt = sprintf($LANG_LIB['on_waitlist'], $waitlist_pos);
             } else {
                 $can_reserve = $user_wait_items < $_CONF_LIB['max_wait_items'] ? true : false;
                 $is_reserved = false;
@@ -908,6 +926,7 @@ class Item
             'is_reserved'   => $is_reserved,
             'wait_limit_reached' => $user_wait_items >= $_CONF_LIB['max_wait_items'],
             'avail_txt'     => $avail_txt,
+            'waitlist_txt'  => $waitlist_txt,
             'due_dt'        => '',
             //'wait_action' => $wait_action,
             //'wait_confirm_txt' => $wait_confirm_txt,

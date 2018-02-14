@@ -1,5 +1,5 @@
 {# begin {templatelocation} #}
-<div style="float:right;position:relative;background-color:#EEE;">
+<div id="avail_{id}" class="libAvailBlk">
 {!if avail_txt}
   {avail_txt}<br />
 {!endif}
@@ -7,25 +7,13 @@
   {reserve_txt}<br />
 {!endif}
 {!if can_reserve}
-  <a href="{pi_url}/index.php?addwait=x&id={id}" 
-        onclick="return confirm('{$LANG_LIB['conf_addwaitlist']}');">
-    <button class="uk-button uk-button-success">{$LANG_LIB['add_waitlist']}</button>
-  </a><br />
+    <button class="uk-button uk-button-success"
+        onclick="javascript:LIBR_ajaxReserve('{id}', 'addwait');">{$LANG_LIB['add_waitlist']}</button>
 {!endif}
 {!if is_reserved}
-  {$LANG_LIB['on_waitlist']}<br />
-  <a href="{pi_url}/index.php?rmvwait=x&id={id}" 
-        onclick="return confirm('{$LANG_LIB['conf_rmvwaitlist']}');">
-    <button class="uk-button uk-button-danger">{$LANG_LIB['click_to_remove']}</button>
-  </a><br />
-{!endif}
-{!if 0}
-  <a href="{pi_url}/index.php?{wait_action}wait=x&id={id}" 
-        onclick="return confirm('{wait_confirm_txt}');">
-{!if wait_action_txt}
-    <br /><button class="uk-button uk-button-success">{wait_action_txt}</button>
-{!endif}
-  </a>
+  {waitlist_txt}<br />
+    <button class="uk-button uk-button-danger"
+        onclick="javascript:LIBR_ajaxReserve('{id}', 'rmvwait');">{$LANG_LIB['click_to_remove']}</button>
 {!endif}
 </div>
 

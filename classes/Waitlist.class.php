@@ -60,9 +60,14 @@ class Waitlist
             expire = '" . $exp_dt . "',
             item_id = '{$Item->id}',
             uid = '$uid'";
-        DB_query($sql);
-        LIBRARY_notifyLibrarian($Item->id, $uid);
-        return DB_error() ? 0 : DB_insertID();
+        DB_query($sql,1);
+        if (!DB_error()) {
+            USES_library_functions();
+            LIBRARY_notifyLibrarian($Item->id, $uid);
+            return DB_insertID();
+        } else {
+            return 0;
+        }
     }
 
 
