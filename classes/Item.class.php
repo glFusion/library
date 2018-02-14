@@ -293,6 +293,7 @@ class Item
             }
         }
         if (empty($this->Error)) {
+            Cache::clear();
             PLG_itemSaved($this->id, $_CONF_LIB['pi_name']);
             return true;
         } else {
@@ -805,7 +806,7 @@ class Item
                     uid=$to,
                     due=$due
                 WHERE id='{$this->id}'");
-
+        Cache:clear();
         // Delete this user from the waitlist, if applicable
         Waitlist::Remove($this->id, $to);
 
@@ -836,6 +837,7 @@ class Item
                     uid = 0,
                     due = 0
                 WHERE id='$id'");
+        Cache:clear();
 
         // Insert the trasaction record, only if it's checked out.
         if ($uid > 1) {
@@ -909,7 +911,6 @@ class Item
             elseif (!$is_reserved)
                 $avail_txt = $LANG_LIB['max_wait_items'];
             break;
-
         case LIB_STATUS_OUT:
             $avail_txt = $LANG_LIB['not_available'];
             $avail_icon = 'red.png';
