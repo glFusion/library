@@ -284,6 +284,26 @@ class MediaType
         return $retval;
     }
 
+
+    /**
+    *   Get the options for a selection list.
+    *
+    *   @param  integer $sel_type   Selected media type
+    *   @return string      HTML for options
+    */
+    public static function buildSelection($sel_type = 0)
+    {
+        global $_TABLES;
+
+        $retval = '';
+        $res = DB_query("SELECT * from {$_TABLES['library.types']}", 1);
+        while ($A = DB_fetchArray($res, false)) {
+            $sel = $A['id'] == $sel_type ? 'selected="selected"' : '';
+            $retval .= "<option value='{$A['id']}' $sel>{$A['name']}</option>" . LB;
+        }
+        return $retval;
+    }
+
 }   // class MediaType
 
 ?>
