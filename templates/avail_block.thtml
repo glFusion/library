@@ -7,13 +7,17 @@
   {reserve_txt}<br />
 {!endif}
 {!if can_reserve}
-    <button class="uk-button uk-button-success"
-        onclick="javascript:LIBR_ajaxReserve('{id}', 'addwait');">{$LANG_LIB['add_waitlist']}</button>
+    <a href="{pi_url}/index.php?addwait=x&id={id}">
+    <button class="uk-button uk-button-success">{$LANG_LIB['add_waitlist']}</button>
+    </a>
+{#        onclick="javascript:LIBR_ajaxReserve('{id}', 'addwait');">{$LANG_LIB['add_waitlist']}</button>#}
 {!endif}
 {!if is_reserved}
   {waitlist_txt}<br />
-    <button class="uk-button uk-button-danger"
-        onclick="javascript:LIBR_ajaxReserve('{id}', 'rmvwait');">{$LANG_LIB['click_to_remove']}</button>
+    <a href="{pi_url}/index.php?rmvwait=x&id={id}">
+    <button class="uk-button uk-button-danger">{$LANG_LIB['click_to_remove']}</button>
+    </a>
+{#        onclick="javascript:LIBR_ajaxReserve('{id}', 'rmvwait');">{$LANG_LIB['click_to_remove']}</button>#}
 {!endif}
 </div>
 
