@@ -1,6 +1,6 @@
 {# begin {templatelocation} #}
 <div style="text-align:center;">
-  <form action="{pi_url}/index.php" method="post">
+  <form action="{pi_url}/index.php" method="get">
   {$LANG_LIB['search']}:&nbsp;
   <input type="text" name="query" value="{query}">&nbsp;&nbsp;
   {$LANG_LIB['sort']}:&nbsp;
@@ -12,7 +12,13 @@
   <select name="type" onchange="this.form.submit();">
     <option value="0">-- {$LANG_LIB['all']} --</option>
     {type_select}
+  </select>&nbsp&nbsp;
+  {$LANG_LIB['category']}:&nbsp;
+  <select name="cat_id" onchange="this.form.submit();">
+    <option value="0">-- {$LANG_LIB['all']} --</option>
+    {cat_select}
   </select>
+
   </form>
 
 <!-- BEGIN ItemRow -->

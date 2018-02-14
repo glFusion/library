@@ -71,7 +71,6 @@ function X_LIBRARY_history($admin = false, $uid = '')
                 'field' => 'username', 'sort' => true);
     }
 
-
     $defsort_arr = array('field' => 'p.purchase_date',
             'direction' => 'asc');
 
@@ -89,7 +88,7 @@ function X_LIBRARY_history($admin = false, $uid = '')
         'form_url' => $base_url . '/index.php?mode=history',
     );
 
-    if (!isset($_REQUEST['query_limit']))
+    if (!isset($_GET['query_limit']))
         $_GET['query_limit'] = 20;
 
     $display .= ADMIN_list('library', 'LIBRARY_getPurchaseHistoryField',
@@ -111,7 +110,7 @@ function X_LIBRARY_history($admin = false, $uid = '')
 *   @param  object  $EntryList  This entry list object
 *   @return string              HTML for field display in the table
 */
-function LIBRARY_getPurchaseHistoryField($fieldname, $fieldvalue, $A, $icon_arr)
+function XX_LIBRARY_getPurchaseHistoryField($fieldname, $fieldvalue, $A, $icon_arr)
 {
     global $_CONF, $_CONF_LIB, $LANG_LIB;
     
@@ -175,46 +174,43 @@ function LIBRARY_ItemList()
     $sortby = 'name';
     $sortdir = isset($_GET['sortdir']) && $_GET['sortdir'] == 'DESC' ? 'DESC' : 'ASC';
     $url_opts = '&sortdir=' . $sortdir;
-    $med_type = isset($_REQUEST['type']) ? (int)$_REQUEST['type'] : 0;
+    $med_type = isset($_GET['type']) ? (int)$_GET['type'] : 0;
+    $cat_id = isset($_GET['cat_id']) ? (int)$_GET['cat_id'] : 0;
     $url_opts .= '&type=' . $med_type;
 
-    $res = DB_query("SELECT * from {$_TABLES['library.types']}", 1);
-    $opt_list = '';
-    while ($type = DB_fetchArray($res, false)) {
-        $sel = $type['id'] == $med_type ? 'selected="selected"' : '';
-        $opt_list .= "<option value='{$type['id']}' $sel>{$type['name']}</option>\n";
-    }
     $T->set_var(array(
-            'pi_url'        => LIBRARY_URL,
-            'type_select'   => $opt_list,
+        'pi_url'        => LIBRARY_URL,
+        'type_select'   => Library\MediaType::buildSelection($med_type),
+        'cat_select'    => Library\Category::buildSelection($cat_id),
     ) );
 
     // Get items from database
-    /*$sql_X = " FROM {$_TABLES['library.items']} p
+    $sql = " FROM {$_TABLES['library.items']} p
             LEFT JOIN {$_TABLES['library.categories']} c
                 ON p.cat_id = c.cat_id
-            WHERE 
-                p.enabled=1 
-            AND 
-                (c.enabled=1 OR c.enabled IS NULL)";*/
+            WHERE p.enabled=1 
+            AND (c.enabled=1 OR c.enabled IS NULL) " .
+            COM_getPermSQL('AND', 0, 2, 'c');
 
-    $sql = " FROM {$_TABLES['library.items']} p
-            WHERE p.enabled=1 ";
+    $pagenav_args = '?1=1';
 
     // If applicable, limit by category
-    /*if (!empty($_REQUEST['category'])) {
-        $sql .= " AND c.cat_id = '".DB_escapeString($_REQUEST['category'])."'";
-        $pagenav_args = '?category=' . urlencode($_REQUEST['category']);
-    }*/
+    if ($cat_id > 0) {
+        $sql .= " AND p.cat_id = $cat_id";
+        $pagenav_args .= '&category=' . $cat_id;
+    }
 
-    if ($med_type > 0)
+    if ($med_type > 0) {
         $sql .= " AND type = '$med_type'";
+        $pagenav_args .= '&type = ' . $med_type;
+    }
 
-    if (!empty($_REQUEST['query'])) {
-        $query = DB_escapeString($_REQUEST['query']);
+    if (!empty($_GET['query'])) {
+        $query = DB_escapeString($_GET['query']);
         $sql .= " AND (p.name like '%$query%' 
                 OR p.dscp like '%$query%')";
-        $T->set_var('query', htmlspecialchars($_REQUEST['query']));
+        $T->set_var('query', htmlspecialchars($_GET['query']));
+        $pagenav_args .= '&query=' . urlencode($_GET['query']);
     }
 
     // If applicable, order by
@@ -223,12 +219,18 @@ function LIBRARY_ItemList()
     // If applicable, handle pagination of query
     if (isset($_CONF_LIB['items_per_page']) && $_CONF_LIB['items_per_page'] > 0) {
         // Count items from database
-        $res = DB_query('SELECT COUNT(*) as cnt ' . $sql);
-        $x = DB_fetchArray($res, false);
-        if (isset($x['cnt']))
-            $count = (int)$x['cnt'];
-        else
-            $count = 0;
+        $count_sql = 'SELECT COUNT(*) as cnt ' . $sql;
+        $key = md5($count_sql);
+        $count = Library\Cache::get($key);
+        if ($count === NULL) {
+            $res = DB_query($count_sql);
+            $x = DB_fetchArray($res, false);
+            if (isset($x['cnt']))
+                $count = (int)$x['cnt'];
+            else
+                $count = 0;
+            Library\Cache::set($key, $count);
+        }
 
         // Make sure page requested is reasonable, if not, fix it
         $page = isset($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
@@ -242,10 +244,16 @@ function LIBRARY_ItemList()
         }
     }
 
-    // Re-execute query with the limit clause in place
-    $res = DB_query('SELECT DISTINCT p.* ' . $sql);
+    $sql1 = 'SELECT p.* ' . $sql;
+    $key = md5($sql);
+    $Items = Library\Cache::get($key);
+    if ($Items === NULL) {
+        // Re-execute query with the limit clause in place
+        $res = DB_query($sql1);
+        $Items = DB_fetchAll($res, false);
+        Library\Cache::set($key, $Items);
+    }
 
-    //$T->set_var('sortby_options', $sortby_options);
     if ($sortdir == 'DESC') {
         $T->set_var('sortdir_desc_sel', ' selected="selected"');
     } else {
@@ -265,7 +273,8 @@ function LIBRARY_ItemList()
 
     // Display each product
     $T->set_block('item', 'ItemRow', 'IRow');
-    while ($A = DB_fetchArray($res, false)) {
+    //while ($A = DB_fetchArray($res, false)) {
+    foreach ($Items as $A) {
 
         $P->SetVars($A, true);
 
