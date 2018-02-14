@@ -135,7 +135,7 @@ case 'savecat':
         $content .= LIBRARY_popupMsg($LANG_LIB['invalid_form']);
         $view = 'editcat';
     } else {
-        $view = 'catlist';
+        COM_refresh(LIBRARY_ADMIN_URL . '/index.php?catlist');
     }
     break;
 
@@ -545,12 +545,8 @@ function LIBRARY_adminlist_Category()
     global $_CONF, $_CONF_LIB, $_TABLES, $LANG_LIB, $_USER, $LANG_ADMIN;
 
     $display = '';
-    $sql = "SELECT
-                cat.cat_id, cat.cat_name, cat.dscp, cat.enabled,
-                parent.cat_name as pcat
-            FROM {$_TABLES['library.categories']} cat
-            LEFT JOIN {$_TABLES['library.categories']} parent
-            ON cat.parent_id = parent.cat_id";
+    $sql = "SELECT cat.cat_id, cat.cat_name, cat.dscp, cat.enabled
+            FROM {$_TABLES['library.categories']} cat";
 
     $header_arr = array(
         array('text' => $LANG_ADMIN['edit'],
@@ -563,8 +559,6 @@ function LIBRARY_adminlist_Category()
                 'field' => 'cat_name', 'sort' => true),
         array('text' => $LANG_LIB['dscp'],
                 'field' => 'dscp', 'sort' => true),
-        array('text' => $LANG_LIB['parent_cat'],
-                'field' => 'pcat', 'sort' => true),
         array('text' => $LANG_ADMIN['delete'],
                 'field' => 'delete', 'sort' => false, 'align' => 'center'),
     );
@@ -614,13 +608,13 @@ function LIBRARY_getAdminField_Category($fieldname, $fieldvalue, $A, $icon_arr)
     switch($fieldname) {
     case 'edit':
         $retval .= COM_createLink(
-                '<i class="' . LIBRARY_getIcon('edit') . '"></i>',
-                LIBRARY_ADMIN_URL . "/index.php?mode=editcat&amp;id={$A['cat_id']}",
-                array('class' => 'gl_mootip',
-                    'title' => $LANG_ADMIN['edit'],
-                    'data-uk-tooltip' => '',
-                )
-            );
+            '<i class="' . LIBRARY_getIcon('edit') . '"></i>',
+            LIBRARY_ADMIN_URL . "/index.php?mode=editcat&amp;id={$A['cat_id']}",
+            array('class' => 'gl_mootip',
+                'title' => $LANG_ADMIN['edit'],
+                'data-uk-tooltip' => '',
+            )
+        );
         break;
 
     case 'enabled':
@@ -641,6 +635,9 @@ function LIBRARY_getAdminField_Category($fieldname, $fieldvalue, $A, $icon_arr)
                     'title' => $LANG_LIB['deleteitem'],
                     'data-uk-tooltip' => '',
                 ));
+        } else {
+            $retval .= '<i class="' . LIBRARY_getIcon('trash', 'unknown') .
+                    '" title="' . $LANG_LIB['nodel_cat'] . '" data-uk-tooltip></i>';
         }
         break;
 

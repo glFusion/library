@@ -55,13 +55,12 @@ class Category
             $this->parent_id = 0;
             $this->cat_name = '';
             $this->dscp = '';
-            $this->group_id = '';
-            $this->owner_id = 0;
+            $this->group_id = 1;
+            $this->owner_id = 2;
             $this->perm_owner = 3;
             $this->perm_group = 3;
             $this->perm_members = 2;
             $this->perm_anon = 2;
-            //$this->image = '';
             $this->enabled = 1;
         } else {
             $this->cat_id = $id;
@@ -104,7 +103,6 @@ class Category
         case 'cat_name':
         case 'disp_name':
         case 'dscp':
-        //case 'image':
             // String values
             $this->properties[$var] = trim($value);
             break;
@@ -142,7 +140,7 @@ class Category
     *
     *   @param array $row Array of values, from DB or $_POST
     */
-    public function setVars($row)
+    public function setVars($row, $fromDB=true)
     {
         if (!is_array($row)) return;
 
@@ -152,14 +150,23 @@ class Category
         $this->enabled = $row['enabled'];
         $this->cat_name = $row['cat_name'];
         $this->disp_name = isset($row['disp_name']) ? $row['disp_name'] : $row['cat_name'];
-        //$this->perm_owner = $row['perm_owner'];
-        //$this->perm_group = $row['perm_group'];
-        //$this->perm_members = $row['perm_members'];
-        //$this->perm_anon = $row['perm_anon'];
-        //$this->keywords = $row['keywords'];
-        //$this->image = $row['image'];
-        //$this->group_id = $row['group_id'];
-        //$this->owner_id = $row['owner_id'];
+        $this->keywords = $row['keywords'];
+        $this->group_id = $row['group_id'];
+        $this->owner_id = $row['owner_id'];
+        if ($fromDB) {
+            $this->perm_owner = $row['perm_owner'];
+            $this->perm_group = $row['perm_group'];
+            $this->perm_members = $row['perm_members'];
+            $this->perm_anon = $row['perm_anon'];
+        } else {
+            list($perm_owner,$perm_group,$perm_members,$perm_anon) =
+                SEC_getPermissionValues($row['perm_owner'] ,$row['perm_group'],
+                    $row['perm_members'] ,$row['perm_anon']);
+            $this->perm_owner = $perm_owner;
+            $this->perm_group = $perm_group;
+            $this->perm_members = $perm_members;
+            $this->perm_anon = $perm_anon;
+        }
     }
 
 
@@ -205,37 +212,8 @@ class Category
         global $_TABLES, $_CONF_LIB;
 
         if (is_array($A)) {
-            $this->setVars($A);
+            $this->setVars($A, false);
         }
-
-        // Handle image uploads.
-        // We don't want to delete the existing image if one isn't
-        // uploaded, we should leave it unchanged.  So we'll first
-        // retrieve the existing image filename, if any.
-        /*if (!$this->isNew) {
-            $img_filename = DB_getItem($_TABLES['library.categories'],
-                        'image', "cat_id={$this->cat_id}");
-        } else {
-            // New entry, assume no image
-            $img_filename = '';
-        }
-        if (is_uploaded_file($_FILES['imagefile']['tmp_name'])) {
-            $img_filename =  rand(100,999) .  "_" .
-                     COM_sanitizeFilename($_FILES['imagefile']['name'], true);
-            if (!@move_uploaded_file($_FILES['imagefile']['tmp_name'],
-                            $_CONF_LIB['catimgpath']."/$img_filename")) {
-                $this->AddError('Error Moving Image');
-            } else {
-                // If a new image was uploaded, and this is an existing category,
-                // then delete the old image, if any.  The DB still has the old
-                // filename at this point.
-                if (!$this->isNew) {
-                    $this->DeleteImage();
-                }
-            }
-        }
-        $this->image = $img_filename;
-        */
 
         // Insert or update the record, as appropriate, as long as a
         // previous error didn't occur.
@@ -247,17 +225,15 @@ class Category
                 $sql1 = "UPDATE {$_TABLES['library.categories']} SET ";
                 $sql3 = " WHERE cat_id = {$this->cat_id}";
             }
-            $sql2 = "parent_id='{$this->parent_id}',
-                cat_name = '" . DB_escapeString($this->cat_name) . "',
+            $sql2 = "cat_name = '" . DB_escapeString($this->cat_name) . "',
                 dscp = '" . DB_escapeString($this->dscp) . "',
                 enabled = '{$this->enabled}',
                 owner_id = '{$this->owner_id}',
                 group_id = '{$this->group_id}',
                 perm_owner = '{$this->perm_owner}',
-                perm_group = '{$this->pern_group}',
+                perm_group = '{$this->perm_group}',
                 perm_members = '{$this->perm_members}',
                 perm_anon = '{$this->perm_anon}'";
-//                image='" . DB_escapeString($this->image) . "'";
             //echo $sql1.$sql2.$sql3;die;
             DB_query($sql1 . $sql2 . $sql3, 1);
             if (DB_error()) {
@@ -266,7 +242,7 @@ class Category
         }
 
         if (empty($this->Errors)) {
-            self::rebuildTree(1, 1);
+            Cache::clear('library_cats');
             return true;
         } else {
             return false;
@@ -290,28 +266,6 @@ class Category
                 'cat_id', $this->cat_id);
         $this->cat_id = 0;
         return true;
-    }
-
-
-    /**
-    *   Deletes a single image from disk.
-    *   Only needs the $img_id value, so this function may be called as a
-    *   standalone function.
-    *
-    *   @param  integer $img_id     DB ID of image to delete
-    */
-    public function DeleteImage()
-    {
-        global $_TABLES, $_CONF_LIB;
-
-        $filename = $this->image;
-        if (file_exists("{$_CONF_LIB['catimgpath']}/{$filename}"))
-                unlink( "{$_CONF_LIB['catimgpath']}/{$filename}" );
-
-        DB_query("UPDATE {$_TABLES['library.categories']}
-                SET image=''
-                WHERE cat_id='{$this->cat_id}'");
-        $this->image = '';
     }
 
 
@@ -341,7 +295,9 @@ class Category
     {
         global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB;
 
-        if ($this->cat_id > 0) {
+        if ($this->cat_id == 1) {   // Cannot edit root
+            return '';
+        } elseif ($this->cat_id > 0) {
             $retval = COM_startBlock($LANG_LIB['edit'] . ': ' . $this->cat_name);
         } else {
             $retval = COM_startBlock($LANG_LIB['create_category']);
@@ -355,27 +311,14 @@ class Category
             'cat_name'      => $this->cat_name,
             'dscp'          => $this->dscp,
             'ena_chk'       => $this->enabled == 1 ? 'checked="checked"' : '',
-            'parent_sel' => self::buildSelection(self::getParent($this->cat_id), $this->cat_id),
+            'parent_sel' => self::buildSelection(false),
             'candelete'     => !self::isUsed($this->cat_id),
+            'owner_dropdown' => COM_optionList($_TABLES['users'],
+                    'uid,username', $this->owner_id, 1, 'uid > 1'),
+            'group_dropdown' => SEC_getGroupDropdown($this->group_id, 3),
+            'permissions_editor' => SEC_getPermissionsHTML($this->perm_owner,
+                    $this->perm_group, $this->perm_members, $this->perm_anon),
         ) );
-
-        if ($this->image != '') {
-            $T->set_var(array(
-                'img_url', LIBRARY_PI_URL . '/images/categories/' .
-                    $this->image,
-            ) );
-        }
-
-        if ($this->image != '') {
-            $T->set_var('img_url',
-                    LIBRARY_URL . "/images/categories/{$this->image}");
-            $T->set_var('txt_delete', $LANG_ADVT['delete']);
-            $T->set_var('del_img_url', LIBRARY_ADMIN_URL . '/index.php' .
-                        '?mode=delete_img' .
-                        "&img_id={$prow['img_id']}".
-                        "&id={$this->id}" );
-        }
-
         $retval .= $T->parse('output', 'category');
 
         @setcookie($_CONF['cookie_name'].'fckeditor',
@@ -494,31 +437,6 @@ class Category
 
 
     /**
-    *   Get the ID of the immediate parent for a given category.
-    *
-    *   @param  integer $cat_id     Current category ID
-    *   @return integer     ID of parent category.
-    */
-    public static function getParent($cat_id)
-    {
-        global $_TABLES;
-
-        $cat_id = (int)$cat_id;
-        $parent_id = 0;
-        $res = DB_query("SELECT parent.cat_id, parent.cat_name
-                FROM {$_TABLES['library.categories']} AS node,
-                    {$_TABLES['library.categories']} AS parent
-                WHERE node.lft BETWEEN parent.lft AND parent.rgt
-                AND node.cat_id = $cat_id
-                ORDER BY parent.lft DESC LIMIT 2");
-        while ($A = DB_fetchArray($res, false)) {
-            $parent_id = $A['cat_id'];
-        }
-        return ($parent_id == $cat_id) ? NULL : $parent_id;
-    }
-
-
-    /**
     *   Recurse through the category table building an option list
     *   sorted by id.
     *
@@ -529,17 +447,15 @@ class Category
     *   @param string   $items      Optional comma-separated list of items to include or exclude
     *   @return string              HTML option list, without <select> tags
     */
-    public static function buildSelection($sel=0, $self=0)
+    public static function buildSelection($sel=0, $enabled=true)
     {
         global $_TABLES;
 
         $str = '';
         $root = 1;
-        $Cats = self::getTree($root);
+        $Cats = self::getTree($enabled);
         foreach ($Cats as $Cat) {
-            if ($Cat->cat_id == $root) {
-                continue;       // Don't include the root category
-            } elseif ($self == $Cat->cat_id) {
+            if ($self == $Cat->cat_id) {
                 // Exclude self when building parent list
                 $disabled = 'disabled="disabled"';
             } elseif (SEC_hasAccess($Cat->owner_id, $Cat->group_id,
@@ -564,33 +480,25 @@ class Category
     *   @param  integer $root   Root category ID
     *   @return array           Array of category objects
     */
-    public static function getTree($root=0, $prefix='&nbsp;')
+    public static function getTree($enabled = false)
     {
         global $_TABLES;
 
         $All = array();
-
-        if (!empty($root)) {
-            $result = DB_query("SELECT lft, rgt FROM {$_TABLES['library.categories']}
-                        WHERE cat_id = $root");
-            $row = DB_fetchArray($result, false);
-            $between = ' AND parent.lft BETWEEN ' . (int)$row['lft'] .
-                        ' AND ' . (int)$row['rgt'];
-        } else {
-            $between = '';
+        $key = 'category_tree_' . $enabled ? 1 : 0;
+        $cats = Cache::get($key);
+        if ($cats === NULL) {
+            $sql = "SELECT * FROM {$_TABLES['library.categories']}";
+            if ($enabled) {
+                $sql .= ' WHERE enabled = 1';
+            }
+            $sql .= ' ORDER BY cat_id ASC';
+            //echo $sql;die;
+            $result = DB_query($sql);
+            $cats = DB_fetchAll($result, false);
+            Cache::set($key, $cats, 'library_cats');
         }
-
-        $prefix = DB_escapeString($prefix);
-        $sql = "SELECT node.*, CONCAT( REPEAT( '$prefix', (COUNT(parent.cat_name) - 1) ), node.cat_name) AS disp_name
-            FROM {$_TABLES['library.categories']} AS node,
-                {$_TABLES['library.categories']} AS parent
-            WHERE node.lft BETWEEN parent.lft AND parent.rgt
-            $between
-            GROUP BY node.cat_name
-            ORDER BY node.lft";
-        //echo $sql;die;
-        $res = DB_query($sql);
-        while ($A = DB_fetchArray($res, false)) {
+        foreach ($cats as $A) {
             $All[$A['cat_id']] = new self($A['cat_id'], $A);
         }
         return $All;
@@ -614,7 +522,6 @@ class Category
         // get all children of this node
         $sql = "SELECT cat_id FROM {$_TABLES['library.categories']}
                 WHERE parent_id ='$parent'";
-COM_errorLog($sql);
         $result = DB_query($sql);
         while ($row = DB_fetchArray($result, false)) {
             // recursive execution of this function for each

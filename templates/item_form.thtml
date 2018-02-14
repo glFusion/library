@@ -49,7 +49,6 @@
     </label>
     <div class="uk-form-controls">
       <select id="cat_id" name="cat_id">
-        <option value="1">{$LANG_LIB['top_cat']}</option>
         {cat_select}
       </select>
     </div>

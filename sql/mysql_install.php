@@ -77,18 +77,15 @@ $_SQL['library.images'] = "CREATE TABLE {$_TABLES['library.images']} (
 
 $_SQL['library.categories'] = "CREATE TABLE {$_TABLES['library.categories']} (
   `cat_id` smallint(5) unsigned NOT NULL auto_increment,
-  `parent_id` smallint(5) unsigned default '0',
   `cat_name` varchar(255) default '',
   `dscp` varchar(255) default '',
   `enabled` tinyint(1) unsigned default '1',
   `group_id` mediumint(8) unsigned NOT NULL default '1',
-  `owner_id` mediumint(8) unsigned NOT NULL default '1',
+  `owner_id` mediumint(8) unsigned NOT NULL default '2',
   `perm_owner` tinyint(1) unsigned NOT NULL default '3',
   `perm_group` tinyint(1) unsigned NOT NULL default '3',
   `perm_members` tinyint(1) unsigned NOT NULL default '2',
   `perm_anon` tinyint(1) unsigned NOT NULL default '2',
-  `lft` int(5) unsigned NOT NULL DEFAULT '0',
-  `rgt` int(5) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY  (`cat_id`),
   KEY `idxName` (`cat_name`,`cat_id`)
 )";
@@ -103,11 +100,11 @@ $_DEFDATA['library.types'] = "INSERT INTO {$_TABLES['library.types']} VALUES
     (1,'Book'),(2,'CD'),(3,'DVD')";
 
 $_DEFDATA['library.categories'] = "INSERT INTO {$_TABLES['library.categories']} (
-        parent_id, cat_name, dscp,
+        cat_id, cat_name, dscp,
         group_id, owner_id, perm_owner, perm_group, perm_members, perm_anon
     ) VALUES (
-        0, 'Root', 'Root Category',
-        13, 2, 3, 3, 2, 2
+        1, 'Miscellaneous', 'Miscellaneous Items',
+        1, 2, 3, 3, 2, 2
     )";
 
 ?>

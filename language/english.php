@@ -95,6 +95,7 @@ $LANG_LIB = array (
 'top_cat'           => '-- Top --',
 'saveitem'          => 'Save Item',
 'deleteitem'        => 'Delete Item',
+'nodel_cat'         => 'Cannot delete categories that are in use.',
 'savecat'           => 'Save Category',
 'deletecat'         => 'Delete Category',
 'product_id'        => 'Product ID',
@@ -165,6 +166,11 @@ $LANG_LIB_HELP = array(
 'max_wait_items' => 'You can reserve up to ' . $_CONF_LIB['max_wait_items'] . ' items at a time.',
 'due_dt' => 'Enter or select the due date for the item.',
 'checkout_user' => 'Select the user to check out this item. The user at the top of the waiting list is shown first.',
+'cat_name' => 'Enter a short name for this category',
+'cat_owner' => 'Select the category owner. There is no submission option so this should normally be an administrator.',
+'cat_group' => 'Select the category group. This can be used to limit read access to a specific group.',
+'cat_perms' => 'Select the permissions for this category. Only Read permission is used.',
+'cat_enabled' => 'Select whether this category is enabled. Disabling a category prevents any of its items from being displayed.',
 );
 
 /** Message indicating plugin version is up to date */
