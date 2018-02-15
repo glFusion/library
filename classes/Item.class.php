@@ -806,7 +806,7 @@ class Item
                     uid=$to,
                     due=$due
                 WHERE id='{$this->id}'");
-        Cache:clear();
+        Cache::clear();
         // Delete this user from the waitlist, if applicable
         Waitlist::Remove($this->id, $to);
 
@@ -912,7 +912,7 @@ class Item
                 $avail_txt = $LANG_LIB['max_wait_items'];
             break;
         case LIB_STATUS_OUT:
-            $avail_txt = $LANG_LIB['not_available'];
+            $avail_txt = $LANG_LIB['checkedout'];
             $avail_icon = 'red.png';
             if ($this->uid == $_USER['uid']) {
                 $avail_txt .= ' ' . $LANG_LIB['by_you'];
