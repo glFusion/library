@@ -49,7 +49,7 @@ var LIBR_openlibLookup = function(isbn) {
         success: function(result, textStatus, jqXHR) {
             try {
                 var res = result[key];
-                LIBR_updateField(res.authors[0].name, "author");
+                LIBR_updateField(res.by_statement, "author");
                 LIBR_updateField(res.publishers[0].name, "publisher");
                 LIBR_updateField(res.title, "item_name");
                 LIBR_updateField(res.subtitle, "short_desc");
