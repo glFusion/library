@@ -61,19 +61,29 @@ if (!empty($action)) {
 if ($action == 'mode') $action = $actionval;
 switch ($action) {
 case 'addwait':
-    $Item = new Library\Item($id);
-    if (!$Item->isNew) {
-        Library\Waitlist::Add($Item);
-        if ($Item->status == LIB_STATUS_AVAIL && $_CONF_LIB['notify_checkout'] == 1) {
-            LIBRARY_notifyLibrarian($id, $uid);
+    if (SEC_hasRights('library.checkout')) {
+        $Item = new Library\Item($id);
+        if (!$Item->isNew) {
+            Library\Waitlist::Add($Item);
+            if ($Item->status == LIB_STATUS_AVAIL && $_CONF_LIB['notify_checkout'] == 1) {
+                LIBRARY_notifyLibrarian($id, $uid);
+            }
         }
+        echo COM_refresh(LIBRARY_URL);
+    } else {
+        $content .= COM_showMessageText($LANG_LIB['access_denied']);
+        $view = 'itemlist';
     }
-    echo COM_refresh(LIBRARY_URL);
     break;
 
 case 'rmvwait':
-    Library\Waitlist::Remove($id);
-    echo COM_refresh(LIBRARY_URL);
+    if (SEC_hasRights('library.checkout')) {
+        Library\Waitlist::Remove($id);
+        echo COM_refresh(LIBRARY_URL);
+    } else {
+        $content .= COM_showMessageText($LANG_LIB['access_denied']);
+        $view = 'itemlist';
+    }
     break;
 
 default:
