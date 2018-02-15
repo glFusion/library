@@ -695,8 +695,8 @@ class Item
         }
 
         if ($_CONF_LIB['ena_ratings'] == 1) {
-            $PP_ratedIds = RATING_getRatedIds('library');
-            if (in_array($this->id, $PP_ratedIds)) {
+            $ratedIds = RATING_getRatedIds('library');
+            if (in_array($this->id, $ratedIds)) {
                 $static = true;
                 $voted = 1;
             } elseif (plugin_canuserrate_library($this->id, $_USER['uid'])) {

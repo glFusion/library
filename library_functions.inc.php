@@ -6,7 +6,7 @@
 *   @copyright  Copyright (c) 2009 Lee Garner
 *   @package    library
 *   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php 
+*   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
@@ -32,14 +32,14 @@ function X_LIBRARY_history($admin = false, $uid = '')
 
     $isAdmin = $admin == true ? 1 : 0;
 
-    $sql = "SELECT p.*, UNIX_TIMESTAMP(p.expiration) AS time, 
+    $sql = "SELECT p.*, UNIX_TIMESTAMP(p.expiration) AS time,
                 d.name, d.short_dscp, d.file, d.prod_type,
-                $isAdmin as isAdmin, 
+                $isAdmin as isAdmin,
                 u.uid, u.username
-            FROM  {$_TABLES['library.trans']} AS p 
-            LEFT JOIN {$_TABLES['library.items']} AS d 
-                ON d.id = p.item_id 
-            LEFT JOIN {$_TABLES['users']} AS u 
+            FROM  {$_TABLES['library.trans']} AS p
+            LEFT JOIN {$_TABLES['library.items']} AS d
+                ON d.id = p.item_id
+            LEFT JOIN {$_TABLES['users']} AS u
                 ON p.user_id = u.uid ";
 
     $base_url = LIBRARY_ADMIN_URL;
@@ -51,9 +51,9 @@ function X_LIBRARY_history($admin = false, $uid = '')
     }
 
     $header_arr = array(
-        array('text' => $LANG_LIB['item_id'], 
+        array('text' => $LANG_LIB['item_id'],
                 'field' => 'name', 'sort' => true),
-        array('text' => $LANG_LIB['qty'], 
+        array('text' => $LANG_LIB['qty'],
                 'field' => 'quantity', 'sort' => true),
         array('text' => $LANG_LIB['dscp'],
                 'field' => 'short_dscp', 'sort' => true),
@@ -67,14 +67,14 @@ function X_LIBRARY_history($admin = false, $uid = '')
                 'field' => 'prod_type', 'sort' => true),
     );
     if ($isAdmin) {
-        $header_arr[] = array('text' => $LANG_LIB['username'], 
+        $header_arr[] = array('text' => $LANG_LIB['username'],
                 'field' => 'username', 'sort' => true);
     }
 
     $defsort_arr = array('field' => 'p.purchase_date',
             'direction' => 'asc');
 
-    $display = COM_startBlock('', '', 
+    $display = COM_startBlock('', '',
                 COM_getBlockTemplate('_admin_block', 'header'));
 
     $query_arr = array('table' => 'library.trans',
@@ -113,24 +113,24 @@ function X_LIBRARY_history($admin = false, $uid = '')
 function XX_LIBRARY_getPurchaseHistoryField($fieldname, $fieldvalue, $A, $icon_arr)
 {
     global $_CONF, $_CONF_LIB, $LANG_LIB;
-    
+   
     $retval = '';
 
     switch($fieldname) {
     case 'name':
         if (is_numeric($A['item_id'])) {
             // One of our catalog items, so link to it
-            $retval = COM_createLink($fieldvalue, 
+            $retval = COM_createLink($fieldvalue,
                 LIBRARY_URL . '/index.php?mode=detail&product=' . $A['item_id']);
         } else {
             // Probably came from a plugin, just show the product name
             $retval = htmlspecialchars($A['item_id']);
         }
-        break; 
+        break;
 
     case 'username':
-        $retval = COM_createLink($fieldvalue, 
-                $_CONF['site_url'] . '/users.php?mode=profile&uid=' . 
+        $retval = COM_createLink($fieldvalue,
+                $_CONF['site_url'] . '/users.php?mode=profile&uid=' .
                 $A['uid']);
         break;
 
@@ -188,7 +188,7 @@ function LIBRARY_ItemList()
     $sql = " FROM {$_TABLES['library.items']} p
             LEFT JOIN {$_TABLES['library.categories']} c
                 ON p.cat_id = c.cat_id
-            WHERE p.enabled=1 
+            WHERE p.enabled=1
             AND (c.enabled=1 OR c.enabled IS NULL) " .
             COM_getPermSQL('AND', 0, 2, 'c');
 
@@ -207,7 +207,7 @@ function LIBRARY_ItemList()
 
     if (!empty($_GET['query'])) {
         $query = DB_escapeString($_GET['query']);
-        $sql .= " AND (p.name like '%$query%' 
+        $sql .= " AND (p.name like '%$query%'
                 OR p.dscp like '%$query%')";
         $T->set_var('query', htmlspecialchars($_GET['query']));
         $pagenav_args .= '&query=' . urlencode($_GET['query']);
@@ -268,7 +268,9 @@ function LIBRARY_ItemList()
     $P = new Library\Item();
 
     if ($_CONF_LIB['ena_ratings'] == 1) {
-        $PP_ratedIds = RATING_getRatedIds('library');
+        $ratedIds = RATING_getRatedIds('library');
+    } else {
+        $ratedIds = array();
     }
 
     // Display each product
@@ -279,7 +281,7 @@ function LIBRARY_ItemList()
         $P->SetVars($A, true);
 
         if ($_CONF_LIB['ena_ratings'] == 1) {
-            if (in_array($A['id'], $PP_ratedIds)) {
+            if (in_array($P->id, $ratedIds)) {
                 $static = true;
                 $voted = 1;
             } elseif (plugin_canuserrate_library($A['id'], $_USER['uid'])) {
@@ -289,8 +291,8 @@ function LIBRARY_ItemList()
                 $static = 1;
                 $voted = 0;
             }
-            $rating_box = RATING_ratingBar('library', $A['id'], 
-                    $P->votes, $P->rating, 
+            $rating_box = RATING_ratingBar('library', $P->id,
+                    $P->votes, $P->rating,
                     $voted, 5, $static, 'sm');
             $T->set_var('rating_bar', $rating_box);
         } else {
@@ -302,9 +304,9 @@ function LIBRARY_ItemList()
             $url_opts .= '&query=' . urlencode($query);
             $hi_name = COM_highlightQuery(htmlspecialchars($P->name),
                         $query);
-            $l_desc = COM_highlightQuery(htmlspecialchars($P->dscp), 
+            $l_desc = COM_highlightQuery(htmlspecialchars($P->dscp),
                         $query);
-            $s_desc = COM_highlightQuery(htmlspecialchars($P->short_dscp), 
+            $s_desc = COM_highlightQuery(htmlspecialchars($P->short_dscp),
                         $query);
         } else {
             $hi_name = htmlspecialchars($P->name);
@@ -329,7 +331,7 @@ function LIBRARY_ItemList()
         $pic_filename = DB_getItem($_TABLES['library.images'], 'filename',
                 "item_id = '{$A['id']}'");
         if ($pic_filename) {
-            $T->set_var('small_pic', 
+            $T->set_var('small_pic',
                 LGLIB_ImageUrl($_CONF_LIB['image_dir'] . '/' . $pic_filename));
         } else {
             $T->set_var('small_pic', '');
@@ -339,12 +341,12 @@ function LIBRARY_ItemList()
     }
 
     // Display pagination
-    if (isset($_CONF_LIB['items_per_page']) && 
+    if (isset($_CONF_LIB['items_per_page']) &&
             $_CONF_LIB['items_per_page'] > 0 &&
             $count > $_CONF_LIB['items_per_page'] ) {
-        $T->set_var('pagination', 
+        $T->set_var('pagination',
             COM_printPageNavigation(LIBRARY_URL . '/index.php' . $pagenav_args,
-                        $page, 
+                        $page,
                         ceil($count / $_CONF_LIB['items_per_page'])));
     } else {
         $T->set_var('pagination', '');
@@ -358,7 +360,7 @@ function LIBRARY_ItemList()
 /**
 *   Display a popup text message
 *
-*   @param string $msg Text to display 
+*   @param string $msg Text to display
 */
 function LIBRARY_popupMsg($msg)
 {
@@ -393,7 +395,7 @@ function LIBRARY_notifyWaitlist($id = '')
     if ($id == '')
         return;
 
-    // retrieve the first waitlisted user info. 
+    // retrieve the first waitlisted user info.
     $sql = "SELECT w.id, w.uid, w.item_id, i.name, i.daysonhold,
                 u.email, u.language
             FROM {$_TABLES['library.waitlist']} w
@@ -412,7 +414,7 @@ function LIBRARY_notifyWaitlist($id = '')
     $daysonhold = (int)$A['daysonhold'] > 0 ? (int)$A['daysonhold'] : '';
 
     // Select the template for the message
-    $template_dir = LIBRARY_PI_PATH . 
+    $template_dir = LIBRARY_PI_PATH .
                     '/templates/notify/' . $name['language'];
     if (!file_exists($template_dir . '/item_avail.thtml')) {
         $template_dir = LIBRARY_PI_PATH . '/templates/notify/english';
@@ -495,7 +497,7 @@ function LIBRARY_notifyLibrarian($item_id, $uid)
 
 /**
 *   Loads a custom language array.
-*   If $requested is an array, the first valid language file is loaded.  
+*   If $requested is an array, the first valid language file is loaded. 
 *   If not, the $requested language file is loaded.
 *   If $requested doesn't refer to a vailid language, then $_CONF['language']
 *   is assumed.  If all else fails, english.php is loaded.
@@ -517,7 +519,7 @@ function LIBRARY_loadLanguage($requested='')
 
     // Add the requested language, which may be an array or
     // a single item.
-    if (is_array($requested)) { 
+    if (is_array($requested)) {
         $languages = $requested;
     } elseif ($requested != '') {
         // If no language requested, load the site/user default
