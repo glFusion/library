@@ -946,6 +946,7 @@ function plugin_itemrated_library($id, $rating, $votes)
             SET rating = $rating, votes = $votes
             WHERE id='$id'";
     DB_query($sql);
+    Library\Cache::clear();
     return true;
 }
 
