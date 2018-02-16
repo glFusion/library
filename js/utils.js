@@ -53,6 +53,7 @@ var LIBR_astoreLookup = function(isbn) {
                 LIBR_updateField(res.publisher, "publisher");
                 LIBR_updateField(res.title, "item_name");
                 LIBR_updateField(res.dscp, "html_content");
+                LIBR_updateField(res.publish_date, "f_pub_date");
             }
             catch(err) {
                 $.UIkit.notify("Astore lookup error", {timeout: 1000,pos:'top-center'});
