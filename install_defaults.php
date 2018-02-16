@@ -38,6 +38,7 @@ $_LIB_DEFAULTS = array(
     'maxcheckout'   => 21,  // Default maximum number of days an item can be checked out
     'notify_checkout' => 1,     // Notify admin of checkout request?
     'max_wait_items'    => 2,   // Max items that can be reserved at once
+    'lookup_method' => 'openlib'    // Openlibrary or Astore supported
 );
 
 /**
@@ -85,6 +86,8 @@ function plugin_initconfig_library($group_id = 0)
                 'select', 0, 0, 13, 60, true, $_CONF_LIB['pi_name']);
         $c->add('maxcheckout', $_LIB_DEFAULTS['maxcheckout'],
                 'text', 0, 0, 0, 70, true, $_CONF_LIB['pi_name']);
+        $c->add('lookup_method', $_LIB_DEFAULTS['lookup_method'],
+                'select', 0, 0, 14, 70, true, $_CONF_LIB['pi_name']);
 
         $c->add('fs_paths', NULL, 'fieldset', 0, 10, NULL, 0, true,
                 $_CONF_LIB['pi_name']);

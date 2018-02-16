@@ -82,7 +82,6 @@ class Item
                 $this->isNew = false;
             }
         }
-
         $this->ListingUrl = LIBRARY_URL . '/index.php';
         $this->isAdmin = SEC_hasRights('library.admin') ? 1 : 0;
     }
@@ -421,6 +420,7 @@ class Item
             'doc_url'       => LIBRARY_getDocURL('product_form.html',
                                             $_CONF['language']),
             'type'          => $this->type,
+            'lookup_method' => $_CONF_LIB['lookup_method'],
         ) );
 
         $T->set_block('product', 'TypeSelBlock', 'TypeSel');
@@ -615,6 +615,7 @@ class Item
             'pub_date'          => $this->pub_date,
             'author'            => $this->author,
             'listing_url'       => $this->ListingUrl,
+            'can_edit'          => plugin_ismoderator_library(),
         ) );
 
         /*$on_waitlist = DB_count($_TABLES['library.waitlist'],
@@ -947,7 +948,7 @@ class Item
     *
     *   @param  string  $url    New complete listing URL
     */
-    public function SetListUrl($url)
+    public function setListUrl($url)
     {
         $this->ListingUrl = $url;
     }

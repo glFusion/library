@@ -1,116 +1,108 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<!-- $Id: config.html 2 2009-12-30 04:11:52Z root $ -->
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" class="uk-height-1-1">
 <head>
-  <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" />
-  <link href="../../../docs/docstyle.css" type="text/css" rel="stylesheet" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="apple-touch-icon-precomposed" href="../../layout/cms/images/apple-touch-icon.png">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/uikit/2.26.3/css/uikit.almost-flat.min.css">
   <meta name="robots" content="noindex,nofollow" />
-  <title>Library Plugin - glFusion CMS</title>
+  <title>glFusion Profile Plugin Configuration</title>
+  <style>
+    html{background:#f9f9f9}.tm-dropdown,.tm-navbar{background:#325482!important}.uk-form label{font-weight:700}.tm-navbar{border-radius:0!important;padding:1px 0 6px!important;border:none!important}.tm-navbar-brand{color:#eee!important}.tm-navbar-brand a{text-shadow:none;color:#fff}.tm-navbar-brand a:hover{color:#ababab;text-decoration:none}.tm-navbar-brand-oc a{text-shadow:none;color:#fff}.tm-navbar-brand-oc a:hover{color:#ababab;text-decoration:none}.tm-navbar-nav>li>a{border:none;border-radius:3px!important;font-size:15px!important;height:40px!important;margin:0!important}.tm-dropdown{color:#000;border-radius:0!important;border:0!important}.tm-nav-navbar>li>a{color:#fff!important}.tm-navbar::after,.tm-navbar::before{margin-top:7px!important}.tm-navbar-nav>li.uk-open>a,.tm-navbar-nav>li:hover>a,.tm-navbar-nav>li>a:focus{color:#fff;outline:0;background:#35B3EE!important}.tm-navbar-nav>li>a{color:#fff!important;text-shadow:none!important}.tm-navbar-toggle{color:#ccc!important;text-shadow:none!important}.tm-navbar-toggle:focus,.tm-navbar-toggle:hover{color:#fff!important}.tm-footer{background:#252525;border-top:1px solid #232425;margin-bottom:0;bottom:0;padding:10px;color:#fff}.tm-wrapper{min-height:100%;margin:0 auto -51px!important}.tm-push,footer{height:51px}.uk-navbar-content > a {color:#fff !important;}
+  </style>
 </head>
 
-<body style="direction: ltr;">
-<div id="gl_container_fluid">
-  <div id="gl_header"><span style="color: rgb(255, 255, 255); float: left; padding-left: 10px; padding-top: 5px; vertical-align: middle;">glFusion Documentation Project
-  </span><a style="float: right; padding-right: 10px; padding-top: 5px; vertical-align: middle;" href="http://www.glfusion.org/wiki/doku.php">glFusion Wiki</a>
-</div>
-<div id="gl_wrapper">
-<div class="body-container">
-<h1><a name="advt_plugin" id="advt_plugin">Library Plugin</a></h1>
+<body class="uk-height-1-1">
+  <div class="tm-wrapper">
+    <nav class="uk-navbar uk-navbar-attached tm-navbar uk-margin-bottom">
+      <div class="uk-navbar-brand tm-navbar-brand">
+        glFusion Profile Plugin Configuration
+      </div>
+      <div class="uk-navbar-flip uk-hidden-small">
+        <div class="uk-navbar-content tm-navbar-content" style="text-shadow:none;">
+          <a href="https://www.glfusion.org/wiki/">glFusion Wiki</a>
+        </div>
+      </div>
+    </nav>
 
-<div class="level1">
-<p>The Library Plugin allows you to create custom paypal fields for your user accounts.</p>
-<p>This version requires glFusion 1.2.0 or higher.</p>
-<h1><a name="paypal_plugin_configuration_options" id="paypal_plugin_configuration_options">Library Plugin Configuration Options</a></h1>
+    <div class="uk-container uk-container-center uk-margin-bottom">
+      <h1>glFusion Profile Plugin Configuration</h1>
+      <p>The Library Plugin allows you to manage physical library items</p>
+      <p>This version requires GLFusion 1.7.0 or higher.</p>
 
-<table class="inline">
-  <tbody>
-    <tr>
-      <th class="col0 leftalign" colspan="2">General Settings</th>
-    </tr>
+      <h2>Main LIbrary Options</h2>
 
-    <tr class="row0">
-      <th class="col0 leftalign">Option </th>
-      <th class="col1 leftalign">Description </th>
-    </tr>
+      <dl id="desc_menuitem">
+        <dt>Show on user menu?</dt>
+        <dd>Select "Yes" to have a menu option for the Library shown on the plugin menu.  Selecting "No" will prevent the automatic creation of a user menu option.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_menuitem"></a>Show on user menu?</td>
-      <td class="col1 leftalign">Select "Yes" to have a menu option for the Library shown on the plugin menu.  Selecting "No" will prevent the automatic creation of a user menu option.</td>
-    </tr>
+      <dl id="desc_daysonhold">
+        <dt>Days to keep items on hold for waitlisted users</dt>
+        <dd>Enter the number of days to keep items "on hold" for a waiting user AFTER the item has been checked in by the previous user.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_daysonhold"></a>Days to keep items on hold for waitlisted users</td>
-      <td class="col1 leftalign">Enter the number of days to keep items "on hold" for a waiting user AFTER the item has been checked in by the previous user.</td>
-    </tr>
+      <dl id="desc_items_per_page">
+        <dt>Items to show per page</dt>
+        <dd>Enter the number of items to show per page in the item catalog.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_items_per_page"></a>Items to show per page</td>
-      <td class="col1 leftalign">Enter the number of items to show per page in the item catalog.</td>
-    </tr>
+      <dl id="desc_ena_comments">
+        <dt>Enable Comments?</dt>
+        <dd>Select whether comments will be enabled for Library items.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_ena_comments"></a>Enable Comments?</td>
-      <td class="col1 leftalign">Select whether comments will be enabled for Library items.</td>
-    </tr>
+      <dl id="desc_ena_ratings">
+        <dt>Enable Ratings?</dt>
+        <dd>Select whether user ratings will be allowed for Library items.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_ena_ratings"></a>Enable Ratings?</td>
-      <td class="col1 leftalign">
-        Select whether user ratings will be allowed for Library items.
-      </td>
-    </tr>
+      <dl id="desc_displayblocks">
+        <dt>Display glFusion blocks</dt>
+        <dd>Select which blocks will be displayed with the product catalog.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_displayblocks"></a>Display glFusion blocks</td>
-      <td class="col1 leftalign">Select which blocks will be displayed with the product catalog.</td>
-    </tr>
+      <dl id="desc_maxcheckout">
+        <dt>Maximum number of days an item may be checked out</dt>
+        <dd>Enter the default maximum number of days that an item may be checked out.  This can be overridden by the Librarian at checkout time.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_maxcheckout"></a>Maximum number of days an item may be checked out</td>
-      <td class="col1 leftalign">Enter the default maximum number of days that an item may be checked out.  This can be overridden by the Librarian at checkout time.</td>
-    </tr>
+      <dl id="desc_max_images">
+        <dt>Max number of item images</dt>
+        <dd>Enter the maximum number of items that can be associated with an item.</dd>
+      </dl>
 
-    <tr>
-      <th class="col0 leftalign" colspan="2">Images and Paths</th>
-    </tr>
+      <dl id="desc_max_image_size">
+        <dt>Max. Product Image Size</dt>
+        <dd>Enter the maximum file size for uploaded images, in bytes.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_max_images"></a>Max number of item images</td>
-      <td class="col1 leftalign">Enter the maximum number of items that can be associated with an item.</td>
-    </tr>
+      <dl id="desc_max_thumb_size">
+        <dt>Max Thumbnail Dimension (px)</dt>
+        <dd>Enter the thumbnail size, in pixels.  The uploaded images will be resized so that the maximum dimension fits within this value while maintaining the aspect ratio.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_max_image_size"></a>Max. Product Image Size</td>
-      <td class="col1 leftalign">Enter the maximum file size for uploaded images, in bytes.</td>
-    </tr>
+      <dl id="desc_img_max_width">
+        <dt>Max Image Width (px)</dt>
+        <dd>Enter the maximum image width, in pixels, for uploaded images.  Images will be resized so that the width fits within this value while maintaining the aspect ratio.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_max_thumb_size"></a>Max Thumbnail Dimension (px)</td>
-      <td class="col1 leftalign">Enter the thumbnail size, in pixels.  The uploaded images will be resized so that the maximum dimension fits within this value while maintaining the aspect ratio.
-      </td>
-    </tr>
+      <dl id="desc_img_max_height">
+        <dt>Max Image Height (px)</dt>
+        <dt>Enter the maximum image height, in pixels, for uploaded images.  Images will be resized so that the height fits within this value while maintaining the aspect ratio.</dt>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_img_max_width"></a>Max Image Width (px)</td>
-      <td class="col1 leftalign">Enter the maximum image width, in pixels, for uploaded images.  Images will be resized so that the width fits within this value while maintaining the aspect ratio.</td>
-    </tr>
+      <dl id="desc_image_dir">
+        <dt>Path to Images</dt>
+        <dd>Enter the full path to where uploaded images are to be stored.  Your webserver must be able to read and create files in this directory.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_img_max_height"></a>Max Image Height (px)</td>
-      <td class="col1 leftalign">Enter the maximum image height, in pixels, for uploaded images.  Images will be resized so that the height fits within this value while maintaining the aspect ratio.</td>
-    </tr>
+      <dl id="desc_lookup_method">
+        <dt>ISBN Lookup Method</dt>
+        <dd>Select the method used to look up ISBN numbers when entering items. Astore may return more information but requires the Astore plugin. OpenLibrary.org requires no other configuration.</dd>
+      </dl>
 
-    <tr class="row0">
-      <td class="col0 leftalign" valign="top"><a name="desc_image_dir"></a>Path to Images</td>
-      <td class="col1 leftalign">Enter the full path to where uploaded images are to be stored.  Your webserver must be able to read and create files in this directory.</td>
-    </tr>
-
-  </tbody>
-</table>
-<p></p>
-</div>
-</div>
-</div>
-</div>
+    </div>
+  </div>
 </body>
 </html>

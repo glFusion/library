@@ -27,6 +27,47 @@ var LIBR_toggle = function(cbox, id, type, component) {
     return false;
 };
 
+
+/**
+*   Look up an ISBN from local AJAX, which relies on the Amazon Astore plugin.
+*   Sets form field values from the lookup results.
+*
+*   @param  string  isbn    Item ISBN number
+*/
+var LIBR_astoreLookup = function(isbn) {
+    var key = "ISBN:" + isbn;
+    var dataS = {
+        "isbn" : isbn,
+        "action" : "lookup",
+    };
+    data = $.param(dataS);
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: site_admin_url + "/plugins/library/ajax.php",
+        data: data,
+        success: function(result, textStatus, jqXHR) {
+            try {
+                var res = result;
+                LIBR_updateField(res.author, "author");
+                LIBR_updateField(res.publisher, "publisher");
+                LIBR_updateField(res.title, "item_name");
+                LIBR_updateField(res.dscp, "html_content");
+            }
+            catch(err) {
+                $.UIkit.notify("Astore lookup error", {timeout: 1000,pos:'top-center'});
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log(jqXHR);
+            console.log(textStatus);
+            console.log(errorThrown);
+        },
+    });
+    return false;
+};
+
+
 /**
 *   Look up an ISBN from openlibrary.org
 *   Sets form field values from the lookup results.
@@ -53,6 +94,7 @@ var LIBR_openlibLookup = function(isbn) {
                 LIBR_updateField(res.publishers[0].name, "publisher");
                 LIBR_updateField(res.title, "item_name");
                 LIBR_updateField(res.subtitle, "short_desc");
+                LIBR_updateField(res.publish_date, "f_pub_date");
             }
             catch(err) {
                 $.UIkit.notify("OpenLibrary lookup error", {timeout: 1000,pos:'top-center'});
@@ -77,6 +119,18 @@ function LIBR_updateField(value, elem_id)
 {
     if (typeof(value) != "undefined")
         document.getElementById(elem_id).value = value;
+}
+
+/**
+*   Update a form field from the library lookup results
+*
+*   @param  string  value   Value to set in field
+*   @param  string  elem_id Form element ID
+*/
+function LIBR_updateText(value, elem_id)
+{
+    if (typeof(value) != "undefined")
+        document.getElementById(elem_id).innerHTML = value;
 }
 
 var LIBR_ajaxReserve = function(item_id, action)

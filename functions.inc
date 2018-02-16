@@ -656,10 +656,9 @@ function plugin_getconfigelementhelp_library($option, $doclang='english')
         return false;
 
     if (!empty($option)) {
-        $file .= '#desc_' . $option;
+        $doc_url .= '#desc_' . $option;
     }
-
-    return array($doc_url . $file, 0);
+    return array($doc_url, 0);
 }
 
 

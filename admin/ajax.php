@@ -20,9 +20,10 @@ if (!SEC_hasRights('library.admin')) {
     COM_accessLog("User {$_USER['username']} tried to illegally access the classifieds admin ajax function.");
     exit;
 }
-$newval = NULL;
+$retval = array();
 switch ($_POST['action']) {
 case 'toggle':
+    $newval = NULL;
     switch ($_POST['component']) {
     case 'item':
         switch ($_POST['type']) {
@@ -45,25 +46,44 @@ case 'toggle':
     default:
         exit;
     }
-}
-
-if ($newval !== NULL) {
-    if ($newval != $_POST['oldval']) {
-        $message = $LANG_LIB['item_updated'];
-    } else {
-        $message = $LANG_LIB['item_nochange'];
-    }
-    $retval = array(
+    if ($newval !== NULL) {
+        if ($newval != $_POST['oldval']) {
+            $message = $LANG_LIB['item_updated'];
+        } else {
+            $message = $LANG_LIB['item_nochange'];
+        }
+        $retval = array(
             'id'    => $_POST['id'],
             'newval' => $newval,
             'statusMessage' => $message,
-    );
+        );
+    }
+    break;
 
-    header('Content-Type: application/json; charset=utf-8');
-    header('Cache-Control: no-cache, must-revalidate');
-    //A date in the past
-    header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
-    echo json_encode($retval);
+case 'lookup':
+    $isbn = isset($_POST['isbn']) ? $_POST['isbn'] : '';
+    if (empty($isbn)) exit;
+    $item = Astore\Item::getByISBN($isbn);
+    if (is_array($item)) $item = array_shift($item);
+    if (is_array($item->EditorialReviews->EditorialReview))
+        $review = $item->EditorialReviews->EditorialReview[0];
+    else
+        $review = $item->EditorialReviews->EditorialReview;
+
+    $retval = array(
+        'author' => $item->ItemAttributes->Author,
+        'title' => $item->ItemAttributes->Title,
+        'publisher' => $item->ItemAttributes->Publisher,
+        'publish_date' => $item->ItemAttributes->PublicationDate,
+        'dscp' => $review->Content,
+    );
+    break;
 }
+
+header('Content-Type: application/json; charset=utf-8');
+header('Cache-Control: no-cache, must-revalidate');
+//A date in the past
+header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+echo json_encode($retval);
 
 ?>

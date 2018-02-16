@@ -211,6 +211,7 @@ $LANG_confignames['library'] = array(
     'menuitem'      => 'Show on user menu?',
     'grp_librarians' => 'Librarian Group',
     'notify_checkout' => 'Notify Librarians on item reservation?',
+    'lookup_method' => 'ISBN Lookup Method',
 );
 
 /** Language strings for the subgroup names in the config section */
@@ -238,6 +239,7 @@ $LANG_configselects['library'] = array(
     6 => array('Always' => 2, 'Physical Items Only' => 1, 'Never' => 0),
     12 => array('No access' => 0, 'Read-Only' => 2, 'Read-Write' => 3),
     13 => array('None' => 0, 'Left' => 1, 'Right' => 2, 'Both' => 3),
+    14 => array('-None-' => '', 'OpenLibrary.org' => 'openlib', 'Astore Plugin' => 'astore'),
 );
 
 ?>
