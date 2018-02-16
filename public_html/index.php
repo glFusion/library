@@ -40,7 +40,7 @@ $actionval = '';
 if (!empty($action)) {
     $id = COM_sanitizeID(COM_getArgument('id'));
 } else {
-    $expected = array('mode', 'addwait', 'rmvwait', 'thanks',
+    $expected = array('mode', 'addwait', 'rmvwait',
         'history', 'detail', 'itemlist',
     );
     $action = 'view';       // Default action
