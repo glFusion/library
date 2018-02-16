@@ -38,6 +38,11 @@
       </a>
     </div>
     <!-- END Thumbnail -->
+{!if can_edit}
+    <a href="{site_admin_url}/plugins/library/index.php?edititem=x&id={id}">
+      <i class="uk-icon uk-icon-edit" title="{$LANG_LIB['edit']}" data-uk-tooltip></i>
+    </a>
+{!endif}
     <div style="clear:both;float:right;">
       <a href="{listing_url}">{$LANG_LIB['back_to_list']}</a>
     </div>
