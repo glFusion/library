@@ -66,7 +66,7 @@ case 'addwait':
         if (!$Item->isNew) {
             Library\Waitlist::Add($Item);
             if ($Item->status == LIB_STATUS_AVAIL && $_CONF_LIB['notify_checkout'] == 1) {
-                LIBRARY_notifyLibrarian($id, $uid);
+                LIBRARY_notifyLibrarian($id, $_USER['uid']);
             }
         }
         echo COM_refresh(LIBRARY_URL);

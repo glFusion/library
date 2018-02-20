@@ -38,7 +38,7 @@ class Waitlist
     *   @param  integer $uid    User requesting reservation
     *   @return integer     Record ID, zero on error
     */
-    public function Add($Item, $uid=0)
+    public static function Add($Item, $uid=0)
     {
         global $_TABLES, $_USER;
 
