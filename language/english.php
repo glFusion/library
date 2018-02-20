@@ -197,7 +197,6 @@ $LANG_confignames['library'] = array(
     'items_per_page' => 'Items to show per page',
     'use_css_menus' => 'CSS Menus? DEPRECATED',
     'max_images'    => 'Max number of item images',
-    'image_dir'     => 'Path to Images',
     'max_thumb_size' => 'Max Thumbnail Dimension (px)',
     'img_max_width' => 'Max Image Width (px)',
     'img_max_height' => 'Max Image Height (px)',

@@ -27,7 +27,6 @@ $_LIB_DEFAULTS = array(
     'items_per_page' => 10,     // Items shown per page when browsing the library
     // Image-related values
     'max_images'    => 3,       // Max number of images
-    'image_dir'     => $_CONF['path'] . 'data/library/images/items',
     'max_thumb_size' => 100,    // Max thumbnail dimension
     'img_max_width' => 800,
     'img_max_height' => 600,
@@ -101,8 +100,6 @@ function plugin_initconfig_library($group_id = 0)
                 'text', 0, 10, 0, 40, true, $_CONF_LIB['pi_name']);
         $c->add('img_max_height', $_LIB_DEFAULTS['img_max_height'],
                 'text', 0, 10, 0, 50, true, $_CONF_LIB['pi_name']);
-        $c->add('image_dir', $_LIB_DEFAULTS['image_dir'],
-                'text', 0, 10, 0, 60, true, $_CONF_LIB['pi_name']);
 
         $c->add('fs_notifications', NULL, 'fieldset', 0, 20, NULL, 0, true,
                 $_CONF_LIB['pi_name']);

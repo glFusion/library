@@ -28,7 +28,6 @@ function LIBRARY_do_upgrade($current_ver)
     $error = 0;
 
     return $error;
-
 }
 
 
@@ -62,10 +61,7 @@ function LIBRARY_do_upgrade_sql($version='')
             break;
         }
     }
-
     return 0;
-
 }
-
 
 ?>
