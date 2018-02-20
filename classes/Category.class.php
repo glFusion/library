@@ -150,7 +150,6 @@ class Category
         $this->enabled = $row['enabled'];
         $this->cat_name = $row['cat_name'];
         $this->disp_name = isset($row['disp_name']) ? $row['disp_name'] : $row['cat_name'];
-        $this->keywords = $row['keywords'];
         $this->group_id = $row['group_id'];
         $this->owner_id = $row['owner_id'];
         if ($fromDB) {
@@ -295,9 +294,7 @@ class Category
     {
         global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB;
 
-        if ($this->cat_id == 1) {   // Cannot edit root
-            return '';
-        } elseif ($this->cat_id > 0) {
+        if ($this->cat_id > 0) {
             $retval = COM_startBlock($LANG_LIB['edit'] . ': ' . $this->cat_name);
         } else {
             $retval = COM_startBlock($LANG_LIB['create_category']);
@@ -455,10 +452,7 @@ class Category
         $root = 1;
         $Cats = self::getTree($enabled);
         foreach ($Cats as $Cat) {
-            if ($self == $Cat->cat_id) {
-                // Exclude self when building parent list
-                $disabled = 'disabled="disabled"';
-            } elseif (SEC_hasAccess($Cat->owner_id, $Cat->group_id,
+            if (SEC_hasAccess($Cat->owner_id, $Cat->group_id,
                     $Cat->perm_owner, $Cat->perm_group,
                     $Cat->perm_members, $Cat->perm_anon) < 3) {
                 $disabled = 'disabled="disabled"';
