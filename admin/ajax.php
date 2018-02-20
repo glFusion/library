@@ -20,6 +20,7 @@ if (!SEC_hasRights('library.admin')) {
     COM_accessLog("User {$_USER['username']} tried to illegally access the classifieds admin ajax function.");
     exit;
 }
+
 $retval = array();
 switch ($_POST['action']) {
 case 'toggle':
@@ -73,8 +74,14 @@ case 'lookup':
         } else {
             $review = $item->EditorialReviews->EditorialReview;
         }
+        if (is_array($item->ItemAttributes->Author)) {
+            $by_statement = implode(', ', $item->ItemAttributes->Author);
+        } else {
+            $by_statement = $item->ItemAttributes->Author;
+        }
         $retval = array(
             'author' => $item->ItemAttributes->Author,
+            'by_statement' => $by_statement,
             'title' => $item->ItemAttributes->Title,
             'publisher' => $item->ItemAttributes->Publisher,
             'publish_date' => $item->ItemAttributes->PublicationDate,

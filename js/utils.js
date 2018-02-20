@@ -49,10 +49,10 @@ var LIBR_astoreLookup = function(isbn) {
         success: function(result, textStatus, jqXHR) {
             try {
                 var res = result;
-                LIBR_updateField(res.author, "author");
+                LIBR_updateField(res.by_statement, "author");
                 LIBR_updateField(res.publisher, "publisher");
                 LIBR_updateField(res.title, "item_name");
-                LIBR_updateField(res.dscp, "html_content");
+                LIBR_updateField(res.dscp, "dscp");
                 LIBR_updateField(res.publish_date, "f_pub_date");
             }
             catch(err) {
