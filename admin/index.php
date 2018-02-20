@@ -232,23 +232,24 @@ function LIBRARY_adminlist_Items($cat_id = 0, $pending = false)
 
     $display = '';
     $stat_join = '';
-    $status = isset($_POST['status']) ? (int)$_POST['status'] : 0;
+    // $status can come in from header links or form submission
+    $status = isset($_REQUEST['status']) ? (int)$_REQUEST['status'] : 0;
     switch ($status) {
-    case 0:
+    case 0:     // All
         $stat_sql = '';
         break;
-    case 1:
+    case 1:     // Available
         $stat_sql = ' WHERE p.status = 0 ';
         break;
-    case 2:
+    case 2:     // Checked Out
         $stat_sql = ' WHERE p.status = 1 ';
         break;
-    case 3:
-        $stat_sql = ' GROUP BY w.item_id HAVING count(w.id) > 0 ';
+    case 3:     // Pending Actions, include available only
+        $stat_sql = ' WHERE p.status = 0 GROUP BY w.item_id HAVING count(w.id) > 0 ';
         $stat_join = "LEFT JOIN {$_TABLES['library.waitlist']} w
                 ON p.id = w.item_id";
         break;
-    case 4:
+    case 4:     // Overdue
         $stat_sql = ' WHERE due > 0 AND due < UNIX_TIMESTAMP() ';
         break;
     }
@@ -333,11 +334,6 @@ function LIBRARY_adminlist_Items($cat_id = 0, $pending = false)
     $display .= COM_startBlock('', '',
                     COM_getBlockTemplate('_admin_block', 'header'));
 
-    /*if ($cat_id > 0) {
-        $def_filter = "WHERE c.cat_id='$cat_id'";
-    } else {
-        $def_filter = 'WHERE 1=1';
-    }*/
     $query_arr = array(
         'table' => 'library.items',
         'sql' => $sql,
@@ -347,10 +343,9 @@ function LIBRARY_adminlist_Items($cat_id = 0, $pending = false)
     );
     $text_arr = array(
         //'has_extras' => true,
-        'form_url' => LIBRARY_ADMIN_URL . '/index.php',
+        'form_url' => LIBRARY_ADMIN_URL . '/index.php?status=' . $status,
     );
     for ($i = 0; $i < 5; $i++) {
-//        ${'sel_' . $i} = $i == $status ? 'checked="checked"' : '';
         ${'sel_' . $i} = $i == $status ? 'selected="selected"' : '';
     }
     $form_arr = array(
@@ -361,27 +356,17 @@ function LIBRARY_adminlist_Items($cat_id = 0, $pending = false)
                 "<option value=\"3\" $sel_3>{$LANG_LIB['pending']}</option>" .
                 "<option value=\"4\" $sel_4>{$LANG_LIB['overdue']}</option>" .
                 '</select>' . LB,
-                 
-/*        'top'    => '<input type="radio" name="status" value="0" ' . $sel_0 .
-                ' onclick="this.form.submit();" /> ' . $LANG_LIB['all'] .
-                '&nbsp;&nbsp;<input type="radio" name="status" value="1" ' . $sel_1 .
-                ' onclick="this.form.submit();" /> ' . $LANG_LIB['available'] .
-                '&nbsp;&nbsp;<input type="radio" name="status" value="2" ' . $sel_2 .
-                ' onclick="this.form.submit();" /> ' . $LANG_LIB['checkedout'] .
-                '&nbsp;&nbsp;<input type="radio" name="status" value="3" ' . $sel_3 .
-                ' onclick="this.form.submit();" /> ' . $LANG_LIB['pending'] .
-                '&nbsp;&nbsp;<input type="radio" name="status" value="4" ' . $sel_4 .
-                ' onclick="this.form.submit();" /> ' . $LANG_LIB['overdue'],*/
     );
-    //$filter = '<input type="checkbox" name="showexp" ' . $frmchk .  '>' .
-    //        $LANG_MEMBERSHIP['show_expired'];
     $filter = '';
-    if (!isset($_REQUEST['query_limit']))
+    $extras = array(
+        'status'    => $status,
+    );
+    if (!isset($_REQUEST['query_limit'])) {
         $_GET['query_limit'] = 20;
-
+    }
     $display .= ADMIN_list('library', 'LIBRARY_getAdminField_Item',
             $header_arr, $text_arr, $query_arr, $defsort_arr,
-            $filter, '', '', $form_arr);
+            $filter, $extras, '', $form_arr);
 
     $display .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
     return $display;
