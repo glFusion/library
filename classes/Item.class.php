@@ -399,6 +399,24 @@ class Item
             $retval = COM_startBlock($LANG_LIB['new_item']);
         }
 
+        // Set up the wysiwyg editor, if available
+        switch (PLG_getEditorType()) {
+        case 'ckeditor':
+            $T->set_var('show_htmleditor', true);
+            PLG_requestEditor('library','library_entry','ckeditor_library.thtml');
+            PLG_templateSetVars('library_entry', $T);
+            break;
+        case 'tinymce':
+            $T->set_var('show_htmleditor',true);
+            PLG_requestEditor('library','library_entry','tinymce_library.thtml');
+            PLG_templateSetVars('library_entry', $T);
+            break;
+        default:
+            // don't support others right now
+            $T->set_var('show_htmleditor', false);
+            break;
+        }
+
         $T->set_var(array(
             'oldid'         => $this->oldid,
             'dt_add'        => $this->dt_add,
@@ -868,6 +886,9 @@ class Item
             $can_reserve = false;
             $is_reserved = false;
             $reserve_txt = $LANG_LIB['login_req'];
+            $waitlisters = 0;
+            $user_wait_items = 0;
+            $waitlist_txt = '';
         } else {
             // Check if we have the item reserved, and if there's a waitlist.
             $sql = "SELECT uid FROM {$_TABLES['library.waitlist']}
@@ -886,11 +907,6 @@ class Item
                     break;
                 }
             }
-            /*$on_waitlist = DB_count($_TABLES['library.waitlist'],
-                    array('item_id', 'uid'),
-                    array($this->id, $_USER['uid'])) == 1;
-            $waitlist = DB_count($_TABLES['library.waitlist'],
-                    'item_id', $this->id);*/
             $user_wait_items = DB_count($_TABLES['library.waitlist'],
                     'uid', $_USER['uid']);
             $reserve_txt = $waitlisters ? sprintf($LANG_LIB['has_waitlist'], $waitlisters) : '';
@@ -930,9 +946,6 @@ class Item
             'avail_txt'     => $avail_txt,
             'waitlist_txt'  => $waitlist_txt,
             'due_dt'        => '',
-            //'wait_action' => $wait_action,
-            //'wait_confirm_txt' => $wait_confirm_txt,
-            //'wait_action_txt' => $wait_action_txt,
             'reserve_txt' => $reserve_txt,
             'id'            => $this->id,
             'pi_url'        =>  LIBRARY_URL,
