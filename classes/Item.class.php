@@ -927,6 +927,8 @@ class Item
                 $avail_txt = $LANG_LIB['available'];
             elseif (!$is_reserved)
                 $avail_txt = $LANG_LIB['max_wait_items'];
+            else
+                $avail_txt = '';
             break;
         case LIB_STATUS_OUT:
             $avail_txt = $LANG_LIB['checkedout'];
