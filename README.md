@@ -10,12 +10,16 @@ A default ID will be automatically generated. For books, the ID will ideally
 be the ISBN number as it can be used to look up details online.
 
 ### Item Lookup
-Click the search icon next to the item ID field to search online for details
-about the book. The default configuration uses Open Library (https://openlibrary.org)
-to get details. For the item lookup to work, the item ID must be the ISBN.
+First, select an option other than "None" from the plugin configuration. When
+that is done a search icon will be shown ext to the item ID field when editing
+an item. Click that to search online for details about the book.
 
-You can also look up book details from Amazon via Astore plugin. The Astore plugin
-version 0.2.0 or higher must be installed and enabled, and you'll need to obtain
-an Amazon Associate ID. Open Library does not require any configuration or authentication.
+Lookup options are:
+1. openlibrary.org - This requires no configuraiton and uses the freely-available
+API at https://openlibrary.org.
+1. Astore Plugin - This requires the installation of the Amazon Astore plugin
+for glFusion (version 0.2.0 or later), and you must create an Amazon Affiliate account.
+at https://affiliate-program.amazon.com/.
+The positive side is that a description of the item is returned from Amazon.
 
 Requires glFusion 1.7.0 or higher and the lgLib plugin
