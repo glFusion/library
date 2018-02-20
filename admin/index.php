@@ -685,7 +685,7 @@ function LIBRARY_adminlist_MediaType()
                 'sort'  => false,
                 'align' => 'center',
             ),
-        array(  'text'  => $LANG_LIB['name'],
+        array(  'text'  => $LANG_LIB['type'],
                 'field' => 'name',
                 'sort'  => true,
             ),

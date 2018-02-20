@@ -143,7 +143,7 @@ $LANG_LIB = array (
 'in_use'            => 'In Use',
 'item_updated'  => 'Item has been updated.',
 'item_nochange' => 'Item has not been changed.',
-'search_openlib' => 'Search for the ISBN at openlibrary.org',
+'search_openlib' => 'Search online for the ISBN.',
 'max_wait_items' => 'You can reserve up to ' . $_CONF_LIB['max_wait_items'] . ' items at a time.',
 );
 
@@ -171,6 +171,7 @@ $LANG_LIB_HELP = array(
 'cat_group' => 'Select the category group. This can be used to limit read access to a specific group.',
 'cat_perms' => 'Select the permissions for this category. Only Read permission is used.',
 'cat_enabled' => 'Select whether this category is enabled. Disabling a category prevents any of its items from being displayed.',
+'mt_type' => 'Enter a name for this media type. This should be unique.',
 );
 
 /** Message indicating plugin version is up to date */
