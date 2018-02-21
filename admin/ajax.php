@@ -80,12 +80,17 @@ case 'lookup':
             $by_statement = $item->ItemAttributes->Author;
         }
         $retval = array(
+            'error' => '',
             'author' => $item->ItemAttributes->Author,
             'by_statement' => $by_statement,
             'title' => $item->ItemAttributes->Title,
             'publisher' => $item->ItemAttributes->Publisher,
             'publish_date' => $item->ItemAttributes->PublicationDate,
             'dscp' => $review->Content,
+        );
+    } else {
+        $retval = array(
+            'error' => "Astore lookup error for $isbn",
         );
     }
     break;
