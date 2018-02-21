@@ -35,6 +35,7 @@ var LIBR_toggle = function(cbox, id, type, component) {
 *   @param  string  isbn    Item ISBN number
 */
 var LIBR_astoreLookup = function(isbn) {
+    LIBR_showIcon("working");
     var key = "ISBN:" + isbn;
     var dataS = {
         "isbn" : isbn,
@@ -49,14 +50,18 @@ var LIBR_astoreLookup = function(isbn) {
         success: function(result, textStatus, jqXHR) {
             try {
                 var res = result;
-                LIBR_updateField(res.by_statement, "author");
-                LIBR_updateField(res.publisher, "publisher");
-                LIBR_updateField(res.title, "item_name");
-                LIBR_updateField(res.dscp, "dscp");
-                if (window.CKEDITOR) {
-                    CKEDITOR.instances["dscp"].setData(res.dscp);
+                if (res.error == '') {
+                    LIBR_updateField(res.by_statement, "author");
+                    LIBR_updateField(res.publisher, "publisher");
+                    LIBR_updateField(res.title, "item_name");
+                    LIBR_updateField(res.dscp, "dscp");
+                    if (window.CKEDITOR) {
+                        CKEDITOR.instances["dscp"].setData(res.dscp);
+                    }
+                    LIBR_updateField(res.publish_date, "f_pub_date");
+                } else {
+                    $.UIkit.notify(res.error, {timeout: 1000,pos:'top-center'});
                 }
-                LIBR_updateField(res.publish_date, "f_pub_date");
             }
             catch(err) {
                 $.UIkit.notify("Astore lookup error", {timeout: 1000,pos:'top-center'});
@@ -68,6 +73,7 @@ var LIBR_astoreLookup = function(isbn) {
             console.log(errorThrown);
         },
     });
+    LIBR_showIcon("search");
     return false;
 };
 
@@ -79,6 +85,7 @@ var LIBR_astoreLookup = function(isbn) {
 *   @param  string  isbn    Item ISBN number
 */
 var LIBR_openlibLookup = function(isbn) {
+    LIBR_showIcon("working");
     var key = "ISBN:" + isbn;
     var dataS = {
         "bibkeys" : key,
@@ -103,11 +110,13 @@ var LIBR_openlibLookup = function(isbn) {
             catch(err) {
                 $.UIkit.notify("OpenLibrary lookup error", {timeout: 1000,pos:'top-center'});
             }
+            LIBR_showIcon("search");
         },
         error: function(jqXHR, textStatus, errorThrown) {
             console.log(jqXHR);
             console.log(textStatus);
             console.log(errorThrown);
+            LIBR_showIcon("search");
         },
     });
     return false;
@@ -173,3 +182,13 @@ var LIBR_ajaxReserve = function(item_id, action)
     return false;
 };
 
+function LIBR_showIcon(icon_name)
+{
+    if (icon_name == "working") {
+        document.getElementById("workingicon").style.display= "";
+        document.getElementById("searchicon").style.display = "none";
+    } else {
+        document.getElementById("workingicon").style.display = "none";
+        document.getElementById("searchicon").style.display = "";
+    }
+}

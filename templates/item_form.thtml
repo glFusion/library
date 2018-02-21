@@ -21,7 +21,8 @@
     <div class="uk-form-controls">
       <input type="text" id="item_id" name="id" value="{id}" size="40" maxlength="255" />
 {!if lookup_method}
-      <i class="uk-icon uk-icon-search" onclick="javascript:LIBR_{lookup_method}Lookup(document.getElementById('item_id').value);" data-uk-tooltip title="{$LANG_LIB['search_openlib']}"></i>
+      <i id="searchicon" class="uk-icon uk-icon-search" onclick="javascript:LIBR_{lookup_method}Lookup(document.getElementById('item_id').value);" data-uk-tooltip title="{$LANG_LIB['search_openlib']}"></i>
+      <i id="workingicon" class="uk-icon uk-icon-spinner uk-icon-spin" style="display:none;"></i>
 {!endif}
     </div>
   </div>
