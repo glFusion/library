@@ -259,6 +259,57 @@ class Instance
         }
     }
 
+
+    /**
+    *   Get all instance records for a given user
+    *
+    *   @param  string  $uid    User ID
+    *   @return array       Array of waitlist records
+    */
+    public static function checkedoutByUser($uid)
+    {
+        global $_TABLES;
+        static $items = array();
+
+        if (!isset($items[$uid])) {
+            $sql = "SELECT * FROM {$_TABLES['library.instances']}
+                    WHERE uid = '" . (int)$uid . "'";
+            $res = DB_query($sql);
+            $items[$uid] = DB_fetchAll($res, false);
+        }
+        return $items[$uid];
+    }
+
+
+    /**
+    *   Get a count of all items that a given user has checked out
+    *
+    *   @uses   self::checkedoutByUser()
+    *   @param  integer $uid    User ID
+    *   @return integer         Count of items
+    */
+    public static function countByUser($uid)
+    {
+        $items = self::checkedoutByUser($uid);
+        return count($items);
+    }
+
+
+    /**
+    *   Check if a given user has an item checked out
+    *
+    *   @uses   self::checkedoutByUser()
+    *   @param  string  $item_id    Item ID
+    *   @param  integer $uid        User ID
+    *   @return boolean     True if the user has checked out the item
+    */
+    public static function UserHasItem($item_id, $uid)
+    {
+        $items = self::checkedoutByUser($uid);
+        $key = array_search($item_id, array_column($items, 'item_id'));
+        return (bool)$key;
+    }
+
 }   // class Instance
 
 ?>

@@ -203,6 +203,99 @@ class Waitlist
         );
     }
 
+
+    /**
+    *   Get all waitlist records for a given item
+    *
+    *   @param  string  $item_id    Item ID
+    *   @return array       Array of waitlist records
+    */
+    public static function getByItem($item_id)
+    {
+        global $_TABLES;
+        static $waitlist = array();
+
+        if (!isset($waitlist[$item_id])) {
+            $sql = "SELECT * FROM {$_TABLES['library.waitlist']}
+                    WHERE item_id = '" . DB_escapeString($item_id) . "'
+                    ORDER BY id ASC";
+            $res = DB_query($sql);
+            $waitlist[$item_id] = DB_fetchAll($res, false);
+        }
+        return $waitlist[$item_id];
+    }
+
+
+    /**
+    *   Get all waitlist records for a given user
+    *
+    *   @param  string  $uid    User ID
+    *   @return array       Array of waitlist records
+    */
+    public static function getByUser($uid)
+    {
+        global $_TABLES;
+        static $waitlist = array();
+
+        if (!isset($waitlist[$uid])) {
+            $sql = "SELECT * FROM {$_TABLES['library.waitlist']}
+                    WHERE uid = '" . (int)$uid . "'
+                    ORDER BY id ASC";
+            $res = DB_query($sql);
+            $waitlist[$uid] = DB_fetchAll($res, false);
+        }
+        return $waitlist[$uid];
+    }
+
+
+    /**
+    *   Get a specific user's position in the waiting list
+    *
+    *   @uses   self::getByUser()
+    *   @param  string  $item_id    Item ID
+    *   @param  integer $uid        User ID
+    *   @return integer     User's position in the list, 0 if not found
+    */
+    public static function getUserPosition($item_id, $uid)
+    {
+        $wl = self::getByItem($item_id);
+        $c = count($wl);
+        for ($i = 0; $i < $c; $i++) {
+            if ($wl[$i]['uid'] == $uid) {
+                return $i;
+            }
+        }
+        return 0;
+    }
+
+
+    /**
+    *   Get a count of all items that a given user has reserved
+    *
+    *   @uses   self::getByUser()
+    *   @param  integer $uid    User ID
+    *   @return integer         Count of items
+    */
+    public static function countByUser($uid)
+    {
+        $wl = self::getByUser($uid);
+        return count($wl);
+    }
+
+
+    /**
+    *   Get a count of all reservations for a given item
+    *
+    *   @uses   self::getByItem()
+    *   @param  integer $item_id    Item ID
+    *   @return integer         Count of items
+    */
+    public static function countByItem($item_id)
+    {
+        $wl = self::getByItem($item_id);
+        return count($wl);
+    }
+
 }
 
 ?>

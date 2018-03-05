@@ -635,44 +635,6 @@ class Item
             'can_edit'          => plugin_ismoderator_library(),
         ) );
 
-        /*$on_waitlist = DB_count($_TABLES['library.waitlist'],
-                    array('item_id', 'uid'),
-                    array($this->Get('id'), $_USER['uid'])) == 1;
-        $waitlist = DB_count($_TABLES['library.waitlist'],
-                    array('item_id'),
-                    array($this->Get('id')));
-
-        if ($this->Get('status') == LIB_STATUS_AVAIL) {
-            $T->set_var(array(
-                'avail_icon'    => $waitlist > 0 ? 'yellow.png' : 'on.png',
-                'due_dt'        => '',
-            ) );
-            $avail_txt = $LANG_LIB['available'];
-        } else {
-            $T->set_var(array(
-                'due_dt'    => date("d-M-Y", $this->Get('due')),
-                'avail_icon' => 'red.png',
-                'have_checkout' => $this->Get('uid') == $_USER['uid'] ? 'true' : '',
-            ) );
-            $avail_txt = $LANG_LIB['not_available'];
-        }
-        $reserv_txt = '<br />' . sprintf($LANG_LIB['has_waitlist'], $waitlist);
-        if ($on_waitlist) {
-            $T->set_var(array(
-                'wait_action' => 'rmv',
-                'wait_confirm_txt' => $LANG_LIB['conf_rmvwaitlist'],
-                'wait_action_txt' => $LANG_LIB['on_waitlist'] . '<br />' .
-                                    $LANG_LIB['click_to_remove'],
-            ) );
-        } else {
-            $T->set_var(array(
-                    'wait_action' => 'add',
-                    'wait_confirm_txt' => $LANG_LIB['conf_addwaitlist'],
-                    'wait_action_txt' => $LANG_LIB['add_waitlist'] . $reserv_txt,
-            ) );
-        }
-        $T->set_var('avail_txt', $avail_txt . $reserv_txt);*/
-
         // Retrieve the photos and put into the template
         $sql = "SELECT img_id, filename
                 FROM {$_TABLES['library.images']}
@@ -863,25 +825,9 @@ class Item
             $user_wait_items = 0;
             $waitlist_txt = '';
         } else {
-            // Check if we have the item reserved, and if there's a waitlist.
-            $sql = "SELECT uid FROM {$_TABLES['library.waitlist']}
-                    WHERE item_id = '" . DB_escapeString($this->id) . "'
-                    ORDER BY id ASC";
-            $res = DB_query($sql);
-            $A = array();
-            if ($res) {
-                $A = DB_fetchAll($res, false);
-            }
-            $waitlisters = count($A);
-            $waitlist_pos = 0;
-            for ($i = 0; $i < $waitlisters; $i++) {
-                if ($A[$i]['uid'] == $_USER['uid']) {
-                    $waitlist_pos = $i + 1;
-                    break;
-                }
-            }
-            $user_wait_items = DB_count($_TABLES['library.waitlist'],
-                    'uid', $_USER['uid']);
+            $waitlist_pos = Waitlist::getUserPosition($this->id, $_USER['uid']);
+            $waitlisters = Waitlist::countByItem($this->id);
+            $user_wait_items = Waitlist::countByUser($_USER['uid']);
             $reserve_txt = $waitlisters ? sprintf($LANG_LIB['has_waitlist'], $waitlisters) : '';
             $waitlist_txt = '';
             if ($waitlist_pos > 0) {
@@ -895,24 +841,25 @@ class Item
         }
 
         // Check if the current user already has the item checked out
-        $checked_out = DB_count($_TABLES['library.instances'],
-                    array('item_id', 'uid'),
-                    array($this->id, $_USER['uid'])
-        );
-        if ($checked_out) {
+        $item_checked_out = Instance::UserHasItem($this->id, $_USER['uid']);
+        $all_checked_out= Instance::countByUser($_USER['uid']);
+        if ($item_checked_out) {
             $avail_txt = $LANG_LIB['by_you'];
             $can_reserve = false;
             $wait_action_txt = '';
+            $reserve_txt = '';
         } else {
             $avail = Instance::getAll($this->id, LIB_STATUS_AVAIL);
             $num_avail = max(count($avail) - $waitlisters, 0);
             if ($num_avail > 0) {
-                if ($user_wait_items < $_CONF_LIB['max_wait_items'])
+                if (($user_wait_items + $all_checked_out) < $_CONF_LIB['max_wait_items']) {
                     $avail_txt = sprintf($LANG_LIB['avail_cnt'], $num_avail);
-                elseif (!$is_reserved)
+                } elseif (!$is_reserved) {
                     $avail_txt = $LANG_LIB['max_wait_items'];
-                else
+                    $can_reserve = false;
+                } else {
                     $avail_txt = '';
+                }
             } else {
                 $avail_txt = $LANG_LIB['checkedout'];
                 $avail_icon = 'red.png';
