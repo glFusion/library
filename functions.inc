@@ -33,10 +33,11 @@ define('LIBRARY_URL', "{$_CONF['site_url']}/{$_CONF_LIB['pi_name']}");
 /** Define URL to plugin admin interface */
 define('LIBRARY_ADMIN_URL',
         "{$_CONF['site_admin_url']}/plugins/{$_CONF_LIB['pi_name']}");
+define ('LIB_STATUS_ALL', 0);
 /** Define status code: item available */
-define ('LIB_STATUS_AVAIL', 0);
+define ('LIB_STATUS_AVAIL', 1);
 /** Define status code: item checked out */
-define ('LIB_STATUS_OUT', 1);
+define ('LIB_STATUS_OUT', 2);
 
 // Store the private image path in a conf var so it's available
 $_CONF_LIB['image_dir'] = $_CONF['path'] . 'data/library/images/items';

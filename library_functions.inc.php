@@ -3,162 +3,13 @@
 *   Plugin-specific functions for the Library plugin for glFusion.
 *
 *   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009 Lee Garner
+*   @copyright  Copyright (c) 2009-2018 Lee Garner
 *   @package    library
 *   @version    0.0.1
 *   @license    http://opensource.org/licenses/gpl-2.0.php
 *               GNU Public License v2 or later
 *   @filesource
 */
-
-
-/**
-*   Checkout History View.
-*   Displays the purchase history for the current user.  Admins
-*   can view any user's histor, or all users
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @package    library
-*/
-function X_LIBRARY_history($admin = false, $uid = '')
-{
-    global $_CONF, $_CONF_LIB, $_TABLES, $LANG_LIB, $_USER;
-
-    // Not available to anonymous users
-    if (COM_isAnonUser())
-        return '';
-
-    USES_lib_admin();
-
-    $isAdmin = $admin == true ? 1 : 0;
-
-    $sql = "SELECT p.*, UNIX_TIMESTAMP(p.expiration) AS time,
-                d.name, d.short_dscp, d.file, d.prod_type,
-                $isAdmin as isAdmin,
-                u.uid, u.username
-            FROM  {$_TABLES['library.trans']} AS p
-            LEFT JOIN {$_TABLES['library.items']} AS d
-                ON d.id = p.item_id
-            LEFT JOIN {$_TABLES['users']} AS u
-                ON p.user_id = u.uid ";
-
-    $base_url = LIBRARY_ADMIN_URL;
-    if (!$isAdmin) {
-        $where = " WHERE p.user_id = '" . (int)$_USER['uid'] . "'";
-        $base_url = LIBRARY_URL;
-    } elseif (!empty($uid)) {
-        $where = " WHERE p.user_id = '" . (int)$uid . "'";
-    }
-
-    $header_arr = array(
-        array('text' => $LANG_LIB['item_id'],
-                'field' => 'name', 'sort' => true),
-        array('text' => $LANG_LIB['qty'],
-                'field' => 'quantity', 'sort' => true),
-        array('text' => $LANG_LIB['dscp'],
-                'field' => 'short_dscp', 'sort' => true),
-        array('text' => $LANG_LIB['purch_date'],
-                'field' => 'purchase_date', 'sort' => true),
-        array('text' => $LANG_LIB['txn_id'],
-                'field' => 'txn_id', 'sort' => true),
-        array('text' => $LANG_LIB['expiration'],
-                'field' => 'expiration', 'sort' => true),
-        array('text' => $LANG_LIB['prod_type'],
-                'field' => 'prod_type', 'sort' => true),
-    );
-    if ($isAdmin) {
-        $header_arr[] = array('text' => $LANG_LIB['username'],
-                'field' => 'username', 'sort' => true);
-    }
-
-    $defsort_arr = array('field' => 'p.purchase_date',
-            'direction' => 'asc');
-
-    $display = COM_startBlock('', '',
-                COM_getBlockTemplate('_admin_block', 'header'));
-
-    $query_arr = array('table' => 'library.trans',
-            'sql' => $sql,
-            'query_fields' => array('d.name', 'd.short_dscp', 'p.txn_id'),
-            'default_filter' => $where,
-        );
-
-    $text_arr = array(
-        'has_extras' => true,
-        'form_url' => $base_url . '/index.php?mode=history',
-    );
-
-    if (!isset($_GET['query_limit']))
-        $_GET['query_limit'] = 20;
-
-    $display .= ADMIN_list('library', 'LIBRARY_getPurchaseHistoryField',
-            $header_arr, $text_arr, $query_arr, $defsort_arr,
-            $filter, $this, '', $form_arr);
-
-    $display .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
-    return $display;
-}
-
-
-/**
-*   Get an individual field for the history screen.
-*
-*   @param  string  $fieldname  Name of field (from the array, not the db)
-*   @param  mixed   $fieldvalue Value of the field
-*   @param  array   $A          Array of all fields from the database
-*   @param  array   $icon_arr   System icon array (not used)
-*   @param  object  $EntryList  This entry list object
-*   @return string              HTML for field display in the table
-*/
-function XX_LIBRARY_getPurchaseHistoryField($fieldname, $fieldvalue, $A, $icon_arr)
-{
-    global $_CONF, $_CONF_LIB, $LANG_LIB;
-   
-    $retval = '';
-
-    switch($fieldname) {
-    case 'name':
-        if (is_numeric($A['item_id'])) {
-            // One of our catalog items, so link to it
-            $retval = COM_createLink($fieldvalue,
-                LIBRARY_URL . '/index.php?mode=detail&product=' . $A['item_id']);
-        } else {
-            // Probably came from a plugin, just show the product name
-            $retval = htmlspecialchars($A['item_id']);
-        }
-        break;
-
-    case 'username':
-        $retval = COM_createLink($fieldvalue,
-                $_CONF['site_url'] . '/users.php?mode=profile&uid=' .
-                $A['uid']);
-        break;
-
-    case 'quantity':
-        $retval = '<div style="text-align:right;">' . $fieldvalue . "</div>";
-        break;
-
-    case 'txn_id':
-        if ($A['isAdmin'] == 1) {
-            $retval = COM_createLink($fieldvalue,
-                LIBRARY_ADMIN_URL . '/index.php?mode=ipnlog&op=single&txn_id=' .
-                $fieldvalue);
-        } else {
-            $retval = $fieldvalue;
-        }
-        break;
-
-    case 'prod_type':
-        $retval = $LANG_LIB['prod_types'][$A['prod_type']];
-        break;
-
-    default:
-        $retval = htmlspecialchars($fieldvalue);
-        break;
-    }
-
-    return $retval;
-}
 
 
 /**
@@ -497,7 +348,7 @@ function LIBRARY_notifyLibrarian($item_id, $uid)
 
 /**
 *   Loads a custom language array.
-*   If $requested is an array, the first valid language file is loaded. 
+*   If $requested is an array, the first valid language file is loaded.
 *   If not, the $requested language file is loaded.
 *   If $requested doesn't refer to a vailid language, then $_CONF['language']
 *   is assumed.  If all else fails, english.php is loaded.

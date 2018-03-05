@@ -30,7 +30,8 @@ $_CONF_LIB['pi_url']             = 'http://www.glfusion.org';
 $_LIB_table_prefix = $_DB_table_prefix . 'library_';
 
 $_TABLES['library.items']       = $_LIB_table_prefix . 'items';
-$_TABLES['library.trans']       = $_LIB_table_prefix . 'trans';
+$_TABLES['library.instances']   = $_LIB_table_prefix . 'instances';
+$_TABLES['library.log']         = $_LIB_table_prefix . 'log';
 $_TABLES['library.images']      = $_LIB_table_prefix . 'images';
 $_TABLES['library.categories']  = $_LIB_table_prefix . 'categories';
 $_TABLES['library.waitlist']    = $_LIB_table_prefix . 'waitlist';

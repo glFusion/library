@@ -14,11 +14,6 @@
 </tr>
 
 <tr>
-  <td valign="top">{$LANG_LIB['description']}: </td>
-  <td>{item_desc}</td>
-</tr>
-
-<tr>
   <td valign="top">{$LANG_LIB['checkout_user']}: </td>
   <td>
     <select name="uid">

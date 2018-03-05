@@ -41,7 +41,8 @@ $LANG_LIB = array (
 'download'          => 'Download',
 'downloadable'      => 'Downloadable',
 'price'             => 'Price',
-'purchase_history'  => 'Purchase History',
+'history'           => 'History',
+'view_history'      => 'View item history',
 'type'              => 'Media Type',
 'new_item'          => 'New Item',
 'new_category'      => 'New Category',
@@ -119,6 +120,7 @@ $LANG_LIB = array (
 'remove'            => 'Remove',
 'click_to_remove'   => 'Click to Remove',
 'available'         => 'Available',
+'avail_cnt'         => '%d available',
 'has_waitlist'      => 'Pending reservations: %d',
 'pending'           => 'Pending',
 'pending_actions'   => 'Pending Actions',
@@ -132,7 +134,7 @@ $LANG_LIB = array (
 'checkout'      => 'Check Out',
 'checkin'       => 'Check In',
 'checkedout'    => 'Checked Out',
-'by_you'        => '(By You)',
+'by_you'        => 'You have checked out this item.',
 'back_to_list'  => 'Back to Listing',
 'all'           => 'All',
 'dt_due'        => 'Due Date',
@@ -145,6 +147,10 @@ $LANG_LIB = array (
 'item_nochange' => 'Item has not been changed.',
 'search_openlib' => 'Search online for the ISBN.',
 'max_wait_items' => 'You can reserve up to ' . $_CONF_LIB['max_wait_items'] . ' items at a time.',
+'add_instances' => 'Add Instances',
+'instance'  => 'Instance',
+'view_instances' => 'View instances of this item',
+'view_item' => 'View this item&apos;s detail',
 );
 
 $LANG_LIB_HELP = array(
@@ -172,6 +178,8 @@ $LANG_LIB_HELP = array(
 'cat_perms' => 'Select the permissions for this category. Only Read permission is used.',
 'cat_enabled' => 'Select whether this category is enabled. Disabling a category prevents any of its items from being displayed.',
 'mt_type' => 'Enter a name for this media type. This should be unique.',
+'add_instances' => 'Enter the number of instances to add for this item.',
+'checkin_instance' => 'Select the specific item instance to check in.',
 );
 
 /** Message indicating plugin version is up to date */

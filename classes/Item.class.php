@@ -33,7 +33,6 @@ class Item
     /** URL to item list, including search params
     *   @var string */
     private $ListingUrl;
-    //var $button_types = array();
 
     /** Array of error messages
     *   @var mixed */
@@ -191,16 +190,10 @@ class Item
 
         if ($fromDB) {
             $this->oldid = $row['id'];
-            $this->uid = $row['uid'];
-            $this->due = $row['due'];
             $this->status = $row['status'];
-            $this->uid = $row['uid'];
         } else {
             $this->oldid = $row['oldid'];
-            $this->uid = 0;
-            $this->due = 0;
             $this->status = 0;
-            $this->uid = 0;
         }
     }
 
@@ -249,6 +242,8 @@ class Item
             $this->setVars($A);
         }
 
+        $add_instances = isset($A['add_instances']) ? (int)$A['add_instances'] : 0;
+
         // Insert or update the record, as appropriate.  Make sure the new ID
         // being inserted or changed to doesn't already exist.
         $allowed = ($this->isNew || $this->id != $this->oldid) ? 0 : 1;
@@ -292,7 +287,8 @@ class Item
             }
         }
         if (empty($this->Error)) {
-            Cache::clear();
+            self::Clone($this->id, $add_instances);
+            Cache::clear($this->id);
             PLG_itemSaved($this->id, $_CONF_LIB['pi_name']);
             return true;
         } else {
@@ -439,6 +435,7 @@ class Item
                                             $_CONF['language']),
             'type'          => $this->type,
             'lookup_method' => $_CONF_LIB['lookup_method'],
+            'add_instances' => $this->isNew ? 1 : 0,
         ) );
 
         $T->set_block('product', 'TypeSelBlock', 'TypeSel');
@@ -456,7 +453,7 @@ class Item
         $T->set_var('ena_chk',
                 $this->enabled == 1 ? ' checked="checked"' : '');
 
-        if (!$this->isNew && !$this->isUsed()) {
+        if (!$this->isNew && !self::isUsed($this->id)) {
             $T->set_var('candelete', 'true');
         }
 
@@ -574,14 +571,16 @@ class Item
     *
     *   @return boolean True if used, False if not
     */
-    public function isUsed()
+    public static function isUsed($item_id)
     {
         global $_TABLES;
-        if (DB_count($_TABLES['library.trans'], 'id',
-                $this->id) > 0) {
+
+        $item_id = DB_escapeString($item_id);
+        if (DB_count($_TABLES['library.log'], 'id',
+                $item_id) > 0) {
             return true;
         } elseif (DB_count($_TABLES['library.waitlist'], 'id',
-                $this->id) > 0) {
+                $item_id) > 0) {
             return true;
         } else {
             return false;
@@ -803,29 +802,25 @@ class Item
     */
     public function checkOut($to, $due='')
     {
-        global $_TABLES, $_USER;
-
         $to = (int)$to;
         if ($to == 1)           // Can't check out to anonymous
             return;
         if ($to == 0 && empty($_POST['co_username']))
             return;
-        $me = (int)$_USER['uid'];
 
         if (empty($due)) {
             $due = LIBRARY_dueDate($this->maxcheckout)->toUnix();
+        } else {
+            $due = (int)$due;
         }
 
-        // Set the due date from the POSTed variable, if present.  If not
-        // present, or if an error occurs in the creation of the timestamp,
-        // fall back to now + the max checkout days.  Add one to the due date
-        // to get it to midnight the following day.
-        DB_query("UPDATE {$_TABLES['library.items']} SET
-                    status='" . LIB_STATUS_OUT . "',
-                    uid=$to,
-                    due=$due
-                WHERE id='{$this->id}'");
-        Cache::clear();
+        $instances = Instance::getAll($this->id, LIB_STATUS_AVAIL);
+        if (empty($instances)) {
+            return;
+        }
+        Instance::checkOut($instances[0], $to, $due);
+        // Clear the instance cache so the counters will be updated
+        Cache::clear(array('instance', $this->id));
         // Delete this user from the waitlist, if applicable
         Waitlist::Remove($this->id, $to);
 
@@ -833,40 +828,18 @@ class Item
         // in line, the actual first borrower probably has a reservation
         // expiration that should be removed.
         Waitlist::resetExpirations($this->id);
-
-        // Insert the trasaction record
-        DB_query("INSERT INTO {$_TABLES['library.trans']}
-                    (item_id, dt, doneby, uid, trans_type)
-                VALUES (
-                    '{$this->id}', UNIX_TIMESTAMP(), $me, $to, 'checkout')");
     }
 
 
     /**
     *   Check in an item.
     */
-    public function checkIn()
+    public function checkIn($instance_id)
     {
-        global $_TABLES, $_USER;
-
-        $me = (int)$_USER['uid'];
-
-        DB_query("UPDATE {$_TABLES['library.items']} SET
-                    status='" . LIB_STATUS_AVAIL . "',
-                    uid = 0,
-                    due = 0
-                WHERE id='$id'");
-        Cache:clear();
-
-        // Insert the trasaction record, only if it's checked out.
-        if ($uid > 1) {
-            DB_query("INSERT INTO {$_TABLES['library.trans']}
-                    (item_id, dt, doneby, uid, trans_type)
-                VALUES (
-                    '{$this->id}', UNIX_TIMESTAMP(), $me, {$this->uid}, 'checkin')");
-        }
+        $I = new Instance($instance_id);
+        $I->checkIn();
         // If there's a reservation for this item, notify the reserver.
-        Waitlist::notifyNext($this);
+        Waitlist::notifyNext($this->id);
     }
 
 
@@ -921,24 +894,29 @@ class Item
             }
         }
 
-        switch ($this->status) {
-        case LIB_STATUS_AVAIL:
-            if ($user_wait_items < $_CONF_LIB['max_wait_items'])
-                $avail_txt = $LANG_LIB['available'];
-            elseif (!$is_reserved)
-                $avail_txt = $LANG_LIB['max_wait_items'];
-            else
-                $avail_txt = '';
-            break;
-        case LIB_STATUS_OUT:
-            $avail_txt = $LANG_LIB['checkedout'];
-            $avail_icon = 'red.png';
-            if ($this->uid == $_USER['uid']) {
-                $avail_txt .= ' ' . $LANG_LIB['by_you'];
-                $can_reserve = false;
-                $wait_action_txt = '';
+        // Check if the current user already has the item checked out
+        $checked_out = DB_count($_TABLES['library.instances'],
+                    array('item_id', 'uid'),
+                    array($this->id, $_USER['uid'])
+        );
+        if ($checked_out) {
+            $avail_txt = $LANG_LIB['by_you'];
+            $can_reserve = false;
+            $wait_action_txt = '';
+        } else {
+            $avail = Instance::getAll($this->id, LIB_STATUS_AVAIL);
+            $num_avail = max(count($avail) - $waitlisters, 0);
+            if ($num_avail > 0) {
+                if ($user_wait_items < $_CONF_LIB['max_wait_items'])
+                    $avail_txt = sprintf($LANG_LIB['avail_cnt'], $num_avail);
+                elseif (!$is_reserved)
+                    $avail_txt = $LANG_LIB['max_wait_items'];
+                else
+                    $avail_txt = '';
+            } else {
+                $avail_txt = $LANG_LIB['checkedout'];
+                $avail_icon = 'red.png';
             }
-            break;
         }
 
         $T->set_var(array(
@@ -966,6 +944,47 @@ class Item
     public function setListUrl($url)
     {
         $this->ListingUrl = $url;
+    }
+
+
+    /**
+    *   Add one or more instances of an item
+    *
+    *   @param  string  $item_id    Item ID
+    *   @param  integer $count      Number of instances to add
+    */
+    public static function Clone($item_id, $count = 1)
+    {
+        global $_TABLES;
+
+        $count = (int)$count;
+        $item_id = DB_escapeString($item_id);
+        $values = array();
+        for ($i = 0; $i < $count; $i++) {
+            $values[] = "('$item_id')";
+        }
+        if (!empty($values)) {
+            $values = implode(',', $values);
+            $sql = "INSERT INTO {$_TABLES['library.instances']}
+                    (item_id) VALUES $values";
+            DB_query($sql);
+            Cache::clear(array('instance', $item_id));
+        }
+    }
+
+
+    /**
+    *   0 = all
+    *   1 = available
+    *   2 = checked out
+    */
+    public static function getInstances($item_id, $status = 0)
+    {
+        static $retval = array();
+        if (!isset($retval[$status])) {
+            $retval[$status] = Instance::getAll($item_id, $status);
+        }
+        return $retval[$status];
     }
 
 }   // class Item

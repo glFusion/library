@@ -16,9 +16,9 @@ if (!defined ('GVERSION')) {
 }
 
 global $_TABLES;
-
-$_SQL['library.items'] = "CREATE TABLE {$_TABLES['library.items']} (
-  `id` varchar(255) NOT NULL DEFAULT '',
+$_SQL = array();
+$_SQL['library.items'] = "CREATE TABLE `{$_TABLES['library.items']}` (
+  `id` varchar(255) NOT NULL,
   `name` varchar(255) NOT NULL,
   `cat_id` int(11) unsigned NOT NULL DEFAULT '0',
   `short_dscp` varchar(255) NOT NULL DEFAULT '',
@@ -39,13 +39,20 @@ $_SQL['library.items'] = "CREATE TABLE {$_TABLES['library.items']} (
   `rating` double(6,4) NOT NULL DEFAULT '0.0000',
   `votes` int(11) unsigned NOT NULL DEFAULT '0',
   `status` tinyint(1) DEFAULT '0',
-  `uid` int(11) NOT NULL DEFAULT '0',
-  `due` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `item_name` (`name`)
-)";
+) ENGINE=MyISAM";
 
-$_SQL['library.trans'] = "CREATE TABLE {$_TABLES['library.trans']} (
+$_SQL['library.instances'] = "CREATE TABLE `{$_TABLES['library.instances']}` (
+  `instance_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `item_id` varchar(80) NOT NULL DEFAULT '',
+  `uid` int(11) unsigned NOT NULL DEFAULT '0',
+  `due` int(11) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`instance_id`),
+  KEY `item_id` (`item_id`,`instance_id`)
+) ENGINE=MyISAM";
+
+$_SQL['library.log'] = "CREATE TABLE `{$_TABLES['library.log']}` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `item_id` varchar(255) NOT NULL,
   `dt` int(11) NOT NULL,
@@ -55,9 +62,9 @@ $_SQL['library.trans'] = "CREATE TABLE {$_TABLES['library.trans']} (
   PRIMARY KEY (`id`),
   KEY `purchases_productid` (`item_id`),
   KEY `purchases_userid` (`uid`)
-)";
+) ENGINE=MyISAM";
 
-$_SQL['library.waitlist'] = "CREATE TABLE {$_TABLES['library.waitlist']} (
+$_SQL['library.waitlist'] = "CREATE TABLE `{$_TABLES['library.waitlist']}` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `dt` int(11) unsigned NOT NULL DEFAULT '0',
   `expire` int(11) unsigned NOT NULL DEFAULT '0',
@@ -65,17 +72,17 @@ $_SQL['library.waitlist'] = "CREATE TABLE {$_TABLES['library.waitlist']} (
   `uid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idxItem` (`item_id`,`uid`)
-)";
+) ENGINE=MyISAM";
 
-$_SQL['library.images'] = "CREATE TABLE {$_TABLES['library.images']} (
+$_SQL['library.images'] = "CREATE TABLE `{$_TABLES['library.images']}` (
   `img_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
   `item_id` varchar(255) NOT NULL DEFAULT '',
   `filename` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`img_id`),
   KEY `idxItem` (`item_id`,`img_id`)
-)";
+) ENGINE=MyISAM";
 
-$_SQL['library.categories'] = "CREATE TABLE {$_TABLES['library.categories']} (
+$_SQL['library.categories'] = "CREATE TABLE `{$_TABLES['library.categories']}` (
   `cat_id` smallint(5) unsigned NOT NULL auto_increment,
   `cat_name` varchar(255) default '',
   `dscp` varchar(255) default '',
@@ -88,13 +95,13 @@ $_SQL['library.categories'] = "CREATE TABLE {$_TABLES['library.categories']} (
   `perm_anon` tinyint(1) unsigned NOT NULL default '2',
   PRIMARY KEY  (`cat_id`),
   KEY `idxName` (`cat_name`,`cat_id`)
-)";
+) ENGINE=MyISAM";
 
-$_SQL['library.types'] = "CREATE TABLE {$_TABLES['library.types']} (
+$_SQL['library.types'] = "CREATE TABLE `{$_TABLES['library.types']}` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-)";
+) ENGINE=MyISAM";
 
 $_DEFDATA['library.types'] = "INSERT INTO {$_TABLES['library.types']} VALUES
     (1,'Book'),(2,'CD'),(3,'DVD')";

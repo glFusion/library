@@ -20,6 +20,13 @@
 </p>
 
 <p>
+  <label>{$LANG_LIB['add_instances']}:
+     <i class="fa fa-question-circle tooltip" title="{$LANG_LIB_HELP['add_instances']}"></i>
+  </label>
+  <input type="text" id="add_instances" name="add_instances" value="{add_instances}" size="5" maxlength="5" />
+</p>
+
+<p>
   <label><font color="red">*</font>{$LANG_LIB['item_name']}:
     <a href="#" onclick="popupWindow('{doc_url}#desc_name', 'Help', 640, 480, 1)" class="toolbar">
     <img src="{layout_url}/images/button_help.png" alt="" /></a>

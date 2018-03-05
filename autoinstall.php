@@ -48,12 +48,16 @@ $INSTALL_plugin['library'] = array(
             'sql' => $_SQL['library.items']
         ),
     array(  'type' => 'table',
+            'table' => $_TABLES['library.instances'],
+            'sql' => $_SQL['library.instances']
+        ),
+    array(  'type' => 'table',
             'table' => $_TABLES['library.categories'],
             'sql' => $_SQL['library.categories']
         ),
     array(  'type' => 'table',
-            'table' => $_TABLES['library.trans'],
-            'sql' => $_SQL['library.trans']
+            'table' => $_TABLES['library.log'],
+            'sql' => $_SQL['library.log']
         ),
     array(  'type' => 'table',
             'table' => $_TABLES['library.images'],
