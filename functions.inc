@@ -533,7 +533,6 @@ function library_filterVars($vars, &$arr) {
 function plugin_searchtypes_library()
 {
     global $_CONF_LIB, $LANG_LIB;
-return array();
     return array($_CONF_LIB['pi_name'] => $LANG_LIB['srchtitle']);
 }
 
@@ -790,6 +789,8 @@ function plugin_getiteminfo_library($id, $what, $uid=0, $options=array())
             $fields[] = 'short_dscp';
             $fields[] = 'dscp';
             $fields[] = 'keywords';
+            $fields[] = 'publisher';
+            $fields[] = 'author';
             break;
         case 'author':
         case 'author_name':
@@ -842,7 +843,8 @@ function plugin_getiteminfo_library($id, $what, $uid=0, $options=array())
                 break;
             case 'searchidx':
                 $props[$p] = $A['name'] . ' ' . $A['short_dscp'] . ' ' .
-                        $A['dscp'] . ' ' . $A['keywords'];
+                        $A['dscp'] . ' ' . $A['keywords'] . ' ' . $A['publisher'] .
+                        ' ' . $A['author'];
                 break;
             case 'url':
                 $props[$p] = COM_buildUrl($_CONF['site_url'] .
