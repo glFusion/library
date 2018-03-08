@@ -728,30 +728,7 @@ function plugin_autouninstall_library()
 
 
 /**
-*   Enable or disable this plugin's blocks when the plugin is changed.
-*   Acts on all blocks with a phpblock function similar to the specified
-*   functions.
-*
-*   @param  boolean $enabled    Plugin's "enabled" state
-*/
-/*function plugin_enablestatechange_library($enabled)
-{
-    global $_TABLES;
-
-    $enabled = $enabled == true ? 1 : 0;
-    $blockfns = array('phpblock_library_');
-
-    foreach ($blockfns as $blockfn) {
-        DB_query("UPDATE {$_TABLES['blocks']}
-                SET is_enabled=$enabled
-                WHERE phpblockfn like '{$blockfn}%'"
-                );
-    }
-}*/
-
-
-/**
-*   Provides the getItemInfo function for classified ads
+*   Provides the getItemInfo function for library items
 *
 *   @param  string  $id         Product ID
 *   @param  string  $fields     Comma-separated list of fields to return
