@@ -986,65 +986,6 @@ function plugin_runScheduledTask_library()
 
 
 /**
-*   Displays Library stats for the user in the user's profile.
-*
-*   @param  integer $uid    User ID whose profile is being displayed
-*   @param  object  &$T     Pointer to template object
-*   @return string          HTML to include in profile page
-*/
-function plugin_profilevariablesdisplay_library($uid, &$T)
-{
-    global $_TABLES, $_CONF, $_USER;
-
-    $retval = '';
-
-    // Only admins can see other users' library items
-    if ($uid != $_USER['uid'] && !SEC_hasRights('library.admin')) {
-        return;
-    }
-
-    $uid = (int)$uid;
-    // Make sure that a valid UID was passed in.
-    if ($uid < 2 ) {
-        return;
-    }
-
-    $sql = "SELECT id, name, short_dscp, due
-            FROM {$_TABLES['library.items']}
-            WHERE uid='$uid'";
-    //echo $sql;die;
-    $res = DB_query($sql, 1);
-    if (DB_error() || DB_numRows($res) < 1)
-        return;
-
-    $LT = new Template(LIBRARY_PI_PATH .'/templates');
-    $LT->set_file('block', 'profileblock.thtml');
-
-    $ts = time();
-    while ($A = DB_fetchArray($res, false)) {
-        $fmt_dt_due = date('M d, Y', $A['due']);
-        if ($A['due'] < $ts) {
-            $fmt_dt_due = '<span style="color:red;">' .
-                $fmt_dt_due . '</span>';
-        }
-        $LT->set_block('block', 'profile_row', 'prow');
-        $LT->set_var(array(
-            'name'  => $A['name'],
-            'short_dscp' => $A['short_dscp'],
-            'id'    => $A['id'],
-            'due_date' => $fmt_dt_due,
-        ) );
-        $LT->parse('prow', 'profile_row', true);
-    }
-
-    $existingFields = $T->get_var('plugin_fields');
-    $LT->parse('output', 'block');
-    $T->set_var('plugin_fields',
-        $existingFields . $LT->finish($LT->get_var('output')));
-}
-
-
-/**
 *   Select the Librarian group.
 *   'All Users' is not allowed
 *
