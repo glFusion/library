@@ -26,13 +26,6 @@ if (isset($config) && !isset($_CONF_LIB['maxcheckout'])) {
 
 /** Include library config file  */
 require_once 'library.php';
-/** Define base path to plugin */
-define('LIBRARY_PI_PATH', "{$_CONF['path']}/plugins/{$_CONF_LIB['pi_name']}");
-/** Define base URL to plugin */
-define('LIBRARY_URL', "{$_CONF['site_url']}/{$_CONF_LIB['pi_name']}");
-/** Define URL to plugin admin interface */
-define('LIBRARY_ADMIN_URL',
-        "{$_CONF['site_admin_url']}/plugins/{$_CONF_LIB['pi_name']}");
 define ('LIB_STATUS_ALL', 0);
 /** Define status code: item available */
 define ('LIB_STATUS_AVAIL', 1);
@@ -40,18 +33,21 @@ define ('LIB_STATUS_AVAIL', 1);
 define ('LIB_STATUS_OUT', 2);
 
 // Store the private image path in a conf var so it's available
+$_CONF_LIB['pi_path']= __DIR__;
+$_CONF_LIB['url'] = "{$_CONF['site_url']}/{$_CONF_LIB['pi_name']}";
+$_CONF_LIB['admin_url'] = "{$_CONF['site_admin_url']}/plugins/{$_CONF_LIB['pi_name']}";
 $_CONF_LIB['image_dir'] = $_CONF['path'] . 'data/library/images/items';
 $_CONF_LIB['_is_uikit'] = $_SYSTEM['framework'] == 'uikit' ? 'true' : '';
 $_CONF_LIB['_iconset'] = $_CONF_LIB['_is_uikit'] ? 'uk-icon' : 'fa fa';
 
 //  Additional config items and table definitions are added here
-if (file_exists(LIBRARY_PI_PATH . '/config.php')) {
+if (file_exists(__DIR__ . '/config.php')) {
     /** Include local configuration overrides */
-    include_once LIBRARY_PI_PATH . '/config.php';
+    include_once __DIR__ . '/config.php';
 }
 
 // Language file Include
-$langpath = LIBRARY_PI_PATH . '/language';
+$langpath = __DIR__ . '/language';
 $langfile = "{$_CONF['language']}.php";
 if (!file_exists("$langpath/$langfile")) {
     $langfile = 'english.php';
@@ -72,11 +68,11 @@ if (empty($_USER['uid'])) {
 
 /** Import plugin-specific functions */
 function USES_library_functions()
-{   require_once LIBRARY_PI_PATH . '/library_functions.inc.php';  }
+{   require_once __DIR__ . '/library_functions.inc.php';  }
 
 /** Upgrade functions */
 function USES_library_upgrade()
-{   require_once LIBRARY_PI_PATH . '/upgrade.inc.php';   }
+{   require_once __DIR__ . '/upgrade.inc.php';   }
 
 spl_autoload_register(function ($class)
 {
@@ -154,7 +150,7 @@ function plugin_getmenuitems_library()
 
     $menuitems = array();
     if ($_CONF_LIB['menuitem'] && SEC_hasRights('library.view,library.admin', 'OR')) {
-      	$menuitems[$LANG_LIB['mnu_library']] = LIBRARY_URL . '/index.php';
+        $menuitems[$LANG_LIB['mnu_library']] = $_CONF_LIB['url'] . '/index.php';
     }
     return $menuitems;
 }
@@ -213,7 +209,7 @@ function plugin_savecomment_library($title,$comment,$id,$pid,$postmode)
         DB_change($_TABLES['library.items'], 'comments',  $comments,
                 'id', $id);
 
-        return (COM_refresh (COM_buildUrl(LIBRARY_URL .
+        return (COM_refresh (COM_buildUrl($_CONF_LIB['url'] .
                     "/index.php?mode=detail&id=$id")) );
     }
 }
@@ -304,7 +300,7 @@ function plugin_deletecomment_library($cid, $id)
                     SET comments=$count
                     WHERE id='$id'");
             // Redirect back to the product detail page
-            return (COM_refresh(LIBRARY_URL .
+            return (COM_refresh($_CONF_LIB['url'] .
                     '/index.php?mode=detail&id=' . $id));
         }
     }
@@ -325,7 +321,7 @@ function plugin_deletecomment_library($cid, $id)
 function plugin_editcomment_library($cid, $id)
 {
     echo COM_refresh(COM_buildUrl(
-            LIBRARY_URL . '/index.php?mode=detail&id=' . $id));
+            $_CONF_LIB['url'] . '/index.php?mode=detail&id=' . $id));
     exit;
 }
 
@@ -338,7 +334,7 @@ function plugin_editcomment_library($cid, $id)
 function plugin_geticon_library()
 {
     global $_CONF_LIB;
-    return LIBRARY_URL . '/images/' . $_CONF_LIB['pi_name'] . '.png';
+    return $_CONF_LIB['url'] . '/images/' . $_CONF_LIB['pi_name'] . '.png';
 }
 
 
@@ -354,7 +350,7 @@ function plugin_cclabel_library()
 
     if (SEC_hasRights('library.admin')) {
         return array($_CONF_LIB['pi_display_name'],
-                    LIBRARY_ADMIN_URL . '/index.php',
+                    $_CONF_LIB['admin_url'] . '/index.php',
                     plugin_geticon_library());
     }
 }
@@ -371,7 +367,7 @@ function plugin_getadminoption_library()
 
     if (SEC_hasRights('library.admin')) {
         return array($_CONF_LIB['pi_display_name'],
-                    LIBRARY_ADMIN_URL . '/index.php',
+                    $_CONF_LIB['admin_url'] . '/index.php',
                     DB_count($_TABLES['library.items']));
     }
 }
@@ -426,7 +422,7 @@ function plugin_autotags_library ($op, $content = '', $autotag = '') {
         return 'library';
     } else if ($op == 'parse') {
         $id = COM_applyFilter($autotag['parm1']);
-        $url = LIBRARY_URL . "/index.php?mode=detail&product=$id";
+        $url = $_CONF_LIB['url'] . "/index.php?mode=detail&product=$id";
 
         // Allow the author to use different text for the link.  Default
         // is the stored product name.
@@ -609,7 +605,7 @@ return;
 function plugin_getheaderjs_library()
 {
     return array(
-        LIBRARY_PI_PATH . '/js/utils.js',
+        __DIR__ . '/js/utils.js',
     );
 }
 
@@ -625,7 +621,7 @@ function plugin_getheadercss_library()
     $styles = array();
     $files = array('style.css');
 
-    $path = LIBRARY_PI_PATH . '/css';
+    $path = __DIR__ . '/css';
     foreach ($files as $file) {
         $styles[] = $path . '/' . $file;
     }
@@ -674,19 +670,19 @@ function plugin_getconfigelementhelp_library($option, $doclang='english')
 */
 function LIBRARY_getDocURL($file='', $doclang='english')
 {
-    $doc_path = LIBRARY_PI_PATH . "/docs/$doclang/";
+    $doc_path = __DIR__ . "/docs/$doclang/";
     $doc_url = '';
 
     if ($file != '') {
         if (!file_exists($doc_path . $file)) {
             $doclang = 'english';
         }
-        $doc_url = LIBRARY_URL . "/docs/$doclang/$file";
+        $doc_url = $_CONF_LIB['url'] . "/docs/$doclang/$file";
     } else {
         if (!is_dir($doc_path)) {
             $doclang = 'english';
         }
-        $doc_url = LIBRARY_URL . "/docs/$doclang/";
+        $doc_url = $_CONF_LIB['url'] . "/docs/$doclang/";
     }
     return $doc_url;
 }

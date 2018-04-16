@@ -30,7 +30,7 @@ function LIBRARY_ItemList()
     $url_opts .= '&type=' . $med_type;
 
     $T->set_var(array(
-        'pi_url'        => LIBRARY_URL,
+        'pi_url'        => $_CONF_LIB['url'],
         'type_select'   => Library\MediaType::buildSelection($med_type),
         'cat_select'    => Library\Category::buildSelection($cat_id),
     ) );
@@ -196,7 +196,7 @@ function LIBRARY_ItemList()
             $_CONF_LIB['items_per_page'] > 0 &&
             $count > $_CONF_LIB['items_per_page'] ) {
         $T->set_var('pagination',
-            COM_printPageNavigation(LIBRARY_URL . '/index.php' . $pagenav_args,
+            COM_printPageNavigation($_CONF_LIB['url'] . '/index.php' . $pagenav_args,
                         $page,
                         ceil($count / $_CONF_LIB['items_per_page'])));
     } else {
@@ -265,10 +265,10 @@ function LIBRARY_notifyWaitlist($id = '')
     $daysonhold = (int)$A['daysonhold'] > 0 ? (int)$A['daysonhold'] : '';
 
     // Select the template for the message
-    $template_dir = LIBRARY_PI_PATH .
+    $template_dir = __DIR__ .
                     '/templates/notify/' . $name['language'];
     if (!file_exists($template_dir . '/item_avail.thtml')) {
-        $template_dir = LIBRARY_PI_PATH . '/templates/notify/english';
+        $template_dir = __DIR__ . '/templates/notify/english';
     }
 
     // Load the recipient's language.
@@ -278,7 +278,7 @@ function LIBRARY_notifyWaitlist($id = '')
     $T->set_file('message', 'item_avail.thtml');
     $T->set_var(array(
         'username'      => $username,
-        'pi_url'        => LIBRARY_URL,
+        'pi_url'        => $_CONF_LIB['url'],
         'item_id'       => $A['item_id'],
         'item_descrip'  => $A['name'],
         'daysonhold'    => $daysonhold,
@@ -382,7 +382,7 @@ function LIBRARY_loadLanguage($requested='')
     $languages[] = 'english';
 
     // Search the array for desired language files, in order.
-    $langpath = LIBRARY_PI_PATH . '/language';
+    $langpath = __DIR__ . '/language';
     foreach ($languages as $language) {
         if (file_exists("$langpath/$language.php")) {
             include "$langpath/$language.php";

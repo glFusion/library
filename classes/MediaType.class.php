@@ -228,7 +228,7 @@ class MediaType
         }
 
         $T->set_var(array(
-            'action_url'    => LIBRARY_ADMIN_URL,
+            'action_url'    => $_CONF_LIB['admin_url'],
             'name'          => $this->name,
             'candelete'     => !$this->isNew && !self::isUsed($this->id),
         ) );

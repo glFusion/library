@@ -173,10 +173,10 @@ class Waitlist
                 " WHERE id = {$A['id']}");
 
         // Select the template for the message
-        $template_dir = LIBRARY_PI_PATH .
+        $template_dir = $_CONF_LIB['pi_path'] .
                     '/templates/notify/' . $A['language'];
         if (!file_exists($template_dir . '/item_avail.thtml')) {
-            $template_dir = LIBRARY_PI_PATH . '/templates/notify/english';
+            $template_dir = $_CONF_LIB['pi_path'] . '/templates/notify/english';
         }
 
         // Load the recipient's language.
@@ -186,7 +186,7 @@ class Waitlist
         $T->set_file('message', 'item_avail.thtml');
         $T->set_var(array(
             'username'      => $username,
-            'pi_url'        => LIBRARY_URL,
+            'pi_url'        => $_CONF_LIB['url'],
             'item_id'       => $A['item_id'],
             'item_descrip'  => $A['name'],
             'daysonhold'    => $daysonhold,

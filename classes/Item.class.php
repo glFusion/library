@@ -81,7 +81,7 @@ class Item
                 $this->isNew = false;
             }
         }
-        $this->ListingUrl = LIBRARY_URL . '/index.php';
+        $this->ListingUrl = $_CONF_LIB['url'] . '/index.php';
         $this->isAdmin = SEC_hasRights('library.admin') ? 1 : 0;
     }
 
@@ -388,7 +388,7 @@ class Item
         $id = $this->id;
 
         $T = LIBRARY_getTemplate('item_form', 'product');
-        $action_url = LIBRARY_ADMIN_URL . '/index.php';
+        $action_url = $_CONF_LIB['admin_url'] . '/index.php';
         if ($this->oldid != '') {
             $retval = COM_startBlock($LANG_LIB['edit'] . ': ' . $this->name);
         } else {
@@ -427,10 +427,10 @@ class Item
             'author'        => $this->author,
             'daysonhold'    => $this->daysonhold,
             'maxcheckout'   => $this->maxcheckout,
-            'pi_admin_url'  => LIBRARY_ADMIN_URL,
+            'pi_admin_url'  => $_CONF_LIB['admin_url'],
             'keywords'      => htmlspecialchars($this->keywords),
             'cat_select'    => Category::buildSelection($this->cat_id),
-            'pi_url'        => LIBRARY_URL,
+            'pi_url'        => $_CONF_LIB['url'],
             'doc_url'       => LIBRARY_getDocURL('product_form.html',
                                             $_CONF['language']),
             'type'          => $this->type,
@@ -496,7 +496,7 @@ class Item
                             $_CONF_LIB['max_thumb_size'], $_CONF_LIB['max_thumb_size']),
                     'seq_no'    => $i,
                     'id'        => $this->id,
-                    'del_img_url' => LIBRARY_ADMIN_URL . '/index.php' .
+                    'del_img_url' => $_CONF_LIB['admin_url'] . '/index.php' .
                         '?mode=delete_img' .
                         "&img_id={$prow['img_id']}".
                         "&id={$this->id}",
@@ -626,7 +626,7 @@ class Item
             'dscp'              => $l_desc,
             'short_dscp'        => $s_desc,
             'img_cell_width'    => ($_CONF_LIB['max_thumb_size'] + 20),
-            'pi_url'            => LIBRARY_URL,
+            'pi_url'            => $_CONF_LIB['url'],
             'avail_blk'         => $this->AvailBlock(),
             'publisher'         => $this->publisher,
             'pub_date'          => $this->pub_date,
@@ -875,7 +875,7 @@ class Item
             'due_dt'        => '',
             'reserve_txt' => $reserve_txt,
             'id'            => $this->id,
-            'pi_url'        =>  LIBRARY_URL,
+            'pi_url'        =>  $_CONF_LIB['url'],
         ) );
         $T->parse('output', 'avail');
         $retval = $T->finish($T->get_var('output'));

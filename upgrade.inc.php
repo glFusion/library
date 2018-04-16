@@ -12,7 +12,7 @@
 */
 
 /** Include the default configuration values */
-require_once LIBRARY_PI_PATH . '/install_defaults.php';
+require_once __DIR__ . '/install_defaults.php';
 
 /**
 *   Perform the upgrade starting at the current version.
@@ -44,7 +44,7 @@ function LIBRARY_do_upgrade_sql($version='')
     global $_TABLES, $_CONF_LIB, $_DB_dbms;
 
     /** Include the table creation strings */
-    require_once LIBRARY_PI_PATH . "/sql/{$_DB_dbms}_install.php";
+    require_once __DIR__ . "/sql/{$_DB_dbms}_install.php";
 
     // If no sql statements passed in, return success
     if (!is_array($UPGRADE[$version]))

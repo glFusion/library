@@ -300,11 +300,11 @@ class Category
             $retval = COM_startBlock($LANG_LIB['create_category']);
         }
 
-        $T = new \Template(LIBRARY_PI_PATH . '/templates');
+        $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
         $T->set_file(array('category' => 'category_form.thtml'));
         $T->set_var(array(
             'cat_id'        => $this->cat_id,
-            'action_url'    => LIBRARY_ADMIN_URL,
+            'action_url'    => $_CONF_LIB['admin_url'],
             'cat_name'      => $this->cat_name,
             'dscp'          => $this->dscp,
             'ena_chk'       => $this->enabled == 1 ? 'checked="checked"' : '',
