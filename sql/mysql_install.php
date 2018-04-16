@@ -47,6 +47,7 @@ $_SQL['library.instances'] = "CREATE TABLE `{$_TABLES['library.instances']}` (
   `instance_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `item_id` varchar(80) NOT NULL DEFAULT '',
   `uid` int(11) unsigned NOT NULL DEFAULT '0',
+  `checkout` int(11) unsigned NOT NULL DEFAULT '0',
   `due` int(11) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`instance_id`),
   KEY `item_id` (`item_id`,`instance_id`)

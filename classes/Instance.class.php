@@ -210,8 +210,10 @@ class Instance
         $me = (int)$_USER['uid'];
         $to = (int)$to;
         $due = (int)$due;
-        $sql = "UPDATE {$_TABLES['library.instances']}
-                SET uid = '$to', due = '$due'
+        $sql = "UPDATE {$_TABLES['library.instances']} SET
+                uid = '$to',
+                checkout = UNIX_TIMESTAMP(),
+                due = '$due'
                 WHERE instance_id = {$instance->instance_id}";
         Cache::clear(array('instance', $instance->item_id));
         DB_query($sql);
@@ -242,6 +244,7 @@ class Instance
 
         DB_query("UPDATE {$_TABLES['library.instances']} SET
                     uid = 0,
+                    checkout = 0,
                     due = 0
                 WHERE instance_id='{$this->instance_id}'");
         Cache::clear(array('instance', $this->item_id));

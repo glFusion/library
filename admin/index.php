@@ -64,13 +64,13 @@ switch ($action) {
 case 'checkout':
     $I = new Library\Item($_POST['id']);
     $I->checkOut($_POST['uid']);
-    COM_refresh(LIBRARY_ADMIN_URL . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
+    COM_refresh($_CONF_LIB['admin_url'] . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
     break;
 
 case 'checkin':
     $I = new Library\Item($_POST['id']);
     $I->checkIn($_POST['instance_id']);
-    COM_refresh(LIBRARY_ADMIN_URL . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
+    COM_refresh($_CONF_LIB['admin_url'] . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
     break;
 
 case 'deleteitem':
@@ -78,7 +78,7 @@ case 'deleteitem':
     $P = new Library\Item($_REQUEST['id']);
     if (!$P->isUsed()) {
         $P->Delete();
-        COM_refresh(LIBRARY_ADMIN_URL . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
+        COM_refresh($_CONF_LIB['admin_url'] . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
     } else {
         $content .= "Product has purchase records, can't delete.";
     }
@@ -88,7 +88,7 @@ case 'deleteinstance':
     // Instance ID only comes from $_GET
     $I = new Library\Instance($_GET['id']);
     $I->Delete();
-    COM_refresh(LIBRARY_ADMIN_URL . '/index.php?instances=x&item_id=' . $_GET['item_id']);;
+    COM_refresh($_CONF_LIB['admin_url'] . '/index.php?instances=x&item_id=' . $_GET['item_id']);;
     break;
 
 case 'deletecatimage':
@@ -143,7 +143,7 @@ case 'savecat':
         $content .= LIBRARY_popupMsg($LANG_LIB['invalid_form']);
         $view = 'editcat';
     } else {
-        COM_refresh(LIBRARY_ADMIN_URL . '/index.php?catlist');
+        COM_refresh($_CONF_LIB['admin_url'] . '/index.php?catlist');
     }
     break;
 
@@ -188,7 +188,7 @@ case 'copyitem':
     }
     //$P = new Library\Item($id);
     //$P->Clone();
-    echo COM_refresh(LIBRARY_ADMIN_URL);
+    echo COM_refresh($_CONF_LIB['admin_url']);
     break;
 
 case 'editcat':
@@ -271,7 +271,7 @@ function LIBRARY_adminlist_Instances($item_id=0, $status=0)
 
     $display = '';
 
-    $sql = "SELECT * FROM {$_TABLES['library.instances']} inst
+    $sql = "SELECT inst.*, item.name FROM {$_TABLES['library.instances']} inst
             LEFT JOIN {$_TABLES['library.items']} item
                 ON item.id = inst.item_id ";
     $stat_join = '';
@@ -313,6 +313,10 @@ function LIBRARY_adminlist_Instances($item_id=0, $status=0)
                 'field' => 'uid',
                 'sort'  => true,
             ),
+        array(  'text'  => $LANG_LIB['checkedout'],
+                'field' => 'checkout',
+                'sort'  => true,
+            ),
         array(  'text'  => $LANG_LIB['dt_due'],
                 'field' => 'due',
                 'sort'  => true,
@@ -342,7 +346,7 @@ function LIBRARY_adminlist_Instances($item_id=0, $status=0)
     $filter = '';
     $text_arr = array(
         //'has_extras' => true,
-        'form_url' => LIBRARY_ADMIN_URL . '/index.php?status=' . $status,
+        'form_url' => $_CONF_LIB['admin_url'] . '/index.php?status=' . $status,
     );
     $form_arr = LIBRARY_itemStatusForm($status, $item_id);
     $extras = array();
@@ -433,7 +437,7 @@ function LIBRARY_adminlist_Items($cat_id = 0, $status = 0)
     );
     $text_arr = array(
         //'has_extras' => true,
-        'form_url' => LIBRARY_ADMIN_URL . '/index.php?status=' . $status,
+        'form_url' => $_CONF_LIB['admin_url'] . '/index.php?status=' . $status,
     );
     $form_arr = LIBRARY_itemStatusForm($status);
     $filter = '';
@@ -477,6 +481,7 @@ function LIBRARY_getAdminField_Instance($fieldname, $fieldvalue, $A, $icon_arr)
             $retval .= $usernames[$fieldvalue];
         }
         break;
+    case 'checkout':
     case 'due':
         if ($fieldvalue > 0) {
             $dt = new Date($fieldvalue, $_CONF['timezone']);
@@ -486,14 +491,14 @@ function LIBRARY_getAdminField_Instance($fieldname, $fieldvalue, $A, $icon_arr)
     case 'checkin':
         if ($A['uid'] > 0) {
             $retval .= COM_createLink('CheckIn',
-                LIBRARY_ADMIN_URL . '/index.php?checkinform=x&id=' . $A['id']);
+                $_CONF_LIB['admin_url'] . '/index.php?checkinform=x&id=' . $A['item_id']);
         }
         break;
     case 'delete':
         if ($A['uid'] == 0) {
             $retval .= COM_createLink(
                 '<i class="' . LIBRARY_getIcon('trash-o', 'danger') . '"></i>',
-                LIBRARY_ADMIN_URL. '/index.php?deleteinstance=x&amp;id=' . $A['instance_id'] .
+                $_CONF_LIB['admin_url']. '/index.php?deleteinstance=x&amp;id=' . $A['instance_id'] .
                         '&item_id=' . $A['id'],
                 array('onclick'=>'return confirm(\''.$LANG_LIB['conf_delitem'].'\');',
                     'title' => $LANG_LIB['deleteitem'],
@@ -503,7 +508,7 @@ function LIBRARY_getAdminField_Instance($fieldname, $fieldvalue, $A, $icon_arr)
         }
         break;
     case 'item_id':
-        $retval .= '<span title="item_title" data-uk-tooltip>' . $fieldvalue . '</span>';
+        $retval .= '<span title="' . htmlspecialchars($A['name']) . '" data-uk-tooltip>' . $fieldvalue . '</span>';
         break;
     default:
         $retval .= $fieldvalue;
@@ -536,7 +541,7 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
     switch($fieldname) {
     case 'id':
         $retval = COM_createLink($fieldvalue,
-            LIBRARY_ADMIN_URL . '/index.php?instances=x&item_id=' . $fieldvalue,
+            $_CONF_LIB['admin_url'] . '/index.php?instances=x&item_id=' . $fieldvalue,
             array(
                 'title' => $LANG_LIB['view_instances'],
                 'data-uk-tooltip' => '',
@@ -546,14 +551,14 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
     case 'edit':
         $retval .= COM_createLink(
                 '<i class="' . LIBRARY_getIcon('edit') . '"></i>',
-                LIBRARY_ADMIN_URL . "/index.php?edititem=x&amp;id={$A['id']}"
+                $_CONF_LIB['admin_url'] . "/index.php?edititem=x&amp;id={$A['id']}"
             );
         break;
 
     case 'copy':
         $retval .= COM_createLink(
                 '<i class="' . LIBRARY_getIcon('copy') . '"></i>',
-                LIBRARY_ADMIN_URL . "/index.php?copyitem=x&amp;id={$A['id']}"
+                $_CONF_LIB['admin_url'] . "/index.php?copyitem=x&amp;id={$A['id']}"
             );
         break;
 
@@ -561,7 +566,7 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
         if (!Library\Item::isUsed($A['id'])) {
             $retval .= COM_createLink(
                     '<i class="' . LIBRARY_getIcon('trash-o', 'danger') . '"></i>',
-                LIBRARY_ADMIN_URL. '/index.php?deleteitem=x&amp;id=' . $A['id'],
+                $_CONF_LIB['admin_url']. '/index.php?deleteitem=x&amp;id=' . $A['id'],
                 array('onclick'=>'return confirm(\''.$LANG_LIB['conf_delitem'].'\');',
                     'title' => $LANG_LIB['deleteitem'],
                     'data-uk-tooltip' => '',
@@ -579,7 +584,7 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
 
     case 'name':
         $retval = COM_createLink($fieldvalue,
-                LIBRARY_URL . '/index.php?detail=x&id=' . $A['id'],
+                $_CONF_LIB['url'] . '/index.php?detail=x&id=' . $A['id'],
             array(
                 'title' => $LANG_LIB['view_item'],
                 'data-uk-tooltip' => '',
@@ -592,7 +597,7 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
 
     case 'cat_name':
         $retval = COM_createLink($fieldvalue,
-                LIBRARY_ADMIN_URL . '/index.php?cat_id=' . $A['cat_id']);
+                $_CONF_LIB['admin_url'] . '/index.php?cat_id=' . $A['cat_id']);
         break;
 
     case 'status':
@@ -623,7 +628,7 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
     case 'checkout':
         if ($avail > 0) {
             $retval .= COM_createLink('CheckOut',
-                LIBRARY_ADMIN_URL . '/index.php?checkoutform=x&id=' .
+                $_CONF_LIB['admin_url'] . '/index.php?checkoutform=x&id=' .
                 $A['id']);
         }
         break;
@@ -631,7 +636,7 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
     case 'checkin':
         if ($total > $avail) {
             $retval .= COM_createLink('CheckIn',
-                LIBRARY_ADMIN_URL . '/index.php?checkinform=x&id=' .
+                $_CONF_LIB['admin_url'] . '/index.php?checkinform=x&id=' .
                 $A['id']);
         }
         break;
@@ -639,7 +644,7 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
     case 'history':
         if (DB_count($_TABLES['library.log'], 'item_id', $A['id']) > 0) {
             $retval .= COM_createLink('<i class="uk-icon uk-icon-file-text-o"></i>',
-                LIBRARY_ADMIN_URL . '/index.php?history=x&id=' . $A['id'],
+                $_CONF_LIB['admin_url'] . '/index.php?history=x&id=' . $A['id'],
                 array(
                     'title' => $LANG_LIB['view_history'],
                     'data-uk-tooltip' => '',
@@ -663,49 +668,49 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
 */
 function LIBRARY_adminMenu($mode='')
 {
-    global $_CONF, $LANG_ADMIN, $LANG_LIB;
+    global $_CONF, $_CONF_LIB, $LANG_ADMIN, $LANG_LIB;
 
     $menu_arr = array(
             array(  'url'   => $_CONF['site_admin_url'],
                     'text'  => $LANG_ADMIN['admin_home'],
             ),
-            array(  'url'   => LIBRARY_ADMIN_URL . '/index.php',
+            array(  'url'   => $_CONF_LIB['admin_url'] . '/index.php',
                     'text'  => $LANG_LIB['item_list'],
             ),
-            array(  'url'   => LIBRARY_ADMIN_URL . '/index.php?medialist=x',
+            array(  'url'   => $_CONF_LIB['admin_url'] . '/index.php?medialist=x',
                     'text'  => $LANG_LIB['media_list'],
             ),
-            /*array(  'url'   => LIBRARY_ADMIN_URL . '/index.php?pending=x',
-                    'text'  => $LANG_LIB['pending_actions'],
-            ),*/
+            array(  'url'   => $_CONF_LIB['admin_url'] . '/index.php?overdue=x',
+                    'text'  => $LANG_LIB['overdue'],
+            ),
     );
 
     $new_item_span = '<span class="libNewAdminItem">%s</span>';
     $admin_hdr = 'admin_item_hdr';
     if ($mode == 'itemlist' || $mode == '') {
         $menu_arr[] = array(
-                    'url'  => LIBRARY_ADMIN_URL . '/index.php?mode=edititem',
+                    'url'  => $_CONF_LIB['admin_url'] . '/index.php?mode=edititem',
                     'text' => sprintf($new_item_span, $LANG_LIB['new_item']));
     }
 
     if ($mode == 'catlist') {
         $menu_arr[] = array(
-                    'url'  => LIBRARY_ADMIN_URL . '/index.php?mode=editcat',
+                    'url'  => $_CONF_LIB['admin_url'] . '/index.php?mode=editcat',
                     'text' => $LANG_LIB['new_category']);
     } else {
         $menu_arr[] = array(
-                    'url'  => LIBRARY_ADMIN_URL . '/index.php?mode=catlist',
+                    'url'  => $_CONF_LIB['admin_url'] . '/index.php?mode=catlist',
                     'text' => $LANG_LIB['category_list']);
     }
 
     if ($mode == 'medialist') {
         $menu_arr[] = array(
-                    'url'  => LIBRARY_ADMIN_URL . '/index.php?editmedia=x',
+                    'url'  => $_CONF_LIB['admin_url'] . '/index.php?editmedia=x',
                     'text' => sprintf($new_item_span, $LANG_LIB['new_mediatype']));
         $admin_hdr = 'admin_media_hdr';
     }
 
-    $T = new Template(LIBRARY_PI_PATH . '/templates');
+    $T = new Template($_CONF_LIB['pi_path'] . '/templates');
     $T->set_file('title', 'library_title.thtml');
     $T->set_var('title', $LANG_LIB['admin_title']);
     $retval = $T->parse('', 'title');
@@ -752,7 +757,7 @@ function LIBRARY_adminlist_Category()
     );
     $text_arr = array(
         //'has_extras' => true,
-        'form_url' => LIBRARY_ADMIN_URL . '/index.php',
+        'form_url' => $_CONF_LIB['admin_url'] . '/index.php',
     );
     $form_arr = array();
     $filter = '';
@@ -788,7 +793,7 @@ function LIBRARY_getAdminField_Category($fieldname, $fieldvalue, $A, $icon_arr)
     case 'edit':
         $retval .= COM_createLink(
             '<i class="' . LIBRARY_getIcon('edit') . '"></i>',
-            LIBRARY_ADMIN_URL . "/index.php?mode=editcat&amp;id={$A['cat_id']}",
+            $_CONF_LIB['admin_url'] . "/index.php?mode=editcat&amp;id={$A['cat_id']}",
             array('class' => 'gl_mootip',
                 'title' => $LANG_ADMIN['edit'],
                 'data-uk-tooltip' => '',
@@ -808,7 +813,7 @@ function LIBRARY_getAdminField_Category($fieldname, $fieldvalue, $A, $icon_arr)
         if (!Library\Category::isUsed($A['cat_id'])) {
             $retval .= COM_createLink(
                 '<i class="' . LIBRARY_getIcon('trash', 'danger') . '"></i>',
-                LIBRARY_ADMIN_URL. '/index.php?deletecat&id=' . $A['cat_id'],
+                $_CONF_LIB['admin_url']. '/index.php?deletecat&id=' . $A['cat_id'],
                 array('class' => 'gl_mootip',
                     'onclick' => 'return confirm(\'' . $LANG_LIB['conf_delitem'] . '\');',
                     'title' => $LANG_LIB['deleteitem'],
@@ -868,7 +873,7 @@ function LIBRARY_adminlist_MediaType()
     );
     $text_arr = array(
         'has_extras' => true,
-        'form_url' => LIBRARY_ADMIN_URL . '/index.php',
+        'form_url' => $_CONF_LIB['admin_url'] . '/index.php',
     );
     $form_arr = array();
     $filter = '';
@@ -901,7 +906,7 @@ function LIBRARY_getAdminField_MediaType($fieldname, $fieldvalue, $A, $icon_arr)
     case 'edit':
         $retval = COM_createLink(
                 '<i class="' . LIBRARY_getIcon('edit') . '"></i>',
-                LIBRARY_ADMIN_URL . "/index.php?editmedia=x&amp;id={$A['id']}",
+                $_CONF_LIB['admin_url'] . "/index.php?editmedia=x&amp;id={$A['id']}",
                 array('class' => 'gl_mootip',
                     'data-uk-tooltip' => '',
                     'title' => $LANG_ADMIN['edit'],
@@ -912,7 +917,7 @@ function LIBRARY_getAdminField_MediaType($fieldname, $fieldvalue, $A, $icon_arr)
         if (!Library\MediaType::isUsed($A['id'])) {
             $retval = COM_createLink(
                 '<i class="' . LIBRARY_getIcon('trash', 'danger') . '"></i>',
-                LIBRARY_ADMIN_URL. '/index.php?deletemedia=x&id=' . $A['id'],
+                $_CONF_LIB['admin_url']. '/index.php?deletemedia=x&id=' . $A['id'],
             array('onclick'=>'return confirm(\''.$LANG_LIB['conf_delitem'].'\');',
                 'title' => $LANG_ADMIN['delete'],
                 'data-uk-tooltip' => '',
@@ -959,8 +964,8 @@ function LIBRARY_checkinForm($id)
     $T = LIBRARY_getTemplate('checkin_form', 'form');
     $T->set_var(array(
         'title'         => $LANG_LIB['admin_title'],
-        'action_url'    => LIBRARY_ADMIN_URL . '/index.php',
-        'pi_url'        => LIBRARY_URL,
+        'action_url'    => $_CONF_LIB['admin_url'] . '/index.php',
+        'pi_url'        => $_CONF_LIB['url'],
         'item_id'       => $I->id,
         'item_name'     => $I->name,
         'item_desc'     => $I->dscp,
@@ -999,8 +1004,8 @@ function LIBRARY_checkoutForm($id)
     $T = LIBRARY_getTemplate('checkout_form', 'form');
     $T->set_var(array(
         'title'         => $LANG_LIB['admin_title'],
-        'action_url'    => LIBRARY_ADMIN_URL . '/index.php',
-        'pi_url'        => LIBRARY_URL,
+        'action_url'    => $_CONF_LIB['admin_url'] . '/index.php',
+        'pi_url'        => $_CONF_LIB['url'],
         'item_id'       => $I->id,
         'item_name'     => $I->name,
         'item_desc'     => $I->dscp,
@@ -1098,7 +1103,7 @@ function LIBRARY_history($item_id)
 
     $item_name = DB_getItem($_TABLES['library.items'], 'name', "id='$item_id'");
 
-    $base_url = LIBRARY_ADMIN_URL;
+    $base_url = $_CONF_LIB['admin_url'];
 
     $header_arr = array(
         array(  'text'  => $LANG_LIB['datetime'],
@@ -1170,7 +1175,7 @@ function LIBRARY_getTransHistoryField($fieldname, $fieldvalue, $A, $icon_arr)
     switch($fieldname) {
     case 'id':
         $retval = COM_createLink($fieldvalue,
-            LIBRARY_URL . '/index.php?detail=x&id=' . $fieldvalue);
+            $_CONF_LIB['url'] . '/index.php?detail=x&id=' . $fieldvalue);
         break;
 
     case 'dt':
