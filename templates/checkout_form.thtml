@@ -1,5 +1,5 @@
 {# begin {templatelocation} #}
-<form action="{action_url}" method="post" class="uk-form-horizontal">
+<form action="{action_url}" method="post" class="uk-form uk-form-horizontal">
   <input type="hidden" name="id" value="{item_id}">
   <div class="uk-form-row">
     <label for="item_id" class="uk-form-label">
@@ -37,7 +37,7 @@
       <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_LIB_HELP['due_dt']}"></i>
     </label>
     <div class="uk-form-controls">
-      <input type="text" id="f_due" name="due" value="{due}" />
+      <input type="text" id="f_due" name="due" value="{due}" data-uk-datepicker />
       <i class="uk-icon uk-icon-calendar"
         id="due_trigger" style="cursor: pointer;" title="{$LANG_LIB['date_selector']}"></i>
     </div>
@@ -51,13 +51,4 @@
   </div>
 
 </form>
-
-<script type="text/javascript">
-    Calendar.setup({
-        inputField     :    "f_due",
-        ifFormat       :    "%Y-%m-%d",
-        showsTime      :    false,
-        button          :   "due_trigger"
-    });
-</script>
 {# end {templatelocation} #}
