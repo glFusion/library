@@ -310,7 +310,7 @@ class Instance
     {
         $items = self::checkedoutByUser($uid);
         $key = array_search($item_id, array_column($items, 'item_id'));
-        return (bool)$key;
+        return $key === false ? false : true;
     }
 
 }   // class Instance

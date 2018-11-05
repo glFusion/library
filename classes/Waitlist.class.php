@@ -262,7 +262,7 @@ class Waitlist
         $c = count($wl);
         for ($i = 0; $i < $c; $i++) {
             if ($wl[$i]['uid'] == $uid) {
-                return $i;
+                return $i + 1;
             }
         }
         return 0;
