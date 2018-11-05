@@ -18,8 +18,8 @@ if (!defined ('GVERSION')) {
 global $_TABLES;
 $_SQL = array();
 $_SQL['library.items'] = "CREATE TABLE `{$_TABLES['library.items']}` (
-  `id` varchar(255) NOT NULL,
-  `name` varchar(255) NOT NULL,
+  `id` varchar(40) NOT NULL,
+  `name` varchar(128) NOT NULL,
   `cat_id` int(11) unsigned NOT NULL DEFAULT '0',
   `short_dscp` varchar(255) NOT NULL DEFAULT '',
   `dscp` text,
@@ -55,7 +55,7 @@ $_SQL['library.instances'] = "CREATE TABLE `{$_TABLES['library.instances']}` (
 
 $_SQL['library.log'] = "CREATE TABLE `{$_TABLES['library.log']}` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `item_id` varchar(255) NOT NULL,
+  `item_id` varchar(40) NOT NULL,
   `dt` int(11) NOT NULL,
   `doneby` tinyint(11) NOT NULL DEFAULT '0',
   `uid` int(11) NOT NULL,
@@ -69,7 +69,7 @@ $_SQL['library.waitlist'] = "CREATE TABLE `{$_TABLES['library.waitlist']}` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `dt` int(11) unsigned NOT NULL DEFAULT '0',
   `expire` int(11) unsigned NOT NULL DEFAULT '0',
-  `item_id` varchar(255) NOT NULL,
+  `item_id` varchar(40) NOT NULL,
   `uid` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idxItem` (`item_id`,`uid`)
@@ -77,7 +77,7 @@ $_SQL['library.waitlist'] = "CREATE TABLE `{$_TABLES['library.waitlist']}` (
 
 $_SQL['library.images'] = "CREATE TABLE `{$_TABLES['library.images']}` (
   `img_id` smallint(5) unsigned NOT NULL AUTO_INCREMENT,
-  `item_id` varchar(255) NOT NULL DEFAULT '',
+  `item_id` varchar(40) NOT NULL DEFAULT '',
   `filename` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`img_id`),
   KEY `idxItem` (`item_id`,`img_id`)
@@ -85,7 +85,7 @@ $_SQL['library.images'] = "CREATE TABLE `{$_TABLES['library.images']}` (
 
 $_SQL['library.categories'] = "CREATE TABLE `{$_TABLES['library.categories']}` (
   `cat_id` smallint(5) unsigned NOT NULL auto_increment,
-  `cat_name` varchar(255) default '',
+  `cat_name` varchar(40) default '',
   `dscp` varchar(255) default '',
   `enabled` tinyint(1) unsigned default '1',
   `group_id` mediumint(8) unsigned NOT NULL default '1',
