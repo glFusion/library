@@ -64,6 +64,8 @@ var LIBR_astoreLookup = function(isbn) {
                 }
             }
             catch(err) {
+                console.log(url);
+                console.log(data);
                 $.UIkit.notify("Astore lookup error", {timeout: 1000,pos:'top-center'});
             }
         },
@@ -86,7 +88,13 @@ var LIBR_astoreLookup = function(isbn) {
 */
 var LIBR_openlibLookup = function(isbn) {
     LIBR_showIcon("working");
-    var key = "ISBN:" + isbn;
+    var indicator = isbn.toLowerCase()
+    indicator = indicator.substring(0,2);
+    if (indicator == "ol") {
+        var key = "OLID:" + isbn;
+    } else {
+        var key = "ISBN:" + isbn;
+    }
     var dataS = {
         "bibkeys" : key,
         "jscmd" : "data",
@@ -108,6 +116,7 @@ var LIBR_openlibLookup = function(isbn) {
                 LIBR_updateField(res.publish_date, "f_pub_date");
             }
             catch(err) {
+                console.log(data);
                 $.UIkit.notify("OpenLibrary lookup error", {timeout: 1000,pos:'top-center'});
             }
             LIBR_showIcon("search");
