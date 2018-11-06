@@ -1,8 +1,8 @@
 {# begin {templatelocation} #}
-<div style="text-align:center;">
+<div>
   <form action="{pi_url}/index.php" method="get">
   {$LANG_LIB['search']}:&nbsp;
-  <input type="text" name="query" value="{query}">&nbsp;&nbsp;
+  <input type="text" name="query" value="{query}"><br />
   {$LANG_LIB['sort']}:&nbsp;
   <select name="sortdir" onchange="this.form.submit();">
     <option value="ASC" {sortdir_asc_sel}>{$LANG_LIB['ascending']}</option>

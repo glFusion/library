@@ -135,6 +135,16 @@ class Category
     }
 
 
+    public static function getInstance($cat_id)
+    {
+        static $cats = array();
+        if (!isset($cats[$cat_id])) {
+            $cats[$cat_id] = new self($cat_id);
+        }
+        return $cats[$cat_id];
+    }
+
+
     /**
     *   Sets all variables to the matching values from $rows
     *
@@ -145,7 +155,7 @@ class Category
         if (!is_array($row)) return;
 
         $this->cat_id = $row['cat_id'];
-        $this->parent_id = $row['parent_id'];
+        //$this->parent_id = $row['parent_id'];
         $this->dscp = $row['dscp'];
         $this->enabled = $row['enabled'];
         $this->cat_name = $row['cat_name'];
@@ -301,7 +311,10 @@ class Category
         }
 
         $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
-        $T->set_file(array('category' => 'category_form.thtml'));
+        $T->set_file(array(
+            'category'  => 'category_form.thtml',
+            'tips'      => 'tooltipster.thtml',
+        ));
         $T->set_var(array(
             'cat_id'        => $this->cat_id,
             'action_url'    => $_CONF_LIB['admin_url'],
@@ -315,7 +328,9 @@ class Category
             'group_dropdown' => SEC_getGroupDropdown($this->group_id, 3),
             'permissions_editor' => SEC_getPermissionsHTML($this->perm_owner,
                     $this->perm_group, $this->perm_members, $this->perm_anon),
+            'doc_url'       => LIBRARY_getDocURL('cat_form.html', $_CONF['language']),
         ) );
+        $T->parse('tooltipster', 'tips');
         $retval .= $T->parse('output', 'category');
 
         @setcookie($_CONF['cookie_name'].'fckeditor',
@@ -534,6 +549,19 @@ class Category
 
         // return the right value of this node + 1
         return $right + 1;
+    }
+
+
+    public function hasAccess($uid=0)
+    {
+        global $_GROUPS, $_USER;
+
+        if ($uid == 0) $uid = $_USER['uid'];
+        if (SEC_inGroup($this->group_id, $uid) || plugin_ismoderator_library()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }   // class Category

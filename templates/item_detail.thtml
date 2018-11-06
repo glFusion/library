@@ -1,7 +1,16 @@
 {# begin {templatelocation} #}
-<div style="margin:0px 40px 0px 40px;">
-  <div style="float:left;">
+<div class="floatleft">
     <h1>{name}</h1>
+</div>
+<div style="float:right;">
+{!if can_edit}
+    <a href="{site_admin_url}/plugins/library/index.php?edititem=x&id={id}">
+      <i class="uk-icon uk-icon-edit" title="{$LANG_LIB['edit']}" data-uk-tooltip></i>
+    </a><br />
+{!endif}
+    <a href="{listing_url}">{$LANG_LIB['back_to_list']}</a>
+</div>
+<div style="clear:both;margin-bottom:15px"">
 {!if short_dscp}
     <strong>{short_dscp}</strong><br />
 {!endif}
@@ -15,17 +24,14 @@
     <strong>{$LANG_LIB['author']}:</strong>&nbsp;&nbsp;{author}<br />
 {!endif}
     <div><small>{id}</small></div>
-{!if can_edit}
-    &nbsp;&nbsp;{edit_icon}
-{!endif}
-  </div>
-  <div style="float:right;">
+</div>
+<div style="float:right;">
     {!if rating_bar}
       {rating_bar}<br />
     {!endif}
     {avail_blk}
-  </div>
-  <div style="clear:left;">
+</div>
+<div style="clear:left;">
     {dscp}
     <div style="clear:left;"></div>
     <!-- BEGIN Thumbnail -->
@@ -34,21 +40,12 @@
         <img src="{tn_url}" border="0" 
             alt="{$LANG_LIB[click_to_enlarge]}" 
             title="{$LANG_LIB[click_to_enlarge]}"
-            class="gl_mootip" />
+            class="tooltip" />
       </a>
     </div>
     <!-- END Thumbnail -->
-{!if can_edit}
-    <a href="{site_admin_url}/plugins/library/index.php?edititem=x&id={id}">
-      <i class="uk-icon uk-icon-edit" title="{$LANG_LIB['edit']}" data-uk-tooltip></i>
-    </a>
-{!endif}
-    <div style="clear:both;float:right;">
-      <a href="{listing_url}">{$LANG_LIB['back_to_list']}</a>
-    </div>
-  </div>
-
 </div>
+
 <div style="clear:both;">
   {usercomments}
 </div>
