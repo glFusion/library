@@ -76,14 +76,33 @@ function USES_library_upgrade()
 
 spl_autoload_register(function ($class)
 {
-    if (strpos($class, 'Library\\') === 0) {
-        $class = str_replace('Library\\', '', $class);
-        $path = __DIR__ . '/classes/' . $class . '.class.php';
-        if (file_exists($path)) {
-            include $path;
-        }
+    // project-specific namespace prefix
+    $prefix = 'Library\\';
+
+    // does the class use the namespace prefix?
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        // no, move to the next registered autoloader
+        return;
+    }
+
+    // base directory for the namespace prefix
+    $base_dir = __DIR__ . '/classes/';
+
+    // get the relative class name
+    $relative_class = substr($class, $len);
+
+    // replace the namespace prefix with the base directory, replace namespace
+    // separators with directory separators in the relative class name, append
+    // with .php
+    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.class.php';
+
+    // if the file exists, require it
+    if (file_exists($file)) {
+        require $file;
     }
 });
+
 
 /**
 *   Upgrade the plugin to the currently-installed version.
@@ -92,50 +111,8 @@ spl_autoload_register(function ($class)
 */
 function plugin_upgrade_library()
 {
-    global $_TABLES, $_CONF_LIB;
-
-    $pi_name = $_CONF_LIB['pi_name'];
-
-    // Get the current version, compare to the version in the plugin code
-    $current_ver = DB_getItem($_TABLES['plugins'], 'pi_version',
-        "pi_name = '$pi_name'");
-    if (!$current_ver) {
-        COM_errorLog("Error getting the $pi_name Plugin version",1);
-        return '03';
-    }
-
-    // if we're at the current version, what are we doing here?
-    if ($current_ver >= $_CONF_LIB['pi_version']) {
-        COM_errorLog("Current version $current_ver is already up to date");
-        return '06';
-    }
-
-    // If we're still here, perform the upgrade functions.
-    USES_library_upgrade();
-    $error = LIBRARY_do_upgrade($current_ver);
-    if ($error) {
-        COM_errorLog("Error updating the $pi_name Plugin version",1);
-        return '04';
-    }
-
-    // now update the current version number.
-    DB_query("UPDATE
-            {$_TABLES['plugins']}
-        SET
-            pi_version = '{$_CONF_LIB['pi_version']}',
-            pi_gl_version = '{$_CONF_LIB['gl_version']}',
-            pi_homepage = '{$_CONF_LIB['pi_url']}'
-        WHERE
-            pi_name = '$pi_name';
-    ");
-
-    if (DB_error()) {
-        COM_errorLog("Error updating the $pi_name Plugin version",1);
-        return '05';
-    }
-
-    COM_errorLog("Succesfully updated the $pi_name Plugin!",1);
-    return true;
+    require_once __DIR__ . '/upgrade.inc.php';
+    return LIBRARY_do_upgrade();
 }
 
 
@@ -670,6 +647,8 @@ function plugin_getconfigelementhelp_library($option, $doclang='english')
 */
 function LIBRARY_getDocURL($file='', $doclang='english')
 {
+    global $_CONF_LIB;
+
     $doc_path = __DIR__ . "/docs/$doclang/";
     $doc_url = '';
 
@@ -959,6 +938,32 @@ function plugin_runScheduledTask_library()
 
 
 /**
+ * Get a selection of groups for the config elements.
+ *
+ * @param   boolean $all_allowed    True to allow "All Users"
+ * @return  array       Array of name=>grp_id
+ */
+function LIBRARY_get_group_select($all_allowed = true)
+{
+    global $_TABLES;
+    static $A = NULL;
+
+    if ($A === NULL) {
+        $A = array();
+        $sql = "SELECT grp_id, grp_name FROM {$_TABLES['groups']}";
+        $res = DB_query($sql);
+        if ($res) {
+            while ($row = DB_fetchArray($res, false)) {
+                $row['grp_name'] = htmlspecialchars($row['grp_name']);
+                $A[$row['grp_name']] = $row['grp_id'];
+            }
+        }
+    }
+    return $A;
+}
+
+
+/**
 *   Select the Librarian group.
 *   'All Users' is not allowed
 *
@@ -966,18 +971,18 @@ function plugin_runScheduledTask_library()
 */
 function plugin_configmanager_select_grp_librarians_library()
 {
-    global $_TABLES;
+    return LIBRARY_get_group_select(false);
+}
 
-    $A = array();
-    $sql = "SELECT grp_id, grp_name FROM {$_TABLES['groups']}";
-    $res = DB_query($sql);
-    if ($res) {
-        while ($row = DB_fetchArray($res, false)) {
-            $row['grp_name'] = htmlspecialchars($row['grp_name']);
-            $A[$row['grp_name']] = $row['grp_id'];
-        }
-    }
-    return $A;
+
+/**
+*   Select the default group_id for new items.
+*
+*   @return array       Array of groups
+*/
+function plugin_configmanager_select_def_group_id_library()
+{
+    return LIBRARY_get_group_select(true);
 }
 
 

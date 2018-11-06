@@ -11,21 +11,23 @@
 *   @filesource
 */
 
-/** Include the default configuration values */
-require_once __DIR__ . '/install_defaults.php';
-
 /**
 *   Perform the upgrade starting at the current version.
 *
 *   @since  version 0.4.0
-*   @param  string  $current_ver    Current version to be upgraded
+*   @param  boolean $dvlp   True if this is a development update
 *   @return integer                 Error code, 0 for success
 */
-function LIBRARY_do_upgrade($current_ver)
+function LIBRARY_do_upgrade($dvlp = false)
 {
     global $_TABLES, $_CONF, $_CONF_LIB;
 
     $error = 0;
+
+    // Sync config items
+    USES_lib_install();
+    require_once __DIR__ . '/install_defaults.php';
+    _update_config('library', $libraryConfigData);
 
     return $error;
 }
@@ -37,9 +39,10 @@ function LIBRARY_do_upgrade($current_ver)
 *   in the SQL installation file.
 *
 *   @param  string  $version    Version being upgraded TO
+*   @param  boolean $dvlp       True to ignore errors and continue
 *   @param  array   $sql        Array of SQL statement(s) to execute
 */
-function LIBRARY_do_upgrade_sql($version='')
+function LIBRARY_do_upgrade_sql($version='', $dvlp=false)
 {
     global $_TABLES, $_CONF_LIB, $_DB_dbms;
 
@@ -57,7 +60,7 @@ function LIBRARY_do_upgrade_sql($version='')
         DB_query($sql, '1');
         if (DB_error()) {
             COM_errorLog("SQL Error during Library Plugin update",1);
-            return 1;
+            if (!$dvlp) return 1;
             break;
         }
     }
