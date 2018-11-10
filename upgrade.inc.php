@@ -1,23 +1,22 @@
 <?php
 /**
-*   Upgrade routines for the Library plugin.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
-*   @package    library
-*   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Upgrade routines for the Library plugin.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
+ * @package     library
+ * @version     0.0.1
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 /**
-*   Perform the upgrade starting at the current version.
-*
-*   @since  version 0.4.0
-*   @param  boolean $dvlp   True if this is a development update
-*   @return integer                 Error code, 0 for success
-*/
+ * Perform the upgrade starting at the current version.
+ *
+ * @param   boolean $dvlp   True if this is a development update
+ * @return  integer                 Error code, 0 for success
+ */
 function LIBRARY_do_upgrade($dvlp = false)
 {
     global $_TABLES, $_CONF, $_CONF_LIB;
@@ -34,14 +33,14 @@ function LIBRARY_do_upgrade($dvlp = false)
 
 
 /**
-*   Actually perform any sql updates.
-*   Gets the sql statements from the $UPGRADE array defined (maybe)
-*   in the SQL installation file.
-*
-*   @param  string  $version    Version being upgraded TO
-*   @param  boolean $dvlp       True to ignore errors and continue
-*   @param  array   $sql        Array of SQL statement(s) to execute
-*/
+ * Actually perform any sql updates.
+ * Gets the sql statements from the $UPGRADE array defined (maybe)
+ * in the SQL installation file.
+ *
+ * @param   string  $version    Version being upgraded TO
+ * @param   boolean $dvlp       True to ignore errors and continue
+ * @return  boolean     True on success, False on failure
+ */
 function LIBRARY_do_upgrade_sql($version='', $dvlp=false)
 {
     global $_TABLES, $_CONF_LIB, $_DB_dbms;

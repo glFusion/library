@@ -1,21 +1,21 @@
 <?php
 /**
-*   Class to manage individual instances of library items.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2018 Lee Garner <lee@leegarner.com>
-*   @package    library
-*   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to manage individual instances of library items.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
+ * @package     library
+ * @version     0.0.1
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Library;
 
 /**
-*   Class for media types
-*   @package library
-*/
+ * Class for specific item instances.
+ * @package library
+ */
 class Instance
 {
     /** Property fields.  Accessed via __set() and __get()
@@ -23,19 +23,21 @@ class Instance
     var $properties;
 
     /**
-    *   Constructor.
-    *   Reads in the specified class, if $id is set.  If $id is zero,
-    *   then a new entry is being created.
-    *
-    *   @param integer $id Optional type ID
-    */
+     * Constructor.
+     * Reads in the specified class, if $id is set.  If $id is zero,
+     * then a new entry is being created.
+     *
+     * @param   integer $id Optional instance ID
+     */
     public function __construct($id=0)
     {
         $this->properties = array();
 
         if (is_array($id)) {
+            // Got a DB record, just load the values
             $this->setVars($id);
         } else {
+            // Got an instance ID, read the item and load
             $id = (int)$id;
             $this->instance_id = $id;
             if (!$this->Read()) {
@@ -46,11 +48,11 @@ class Instance
 
 
     /**
-    *   Set a property's value.
-    *
-    *   @param  string  $var    Name of property to set.
-    *   @param  mixed   $value  New value for property.
-    */
+     * Set a property's value.
+     *
+     * @param   string  $var    Name of property to set.
+     * @param   mixed   $value  New value for property.
+     */
     public function __set($var, $value='')
     {
         switch ($var) {
@@ -74,12 +76,11 @@ class Instance
 
 
     /**
-    *   Get the value of a property.
-    *   Emulates the behaviour of __get() function in PHP 5.
-    *
-    *   @param  string  $var    Name of property to retrieve.
-    *   @return mixed           Value of property, NULL if undefined.
-    */
+     * Get the value of a property.
+     *
+     * @param   string  $var    Name of property to retrieve.
+     * @return  mixed           Value of property, NULL if undefined.
+     */
     public function __get($var)
     {
         if (array_key_exists($var, $this->properties)) {
@@ -91,10 +92,10 @@ class Instance
 
 
     /**
-    *   Sets all variables to the matching values from $rows
-    *
-    *   @param array $row Array of values, from DB or $_POST
-    */
+     * Sets all variables to the matching values from $rows
+     *
+     * @param   array $row Array of values, from DB or $_POST
+     */
     public function setVars($row)
     {
         if (!is_array($row)) return;
@@ -107,11 +108,11 @@ class Instance
 
 
     /**
-    *   Read a specific record and populate the local values.
-    *
-    *   @param  integer $id Optional ID.  Current ID is used if zero.
-    *   @return boolean     True if a record was read, False on failure
-    */
+     * Read a specific record and populate the local values.
+     *
+     * @param   integer $id Optional ID.  Current ID is used if zero.
+     * @return  boolean     True if a record was read, False on failure
+     */
     public function Read($id = 0)
     {
         global $_TABLES;
@@ -137,8 +138,8 @@ class Instance
 
 
     /**
-    *   Delete the current instance record from the database
-    */
+     * Delete the current instance record from the database
+     */
     public function Delete()
     {
         global $_TABLES, $_CONF_LIB;
@@ -156,11 +157,11 @@ class Instance
 
 
     /**
-    *   Get all item instances that match a given availability.
-    *
-    *   @param  string  $item_id    Item ID
-    *   @param  integer $avail      Availability (0=all, 1=available, 2=out
-    */
+     * Get all item instances that match a given availability.
+     *
+     * @param   string  $item_id    Item ID
+     * @param   integer $avail      Availability (0=all, 1=available, 2=out
+     */
     public static function getAll($item_id, $avail = 0)
     {
         global $_TABLES;
@@ -168,7 +169,7 @@ class Instance
         $avail = (int)$avail;
         $key = md5($item_id . '_' . $avail);
         $retval = Cache::get($key);
-        if ($retval) {
+        if ($retval !== NULL) {
             return $retval;
         }
 
@@ -197,12 +198,12 @@ class Instance
 
 
     /**
-    *   Check out a specific instance
-    *
-    *   @param  object  $instance   Item instance
-    *   @param  integer $to         User ID
-    *   @param  integer $due        Due date (timestamp)
-    */
+     * Check out a specific instance.
+     *
+     * @param   object  $instance   Item instance
+     * @param   integer $to         User ID
+     * @param   integer $due        Due date (timestamp)
+     */
     public static function checkOut($instance, $to, $due)
     {
         global $_TABLES, $_USER;
@@ -231,8 +232,8 @@ class Instance
 
 
     /**
-    *   Check in an instance of an item
-    */
+     * Check in the current instance of an item.
+     */
     public function checkIn()
     {
         global $_TABLES, $_USER;
@@ -264,11 +265,11 @@ class Instance
 
 
     /**
-    *   Get all instance records for a given user
-    *
-    *   @param  string  $uid    User ID
-    *   @return array       Array of waitlist records
-    */
+     * Get all instance records for a given user.
+     *
+     * @param   string  $uid    User ID
+     * @return  array       Array of waitlist records
+     */
     public static function checkedoutByUser($uid)
     {
         global $_TABLES;
@@ -285,12 +286,12 @@ class Instance
 
 
     /**
-    *   Get a count of all items that a given user has checked out
-    *
-    *   @uses   self::checkedoutByUser()
-    *   @param  integer $uid    User ID
-    *   @return integer         Count of items
-    */
+     * Get a count of all items that a given user has checked out.
+     *
+     * @uses    self::checkedoutByUser()
+     * @param   integer $uid    User ID
+     * @return  integer         Count of items
+     */
     public static function countByUser($uid)
     {
         $items = self::checkedoutByUser($uid);
@@ -299,13 +300,13 @@ class Instance
 
 
     /**
-    *   Check if a given user has an item checked out
-    *
-    *   @uses   self::checkedoutByUser()
-    *   @param  string  $item_id    Item ID
-    *   @param  integer $uid        User ID
-    *   @return boolean     True if the user has checked out the item
-    */
+     * Check if a given user has an item checked out.
+     *
+     * @uses    self::checkedoutByUser()
+     * @param   string  $item_id    Item ID
+     * @param   integer $uid        User ID
+     * @return  boolean     True if the user has checked out the item
+     */
     public static function UserHasItem($item_id, $uid)
     {
         $items = self::checkedoutByUser($uid);

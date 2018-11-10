@@ -1,15 +1,15 @@
 <?php
 /**
-*   glFusion API functions for the Library plugin.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
-*   @package    library
-*   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * glFusion API functions for the Library plugin.
+ *
+ * @author     Lee Garner <lee@leegarner.com>
+ * @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
+ * @package    library
+ * @version    0.0.1
+ * @license    http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 // this file can't be used on its own
 if (!defined ('GVERSION')) {
@@ -105,10 +105,10 @@ spl_autoload_register(function ($class)
 
 
 /**
-*   Upgrade the plugin to the currently-installed version.
-*
-*   @return mixed       true if successful, false or error number otherwise
-*/
+ * Upgrade the plugin to the currently-installed version.
+ *
+ * @return  mixed       true if successful, false or error number otherwise
+ */
 function plugin_upgrade_library()
 {
     require_once __DIR__ . '/upgrade.inc.php';
@@ -117,10 +117,10 @@ function plugin_upgrade_library()
 
 
 /**
-*   Returns the main menu items for the plugin.
-*
-*   @return array   Associative array of menu items to be added to menu
-*/
+ * Returns the main menu items for the plugin.
+ *
+ * @return  array   Associative array of menu items to be added to menu
+ */
 function plugin_getmenuitems_library()
 {
     global $_CONF_LIB, $LANG_LIB;
@@ -134,10 +134,10 @@ function plugin_getmenuitems_library()
 
 
 /**
-*   Check to see if this plugin supports comments.
-*
-*   @return boolean     True if comments supported, false otherwise
-*/
+ * Check to see if this plugin supports comments.
+ *
+ * @return  boolean     True if comments supported, false otherwise
+ */
 function plugin_commentsupport_library()
 {
     global $_CONF_LIB;
@@ -146,16 +146,15 @@ function plugin_commentsupport_library()
 
 
 /**
-*   Save a comment
-*
-*   @param  string  $type       Plugin to save comment
-*   @param  string  $title      Comment title
-*   @param  string  $comment    Comment text
-*   @param  string  $id         Item id to which $cid belongs
-*   @param  int     $pid        Comment parent
-*   @param  string  $postmode   'html' or 'text'
-*   @return mixed   false for failure, HTML string (redirect?) for success
-*/
+ * Save a comment.
+ *
+ * @param   string  $title      Comment title
+ * @param   string  $comment    Comment text
+ * @param   string  $id         Item id to which $cid belongs
+ * @param   integer $pid        Comment parent
+ * @param   string  $postmode   'html' or 'text'
+ * @return  mixed   false for failure, HTML string (redirect?) for success
+ */
 function plugin_savecomment_library($title,$comment,$id,$pid,$postmode)
 {
     global $_CONF, $LANG03, $_TABLES;
@@ -193,17 +192,17 @@ function plugin_savecomment_library($title,$comment,$id,$pid,$postmode)
 
 
 /**
-*   How the plugin will display specific comments.
-*
-*   @param   string  $id     Unique idenifier for item comment belongs to
-*   @param   int     $cid    Comment id to display
-*   @param   string  $title  Page/comment title
-*   @param   string  $order  'ASC' or 'DSC' or blank
-*   @param   string  $format 'threaded', 'nested', or 'flat'
-*   @param   int     $page   Page number of comments to display
-*   @param   boolean $view   True to view comment (by cid), false to display (by $pid)
-*   @return  mixed   results of calling the plugin_displaycomment_ function
-*/
+ *   How the plugin will display specific comments.
+ *
+ * @param   string  $id     Unique idenifier for item comment belongs to
+ * @param   integer $cid    Comment id to display
+ * @param   string  $title  Page/comment title
+ * @param   string  $order  'ASC' or 'DSC' or blank
+ * @param   string  $format 'threaded', 'nested', or 'flat'
+ * @param   integer $page   Page number of comments to display
+ * @param   boolean $view   True to view comment (by cid), false to display (by $pid)
+ * @return  mixed   results of calling the plugin_displaycomment_ function
+ */
 function plugin_displaycomment_library($id, $cid, $title, $order, $format, $page, $view)
 {
     global $_TABLES, $LANG_ACCESS;
@@ -253,12 +252,12 @@ function plugin_displaycomment_library($id, $cid, $title, $order, $format, $page
 
 
 /**
-*   Delete a single comment.
-*
-*   @param  int     $cid    Comment to be deleted
-*   @param  string  $id     Item id to which $cid belongs
-*   @return mixed   false for failure, HTML string (redirect?) for success
-*/
+ * Delete a single comment.
+ *
+ * @param   integer $cid    Comment to be deleted
+ * @param   string  $id     Item id to which $cid belongs
+ * @return  mixed   false for failure, HTML string (redirect?) for success
+ */
 function plugin_deletecomment_library($cid, $id)
 {
     global $_CONF,$_FM_TABLES, $_TABLES;
@@ -288,13 +287,13 @@ function plugin_deletecomment_library($cid, $id)
 
 
 /**
-*   Handle any post-processing for an edited comment.
-*   Just redirects back to the ad detail page.  The comment is actually
-*   saved in comment.php.
-*
-*   @param  integer $cid    Comment ID
-*   @param  mixed   $id     Item ID
-*/
+ * Handle any post-processing for an edited comment.
+ * Just redirects back to the ad detail page.  The comment is actually
+ * saved in comment.php.
+ *
+ * @param   integer $cid    Comment ID
+ * @param   mixed   $id     Item ID
+ */
 function plugin_editcomment_library($cid, $id)
 {
     echo COM_refresh(COM_buildUrl(
@@ -304,10 +303,10 @@ function plugin_editcomment_library($cid, $id)
 
 
 /**
-*   Returns the URL of the plugin's icon.
-*
-*   @return string      URL of the icon
-*/
+ * Returns the URL of the plugin's icon.
+ *
+ * @return  string      URL of the icon
+ */
 function plugin_geticon_library()
 {
     global $_CONF_LIB;
@@ -317,10 +316,10 @@ function plugin_geticon_library()
 
 
 /**
-*   Add an option for the plugin in the command and control area.
-*
-*   @return array   Array containing (pi_name, admin_url, icon_url)
-*/
+ * Add an option for the plugin in the command and control area.
+ *
+ * @return  array   Array containing (pi_name, admin_url, icon_url)
+ */
 function plugin_cclabel_library()
 {
     global $_CONF_LIB;
@@ -334,10 +333,10 @@ function plugin_cclabel_library()
 
 
 /**
-*   Adds the library plugin to the Admin menu.
-*
-*   @return array   Array containing (pi_name, pi_admin_url, # of items or '')
-*/
+ * Adds the library plugin to the Admin menu.
+ *
+ * @return  array   Array containing (pi_name, pi_admin_url, # of items or '')
+ */
 function plugin_getadminoption_library()
 {
     global $_TABLES, $_CONF_LIB;
@@ -351,10 +350,10 @@ function plugin_getadminoption_library()
 
 
 /**
-*   Returns the current version of the library plugin.
-*
-*   @return string  Plugin version
-*/
+ * Returns the current version of the library plugin.
+ *
+ * @return  string  Plugin version
+ */
 function plugin_chkVersion_library()
 {
     global $_CONF_LIB;
@@ -364,14 +363,14 @@ function plugin_chkVersion_library()
 
 
 /**
-*   Performs operations when a user (or admin) deletes an account
-*
-*   Remove purchases from the library purchases table.
-*
-*   @TODO   Rather than drop rows, archive them
-*   @param  int $uid    User ID that is being deleted
+ * Performs operations when a user (or admin) deletes an account.
+ * Remove purchases from the library purchases table.
+ *
+ * @TODO   Rather than drop rows, archive them
+ * @param  int $uid    User ID that is being deleted
 */
-function plugin_user_delete_library($uid) {
+function plugin_user_delete_library($uid)
+{
     global $_TABLES;
 
     //$sql = "DELETE FROM {$_TABLES['library.purchases']} WHERE user_id = $uid";
@@ -380,18 +379,16 @@ function plugin_user_delete_library($uid) {
 
 
 /**
-*   Implements the [library:] autotag.
-*
-*   Handle autotags.
-*   Currently only allows for a single product ID, which will generate
-*   a link to that product's detail page.
-*
-*   @since  version 0.4.0
-*   @param  string  $op         Operation to perform (tagname or parse)
-*   @param  string  $content    Content in which to replace autotag
-*   @param  array   $autotag    Autotag details
-*   @return string              Updated $content
-*/
+ * Implements the [library:] autotag.
+ *
+ * Currently only allows for a single product ID, which will generate
+ * a link to that product's detail page.
+ *
+ * @param   string  $op         Operation to perform (tagname or parse)
+ * @param   string  $content    Content in which to replace autotag
+ * @param   array   $autotag    Autotag details
+ * @return  string              Updated $content
+ */
 function plugin_autotags_library ($op, $content = '', $autotag = '') {
     global $_CONF, $_TABLES;
 
@@ -418,14 +415,14 @@ function plugin_autotags_library ($op, $content = '', $autotag = '') {
 
 
 /**
-*   Checks to see if the user has sufficient rights to view the page.
-*
-*   Check if the current user has rights (at least one of) specified by
-*   $rights.  If not log the error, display a generic access denied message
-*   and exit.
-*
-*   @param  string  $rights     Comma-separated list of allowable rights
-*/
+ * Checks to see if the user has sufficient rights to view the page.
+ *
+ * Check if the current user has rights (at least one of) specified by
+ * $rights.  If not log the error, display a generic access denied message
+ * and exit.
+ *
+ * @param   string  $rights     Comma-separated list of allowable rights
+ */
 function library_access_check($rights = 'library.user,library.admin')
 {
     global $_USER, $_SERVER, $LANG_LIB;
@@ -448,10 +445,10 @@ function library_access_check($rights = 'library.user,library.admin')
 
 
 /**
-*   Determine if the current user is a plugin administrator
-*
-*   @return boolean     True if is a moderator, False if not.
-*/
+ * Determine if the current user is a plugin administrator
+ *
+ * @return  boolean     True if is a moderator, False if not.
+ */
 function plugin_ismoderator_library()
 {
     static $retval = NULL;
@@ -463,15 +460,15 @@ function plugin_ismoderator_library()
 
 
 /**
-*   Filter submitted variables.
-*
-*   Uses glFusion functions to filter submitted variables for illegal content.
-*   Any editing is done in place and no value is returned.
-*
-*   @param  array   $vars   Associative array of varname => typei
-*                           (type is (number,alpha,text,html))
-*   @param  array   &$arr   Reference to array of variable name => value
-*/
+ * Filter submitted variables.
+ *
+ * Uses glFusion functions to filter submitted variables for illegal content.
+ * Any editing is done in place and no value is returned.
+ *
+ * @param   array   $vars   Associative array of varname => typei
+ *                           (type is (number,alpha,text,html))
+ * @param   array   &$arr   Reference to array of variable name => value
+ */
 function library_filterVars($vars, &$arr) {
     // cycle through each variable applying the appropriate filter
     foreach ($vars as $var => $type) {
@@ -499,10 +496,10 @@ function library_filterVars($vars, &$arr) {
 
 
 /**
-*   Return the types to list in the search types selection.
-*
-*   @return array   Associative array (typename => title)
-*/
+ * Return the types to list in the search types selection.
+ *
+ * @return  array   Associative array (typename => title)
+ */
 function plugin_searchtypes_library()
 {
     global $_CONF_LIB, $LANG_LIB;
@@ -511,16 +508,16 @@ function plugin_searchtypes_library()
 
 
 /**
-*   Create a plugin search object to search this plugin
-*
-*   @param  string  $query
-*   @param  string  $datestart  Starting date for search
-*   @param  string  $dateend    Ending date for search
-*   @param  string  $topic      Topic selected for search
-*   @param  string  $type       Type selected during search
-*   @param  string  $author     Limit results to this author (not used)
-*   @return object              Search object to be processed by Search class
-*/
+ * Create a plugin search object to search this plugin
+ *
+ * @param   string  $query
+ * @param   string  $datestart  Starting date for search
+ * @param   string  $dateend    Ending date for search
+ * @param   string  $topic      Topic selected for search
+ * @param   string  $keyType    Type selected during search
+ * @param   string  $author     Limit results to this author (not used)
+ * @return  object              Search object to be processed by Search class
+ */
 function plugin_dopluginsearch_library(
     $query, $datestart, $dateend, $topic, $keyType, $author
 )
@@ -575,10 +572,10 @@ return;
 
 
 /**
-*   Get additional Javascript files to import in the header
-*
-*   @return array   Array of filenames to import
-*/
+ * Get additional Javascript files to import in the header
+ *
+ * @return  array   Array of filenames to import
+ */
 function plugin_getheaderjs_library()
 {
     return array(
@@ -588,11 +585,11 @@ function plugin_getheaderjs_library()
 
 
 /**
-*   Get additional CSS into the site header.
-*   Allows for custom CSS to be placed by the site admin.
-*
-*   @return array   List of paths to CSS files
-*/
+ * Get additional CSS into the site header.
+ * Allows for custom CSS to be placed by the site admin.
+ *
+ * @return  array   List of paths to CSS files
+ */
 function plugin_getheadercss_library()
 {
     $styles = array();
@@ -615,13 +612,13 @@ function plugin_getheadercss_library()
 
 
 /**
-*   Get the URL to the localized configuration help file.
-*
-*   @see    LIBRARY_getDocURL()
-*   @param  string  $option     Configuration option to display
-*   @param  string  $doclang    Documentation language requested
-*   @return array   Array of (url, window_type)
-*/
+ * Get the URL to the localized configuration help file.
+ *
+ * @see     LIBRARY_getDocURL()
+ * @param   string  $option     Configuration option to display
+ * @param   string  $doclang    Documentation language requested
+ * @return  array   Array of (url, window_type)
+ */
 function plugin_getconfigelementhelp_library($option, $doclang='english')
 {
     $doc_url = LIBRARY_getDocURL('config.html', $doclang);
@@ -636,15 +633,15 @@ function plugin_getconfigelementhelp_library($option, $doclang='english')
 
 
 /**
-*   Get the link to a documentation file.
-*   Returns the URL to the file, or to the directory if no file requested.
-*
-*   @see    plugin_getconfigelementhelp_library()
-*   @see    Product::showForm()
-*   @param  string  $file       HTML file
-*   @param  string  $doclang    Documentation language
-*   @return string              URL to document directory or file
-*/
+ * Get the link to a documentation file.
+ * Returns the URL to the file, or to the directory if no file requested.
+ *
+ * @see     plugin_getconfigelementhelp_library()
+ * @see     Product::showForm()
+ * @param   string  $file       HTML file
+ * @param   string  $doclang    Documentation language
+ * @return  string              URL to document directory or file
+ */
 function LIBRARY_getDocURL($file='', $doclang='english')
 {
     global $_CONF_LIB;
@@ -668,11 +665,11 @@ function LIBRARY_getDocURL($file='', $doclang='english')
 
 
 /**
-*   Return the items that should be removed with the plugin.
-*   Can also handle any plugin-specific removal tasks.
-*
-*   @return   array     Array of items to be removed.
-*/
+ * Return the items that should be removed with the plugin.
+ * Can also handle any plugin-specific removal tasks.
+ *
+ * @return  array     Array of items to be removed.
+ */
 function plugin_autouninstall_library()
 {
     $out = array (
@@ -703,14 +700,14 @@ function plugin_autouninstall_library()
 
 
 /**
-*   Provides the getItemInfo function for library items
-*
-*   @param  string  $id         Product ID
-*   @param  string  $fields     Comma-separated list of fields to return
-*   @param  integer $uid        User ID
-*   @param  array   $options    Not used
-*   @return array           Array of product information
-*/
+ * Provides the getItemInfo function for library items
+ *
+ * @param   string  $id         Product ID
+ * @param   string  $what       Comma-separated list of fields to return
+ * @param   integer $uid        User ID
+ * @param   array   $options    Not used
+ * @return  array           Array of product information
+ */
 function plugin_getiteminfo_library($id, $what, $uid=0, $options=array())
 {
     global $_TABLES, $_CONF, $LANG_LIB;
@@ -839,13 +836,13 @@ function plugin_getiteminfo_library($id, $what, $uid=0, $options=array())
 
 
 /**
-*   Display a formatted error message
-*
-*   @param  string $msg     Error message to display
-*   @param  string $type    Type of message, used for style and header
-*   @param  string $header  Optional header text.
-*   @return string          HTML for formatted error message
-*/
+ * Display a formatted error message.
+ *
+ * @param   string $msg     Error message to display
+ * @param   string $type    Type of message, used for style and header
+ * @param   string $header  Optional header text.
+ * @return  string          HTML for formatted error message
+ */
 function LIBRARY_errorMessage($msg = '', $type = '', $header = '')
 {
     global $LANG_LIB;
@@ -884,14 +881,13 @@ function LIBRARY_errorMessage($msg = '', $type = '', $header = '')
 
 
 /**
-*   Updates the product table with the new rating and vote count.
-*   Requires glFusion 1.1.7 or higher.
-*
-*   @since  version 0.4.0
-*   @param  mixed   $id     Product ID
-*   @param  float   $rating Rating Value
-*   @param  integer $votes  Number of votes cast
-*/
+ * Updates the product table with the new rating and vote count.
+ * Requires glFusion 1.1.7 or higher.
+ *
+ * @param   mixed   $id     Product ID
+ * @param   float   $rating Rating Value
+ * @param   integer $votes  Number of votes cast
+ */
 function plugin_itemrated_library($id, $rating, $votes)
 {
     global $_TABLES;
@@ -906,20 +902,19 @@ function plugin_itemrated_library($id, $rating, $votes)
 
 
 /**
-*   Determine if the current user is allowed to rate an item.
-*   Curretly, all logged-in users can rate (even admin).
-*   Requires glFusion 1.1.7 or higher.
-*
-*   @since  version 0.4.0
-*   @param  mixed   $item_id    ID of product to be rated
-*   @param  integer $uid        User ID of the one doing the rating
-*   @return boolean             True if user is allowed, false if not
-*/
+ * Determine if the current user is allowed to rate an item.
+ * Curretly, all logged-in users can rate (even admin).
+ * Requires glFusion 1.1.7 or higher.
+ *
+ * @param   mixed   $item_id    ID of product to be rated
+ * @param   integer $uid        User ID of the one doing the rating
+ * @return  boolean             True if user is allowed, false if not
+ */
 function plugin_canuserrate_library($item_id, $uid)
 {
     global $_CONF_LIB;
 
-    $_CONF_LIB['anon_can_rate'] = 0;    // TODO
+    $_CONF_LIB['anon_can_rate'] = 0;    // TODO Make a config var
     if ($_CONF_LIB['anon_can_rate'] == 0 && COM_isAnonUser()) {
         return false;
     } else {
@@ -929,8 +924,8 @@ function plugin_canuserrate_library($item_id, $uid)
 
 
 /**
-*   Perform scheduled functions, such as notifications and waitlist cleanup.
-*/
+ * Perform scheduled functions, such as notifications and waitlist cleanup.
+ */
 function plugin_runScheduledTask_library()
 {
     Library\Waitlist::Expire();
@@ -964,11 +959,11 @@ function LIBRARY_get_group_select($all_allowed = true)
 
 
 /**
-*   Select the Librarian group.
-*   'All Users' is not allowed
-*
-*   @return array       Array of groups
-*/
+ * Select the Librarian group.
+ * 'All Users' is not allowed.
+ *
+ * @return  array       Array of groups
+ */
 function plugin_configmanager_select_grp_librarians_library()
 {
     return LIBRARY_get_group_select(false);
@@ -976,10 +971,10 @@ function plugin_configmanager_select_grp_librarians_library()
 
 
 /**
-*   Select the default group_id for new items.
-*
-*   @return array       Array of groups
-*/
+ * Select the default group_id for new items.
+ *
+ * @return  array       Array of groups
+ */
 function plugin_configmanager_select_def_group_id_library()
 {
     return LIBRARY_get_group_select(true);
@@ -987,14 +982,13 @@ function plugin_configmanager_select_def_group_id_library()
 
 
 /**
-*   Show the site header, with or without left blocks according to config.
-*
-*   @since  version 1.0.2
-*   @see    COM_siteHeader()
-*   @param  string  $subject    Text for page title (ad title, etc)
-*   @param  string  $meta       Other meta info
-*   @return string              HTML for site header
-*/
+ * Show the site header, with or without left blocks according to config.
+ *
+ * @see     COM_siteHeader()
+ * @param   string  $subject    Text for page title (ad title, etc)
+ * @param   string  $meta       Other meta info
+ * @return  string              HTML for site header
+ */
 function LIBRARY_siteHeader($subject='', $meta='')
 {
     global $_CONF_LIB, $LANG_LIB;
@@ -1023,12 +1017,11 @@ function LIBRARY_siteHeader($subject='', $meta='')
 
 
 /**
-*   Show the site footer, with or without right blocks according to config.
-*
-*   @since  version 1.0.2
-*   @see    COM_siteFooter()
-*   @return string              HTML for site header
-*/
+ * Show the site footer, with or without right blocks according to config.
+ *
+ * @see     COM_siteFooter()
+ * @return  string              HTML for site header
+ */
 function LIBRARY_siteFooter()
 {
     global $_CONF_LIB;
@@ -1053,10 +1046,10 @@ function LIBRARY_siteFooter()
 
 
 /**
-*   Shortcut to get the current date object
-*
-*   @return object  Date object for current timestamp
-*/
+ * Shortcut to get the current date object
+ *
+ * @return  object  Date object for current timestamp
+ */
 function LIBRARY_now()
 {
     global $_CONF;
@@ -1069,10 +1062,10 @@ function LIBRARY_now()
 
 
 /**
-*   Shortcut function to get the SQL-formatted date
-*
-*   @return string  Today's date as "YYYY-MM-DD"
-*/
+ * Shortcut function to get the SQL-formatted date
+ *
+ * @return  string  Today's date as "YYYY-MM-DD"
+ */
 function LIBRARY_today()
 {
     return LIBRARY_now()->format('Y-m-d', true);
@@ -1080,10 +1073,11 @@ function LIBRARY_today()
 
 
 /**
-*   Calculate and return the expiration date for an item
-*
-*   @return Object      Expiration date
-*/
+ * Calculate and return the expiration date for an item
+ *
+ * @param   integer $days   Number of days being checked out.
+ * @return  object      Expiration date
+ */
 function LIBRARY_dueDate($days = 0)
 {
     global $_CONF_LIB;
@@ -1093,12 +1087,12 @@ function LIBRARY_dueDate($days = 0)
 
 
 /**
-*   Get an icon from the CSS icon set, either UIkit or FontAwesome
-*
-*   @param  string  $name   Base name of icon, e.g. "edit" for "uk-icon-edit"
-*   @param  string  $style  Style name from local CSS
-*   @return string      Class names for icon
-*/
+ * Get an icon from the CSS icon set, either UIkit or FontAwesome.
+ *
+ * @param   string  $name   Base name of icon, e.g. "edit" for "uk-icon-edit"
+ * @param   string  $style  Style name from local CSS
+ * @return  string      Class names for icon
+ */
 function LIBRARY_getIcon($name, $style='info')
 {
     global $_CONF_LIB;
@@ -1110,13 +1104,13 @@ function LIBRARY_getIcon($name, $style='info')
 
 
 /**
-*   Helper function to get a template object.
-*
-*   @param  string  $name   Base name of template file, e.g. "editor"
-*   @param  string  $id     ID of template, e.g. "editform"
-*   @param  string  $path   Optional path if not "templates/"
-*   @return string      Full filename, e.g. "editor.uikit.thtml"
-*/
+ * Helper function to get a template object.
+ *
+ * @param   string  $name   Base name of template file, e.g. "editor"
+ * @param   string  $id     ID of template, e.g. "editform"
+ * @param   string  $path   Optional path if not "templates/"
+ * @return  string      Full filename, e.g. "editor.uikit.thtml"
+ */
 function LIBRARY_getTemplate($name, $id='', $path='')
 {
     global $_CONF_LIB;

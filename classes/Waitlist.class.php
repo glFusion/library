@@ -1,30 +1,30 @@
 <?php
 /**
-*   Class to manage library item waitlist entries
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2018 Lee Garner <lee@leegarner.com>
-*   @package    library
-*   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to manage library item waitlist entries
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2018 Lee Garner <lee@leegarner.com>
+ * @package     library
+ * @version     0.0.1
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Library;
 
 /**
-*   Class for Waitlist entries
-*   @package library
-*/
+ * Class for Waitlist entries.
+ * @package library
+ */
 class Waitlist
 {
 
     /**
-    *   Calculate the expiration date of a reservation.
-    *
-    *   @param  integer $days   Max days on hold, from the Item object
-    *   @return object          Date object
-    */
+     * Calculate the expiration date of a reservation.
+     *
+     * @param   integer $days   Max days on hold, from the Item object
+     * @return  object          Date object
+     */
     private static function _calcExp($days)
     {
         return LIBRARY_now()->add(new \DateInterval("P{$days}D"))->toUnix();
@@ -32,12 +32,12 @@ class Waitlist
 
 
     /**
-    *   Add a reservation to the waitlist table.
-    *
-    *   @param  object  $Item   Item being waitlisted
-    *   @param  integer $uid    User requesting reservation
-    *   @return integer     Record ID, zero on error
-    */
+     * Add a reservation to the waitlist table.
+     *
+     * @param   object  $Item   Item being waitlisted
+     * @param   integer $uid    User requesting reservation
+     * @return  integer     Record ID, zero on error
+     */
     public static function Add($Item, $uid=0)
     {
         global $_TABLES, $_USER;
@@ -72,8 +72,11 @@ class Waitlist
 
 
     /**
-    *   Delete a waitlist record from the DB
-    */
+     * Delete a waitlist record from the DB.
+     *
+     * @param   string  $item_id    ID of library item
+     * @param   integer $uid        User ID, current user by default
+     */
     public static function Remove($item_id, $uid=0)
     {
         global $_TABLES, $_USER;
@@ -87,13 +90,13 @@ class Waitlist
 
 
     /**
-    *   Reset the expiration dates of all item reservations.
-    *   Used if an item is checked out to a borrower that is not the next
-    *   in line, which would cause the actual next borrower's reservation to
-    *   expire.
-    *
-    *   @param  string  $item_id    Item ID
-    */
+     * Reset the expiration dates of all item reservations.
+     * Used if an item is checked out to a borrower that is not the next
+     * in line, which would cause the actual next borrower's reservation to
+     * expire.
+     *
+     * @param   string  $item_id    Item ID
+     */
     public static function resetExpirations($item_id)
     {
         global $_TABLES;
@@ -105,10 +108,10 @@ class Waitlist
 
 
     /**
-    *   Expire waitlist records.
-    *   1. Expires the current reservation that has not been claimed.
-    *   2. Notifies the next reservation, if any.
-    */
+     * Expire waitlist records.
+     * - Expires the current reservation that has not been claimed.
+     * - Notifies the next reservation, if any.
+     */
     public static function Expire()
     {
         global $_TABLES, $_CONF_LIB, $_CONF;
@@ -137,10 +140,10 @@ class Waitlist
 
 
     /**
-    *   Notify the next user on the waiting list that an item has become available.
-    *
-    *   @param  object  $Item   Item object
-    */
+     * Notify the next user on the waiting list that an item has become available.
+     *
+     * @param  string   $item_id    Library item id
+     */
     public static function notifyNext($item_id)
     {
         global $_TABLES,  $_CONF, $_CONF_LIB, $_LANG_LIB;
@@ -205,11 +208,11 @@ class Waitlist
 
 
     /**
-    *   Get all waitlist records for a given item
-    *
-    *   @param  string  $item_id    Item ID
-    *   @return array       Array of waitlist records
-    */
+     * Get all waitlist records for a given item.
+     *
+     * @param   string  $item_id    Item ID
+     * @return  array       Array of waitlist records
+     */
     public static function getByItem($item_id)
     {
         global $_TABLES;
@@ -227,11 +230,11 @@ class Waitlist
 
 
     /**
-    *   Get all waitlist records for a given user
-    *
-    *   @param  string  $uid    User ID
-    *   @return array       Array of waitlist records
-    */
+     * Get all waitlist records for a given user.
+     *
+     * @param   string  $uid    User ID
+     * @return  array       Array of waitlist records
+     */
     public static function getByUser($uid)
     {
         global $_TABLES;
@@ -249,13 +252,13 @@ class Waitlist
 
 
     /**
-    *   Get a specific user's position in the waiting list
-    *
-    *   @uses   self::getByUser()
-    *   @param  string  $item_id    Item ID
-    *   @param  integer $uid        User ID
-    *   @return integer     User's position in the list, 0 if not found
-    */
+     * Get a specific user's position in the waiting list
+     *
+     * @uses    self::getByUser()
+     * @param   string  $item_id    Item ID
+     * @param   integer $uid        User ID
+     * @return  integer     User's position in the list, 0 if not found
+     */
     public static function getUserPosition($item_id, $uid)
     {
         $wl = self::getByItem($item_id);
@@ -270,12 +273,12 @@ class Waitlist
 
 
     /**
-    *   Get a count of all items that a given user has reserved
-    *
-    *   @uses   self::getByUser()
-    *   @param  integer $uid    User ID
-    *   @return integer         Count of items
-    */
+     * Get a count of all items that a given user has reserved
+     *
+     * @uses    self::getByUser()
+     * @param   integer $uid    User ID
+     * @return  integer         Count of items
+     */
     public static function countByUser($uid)
     {
         $wl = self::getByUser($uid);
@@ -284,12 +287,12 @@ class Waitlist
 
 
     /**
-    *   Get a count of all reservations for a given item
-    *
-    *   @uses   self::getByItem()
-    *   @param  integer $item_id    Item ID
-    *   @return integer         Count of items
-    */
+     * Get a count of all reservations for a given item
+     *
+     * @uses    self::getByItem()
+     * @param   integer $item_id    Item ID
+     * @return  integer         Count of items
+     */
     public static function countByItem($item_id)
     {
         $wl = self::getByItem($item_id);

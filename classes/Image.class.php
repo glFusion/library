@@ -1,43 +1,45 @@
 <?php
 /**
-*   Class to handle images
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
-*   @package    library
-*   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to handle images
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
+ * @package     library
+ * @version     0.0.1
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Library;
 
 /**
-*   Image-handling class
-*   @package library
-*/
+ * Image-handling class.
+ * @package library
+ */
 class Image extends \upload
 {
     /** Path to actual image (without filename)
-    *   @var string */
+     * @var string */
     var $pathImage;
 
     /** Path to image thumbnail (without filename)
-    *   @var string */
+     * @var string */
     //var $pathThumb;
 
     /** ID of the current ad
-    *   @var string */
+     * @var string */
     var $item_id;
 
     /** Array of the names of successfully uploaded files
-    *   @var array */
+     * @var array */
     var $goodfiles = array();
 
     /**
-    *   Constructor
-    *   @param string $name Optional image filename
-    */
+     * Constructor.
+     *
+     * @param   string  $item_id    Associated library item ID
+     * @param   string  $varname    Form field name
+     */
     public function __construct($item_id, $varname='photo')
     {
         global $_CONF_LIB, $_CONF;
@@ -74,6 +76,11 @@ class Image extends \upload
     }
 
 
+    /**
+     * Upload the files.
+     * Calls the parent uploader to handle the upload and then sets the
+     * image information in the DB.
+     */
     public function uploadFiles()
     {
         global $_TABLES;
@@ -98,9 +105,8 @@ class Image extends \upload
 
 
     /**
-    *   Delete an image from disk.  Called by Entry::Delete if disk
-    *   deletion is requested.
-    */
+     * Delete the current image from disk.
+     */
     public function Delete()
     {
         // If we're deleting from disk also, get the filename and
@@ -113,10 +119,10 @@ class Image extends \upload
 
 
     /**
-    *   Delete a single image using the current name and supplied path
-    *
-    *   @param string $imgpath Path to file
-    */
+     * Delete a single image using the current name and supplied path
+     *
+     * @param   string  $imgpath    Path to file
+     */
     private function _deleteOneImage($imgpath)
     {
         if (file_exists($imgpath . '/' . $this->filename))
@@ -125,11 +131,11 @@ class Image extends \upload
 
 
     /**
-    *   Handles the physical file upload and storage.
-    *   If the image isn't validated, the upload doesn't happen.
-    *
-    *   @param array $file $_FILES array
-    */
+     * Handles the physical file upload and storage.
+     * If the image isn't validated, the upload doesn't happen.
+     *
+     * @param   array   $file   $_FILES array
+     */
     public function Upload($file)
     {
         if (!is_array($file))
@@ -154,10 +160,10 @@ class Image extends \upload
 
 
     /**
-    *   Validate the uploaded image, checking for size constraints and other errors
-    *   @param array $file $_FILES array
-    *   @return boolean True if valid, False otherwise
-    */
+     * Validate the uploaded image, checking for size constraints and other errors
+     * @param   array   $file   $_FILES array
+     * @return  boolean         True if valid, False otherwise
+     */
     private function Validate($file)
     {
         if (!is_array($file))

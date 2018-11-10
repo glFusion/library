@@ -1,15 +1,15 @@
 <?php
 /**
-*   Installation functions for the Library plugin.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
-*   @package    library
-*   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ *   Installation functions for the Library plugin.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
+ * @package     library
+ * @version     0.0.1
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 require_once '../../../lib-common.php';
 require_once $_CONF['path'].'/plugins/library/autoinstall.php';
@@ -22,10 +22,6 @@ if (!SEC_inGroup('Root')) {
     COM_404();
     exit;
 }
-
-/**
-* Main Function
-*/
 
 if (SEC_checkToken()) {
     $action = COM_applyFilter($_GET['action']);
