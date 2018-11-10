@@ -1,0 +1,61 @@
+{# begin {templatelocation} #}
+<script type="text/javascript">
+var lib_actions_modal;
+
+function showCheckInOutForm(item_id, action)
+{
+    var dataS = {
+        "action": "checkinoutform",
+        "ck_type": action,
+        "item_id": item_id
+    }
+    data = $("form").serialize() + "&" + $.param(dataS);
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: "{site_admin_url}/plugins/library/ajax.php",
+        data: data,
+        success: function(result) {
+            try {
+                if (result.status == 0) {
+                    lib_actions_modal = UIkit.lib_actions_modal.blockUI(result.content);
+                }
+            }
+            catch(err) {
+            }
+        },
+        error: function(err) {
+            console.log(err);
+        }
+    });
+    return false;
+//    showCheckInOutDialog(item_id, action);
+}
+
+function LIBR_doAction()
+{
+    data = $("form").serialize();
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: "{site_admin_url}/plugins/library/ajax.php",
+        data: data,
+        success: function(result) {
+            try {
+                if (result.status == 0) {
+                    document.getElementById("avail_" + result.item_id).innerHTML =
+                        result.content;
+                }
+                lib_actions_modal.hide();
+            }
+            catch(err) {
+            }
+        },
+        error: function(err) {
+            console.log(err);
+        }
+    });
+    return false;
+};
+</script>
+{# end {templatelocation} #}

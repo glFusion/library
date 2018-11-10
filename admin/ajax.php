@@ -1,15 +1,15 @@
 <?php
 /**
-*   Common AJAX functions.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
-*   @package    library
-*   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Administrative AJAX functions for the Library plugin
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
+ * @package     library
+ * @version     0.0.1
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 /** Include required glFusion common functions */
 require_once '../../../lib-common.php';
@@ -93,6 +93,53 @@ case 'lookup':
             'error' => "Astore lookup error for $isbn",
         );
     }
+    break;
+
+case 'checkinoutform':
+    $item_id = isset($_POST['item_id']) ? $_POST['item_id'] : '';
+    $ck_type = isset($_POST['ck_type']) ? $_POST['ck_type'] : '';
+    if ($ck_type == 'checkout') {
+        $retval['content'] = \Library\Item::checkoutForm($item_id, true);
+    } else {
+        $retval['content'] = \Library\Item::checkinForm($item_id, true);
+    }
+    if ($retval['content'] == '') {
+        // Get count of available instances
+        $retval['error'] = 'Invalid form returned';
+        $retval['status'] = 1;
+    } else {
+        $retval['status'] = 0;
+    }
+    break;
+
+case 'docheckout':
+    $item_id = isset($_POST['id']) ? $_POST['id'] : '';
+    $uid = isset($_POST['uid']) ? $_POST['uid'] : '0';
+    $due_dt = isset($_POST['due_dt']) ? $_POST['due_dt'] : '';
+    if ($uid == 0) {
+        $retval['error'] = 'Invalid User ID';
+        break;
+    } else {
+        if ($due_dt == '') {
+            $due_dt = LIBRARY_dueDate();
+        }
+        $I = \Library\Item::getInstance($item_id);
+        $I->checkOut($uid);
+        $retval['content'] = $I->AvailBlock();
+        $retval['item_id'] = $item_id;  // needed to update the right avail blk
+        $retval['status'] = 0;
+    }
+    COM_errorLog(print_r($retval,true));
+    break;
+
+case 'docheckin':
+    $item_id = isset($_POST['id']) ? $_POST['id'] : '';
+    $instance_id = isset($_POST['instance_id']) ? $_POST['instance_id'] : '0';
+    $I = \Library\Item::getInstance($item_id);
+    $I->checkIn($instance_id);
+    $retval['content'] = $I->AvailBlock();
+    $retval['item_id'] = $item_id;  // needed to update the right avail blk
+    $retval['status'] = 0;
     break;
 }
 

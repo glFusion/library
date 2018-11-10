@@ -76,4 +76,5 @@
   <div style="align: center">{pagination}</div>
 </p>
 </div>
+{checkinout_js}
 {# end {templatelocation} #}

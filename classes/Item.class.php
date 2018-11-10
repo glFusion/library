@@ -862,6 +862,9 @@ class Item
 
         $T = LIBRARY_getTemplate('avail_block', 'avail');
 
+        $avail = Instance::getAll($this->id, LIB_STATUS_AVAIL);
+        $num_avail = max(count($avail) - $waitlisters, 0);
+
         //if (!SEC_hasRights('library.checkout,library.admin', 'OR')) {
         if (!$this->canCheckout()) {
             $can_reserve = false;
@@ -895,8 +898,6 @@ class Item
             $wait_action_txt = '';
             $reserve_txt = '';
         } else {
-            $avail = Instance::getAll($this->id, LIB_STATUS_AVAIL);
-            $num_avail = max(count($avail) - $waitlisters, 0);
             if ($num_avail > 0) {
                 if (($user_wait_items + $all_checked_out) < $_CONF_LIB['max_wait_items']) {
                     $avail_txt = sprintf($LANG_LIB['avail_cnt'], $num_avail);
@@ -911,7 +912,11 @@ class Item
                 $avail_icon = 'red.png';
             }
         }
-
+        if (count(self::getInstances($this->id, LIB_STATUS_OUT)) > 0) {
+            $can_checkin = true;
+        } else {
+            $can_checkin = false;
+        }
         $T->set_var(array(
             'can_reserve'   => $can_reserve,
             'is_reserved'   => $is_reserved,
@@ -923,8 +928,11 @@ class Item
             'id'            => $this->id,
             'pi_url'        => $_CONF_LIB['url'],
             'pi_admin_url'  => $_CONF_LIB['admin_url'],
-            'is_librarian'  => true,
+            'is_librarian'  => plugin_ismoderator_library(),
             'iconset'       => $_CONF_LIB['_iconset'],
+            'can_checkout'  => $num_avail,
+            'can_checkin'   => $can_checkin,
+            'num_avail'     => sprintf($LANG_LIB['avail_cnt'], count($avail)),
         ) );
         $T->parse('output', 'avail');
         $retval = $T->finish($T->get_var('output'));
@@ -978,11 +986,7 @@ class Item
      */
     public static function getInstances($item_id, $status = 0)
     {
-        static $retval = array();
-        if (!isset($retval[$status])) {
-            $retval[$status] = Instance::getAll($item_id, $status);
-        }
-        return $retval[$status];
+        return Instance::getAll($item_id, $status);
     }
 
 
@@ -1024,9 +1028,10 @@ class Item
      * Display the item checkin form.
      *
      * @param   string  $id     Item ID
+     * @param   boolean $ajax   True if this is an AJAX form
      * @return  string          HTML for the form
      */
-    public static function checkinForm($id)
+    public static function checkinForm($id, $ajax=false)
     {
         global $_CONF, $LANG_LIB, $_CONF_LIB;
 
@@ -1039,7 +1044,7 @@ class Item
         $opts = '';
         foreach ($instances as $inst_id=>$inst) {
             $username = COM_getDisplayName($inst->uid);
-            $due = new Date($inst->due, $_CONF['timezone']);
+            $due = new \Date($inst->due, $_CONF['timezone']);
             $due = $due->format('Y-m-d', true);
 
             $opts .= '<option value="' . $inst->instance_id . '">' .
@@ -1055,6 +1060,7 @@ class Item
             'item_name'     => $I->name,
             'item_desc'     => $I->dscp,
             'instance_select' => $opts,
+            'is_ajax'       => $ajax,
         ) );
         $T->parse('output', 'form');
         return $T->finish($T->get_var('output'));
@@ -1065,9 +1071,10 @@ class Item
      * Display the item checkout form.
      *
      * @param   string  $id     Item ID
+     * @param   boolean $ajax   True if this is an AJAX form
      * @return  string          HTML for the form
      */
-    function checkoutForm($id)
+    function checkoutForm($id, $ajax=false)
     {
         global $_CONF, $LANG_LIB, $_CONF_LIB;
 
@@ -1104,6 +1111,7 @@ class Item
             'user_select'   => LIBRARY_userSelect($I->id),
             'due'           => LIBRARY_dueDate($I->maxcheckout)->format('Y-m-d'),
             'iso_lang'      => $iso_lang,
+            'is_ajax'       => $ajax,
         ) );
         $T->parse('output', 'form');
         return $T->finish($T->get_var('output'));

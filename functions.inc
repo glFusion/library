@@ -38,7 +38,7 @@ $_CONF_LIB['url'] = "{$_CONF['site_url']}/{$_CONF_LIB['pi_name']}";
 $_CONF_LIB['admin_url'] = "{$_CONF['site_admin_url']}/plugins/{$_CONF_LIB['pi_name']}";
 $_CONF_LIB['image_dir'] = $_CONF['path'] . 'data/library/images/items';
 $_CONF_LIB['_is_uikit'] = $_SYSTEM['framework'] == 'uikit' ? 'true' : '';
-$_CONF_LIB['_iconset'] = $_CONF_LIB['_is_uikit'] ? 'uk-icon' : 'fa fa';
+$_CONF_LIB['_iconset'] = $_CONF_LIB['_is_uikit'] ? 'uk-icon uk-icon' : 'fa fa';
 
 //  Additional config items and table definitions are added here
 if (file_exists(__DIR__ . '/config.php')) {

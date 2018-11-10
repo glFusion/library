@@ -19,6 +19,26 @@
     </a>
 {#        onclick="javascript:LIBR_ajaxReserve('{id}', 'rmvwait');">{$LANG_LIB['click_to_remove']}</button>#}
 {!endif}
+{!if is_librarian}
+  <br />
+    <span style="float:left;">{num_avail}</span>
+  <div style="float:right;">
+{!if can_checkin}
+    <i class="{iconset}-sign-in lib-icon-info tooltip"
+        title="{$LANG_LIB['checkin']}"
+        onclick="javascript:showCheckInOutForm('{id}', 'checkin');"></i>
+{!else}
+    <i class="{iconset}-sign-in"></i>
+{!endif}
+{!if can_checkout}
+    <i class="{iconset}-sign-out lib-icon-info tooltip"
+        title="{$LANG_LIB['checkout']}"
+        onclick="javascript:showCheckInOutForm('{id}', 'checkout');"></i>
+{!else}
+    <i class="{iconset}-sign-out"></i>
+{!endif}
+  </div>
+{!endif}
 </div>
 
 {!if due_dt}
