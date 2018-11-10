@@ -1,27 +1,30 @@
 <?php
 /**
-*   Plugin-specific functions for the Library plugin for glFusion.
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009-2018 Lee Garner
-*   @package    library
-*   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Plugin-specific functions for the Library plugin for glFusion.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2018 Lee Garner
+ * @package     library
+ * @version     0.0.1
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 
 
 /**
-*   Diaplay the product catalog items.
-*
-*   @return string      HTML for product catalog.
-*/
+ * Diaplay the product catalog items.
+ *
+ * @return  string      HTML for product catalog.
+ */
 function LIBRARY_ItemList()
 {
-    global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB, $_USER, $_PLUGINS;
+    global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB, $_USER, $_GROUPS;
 
-    $T = LIBRARY_getTemplate('item_list', 'item');
+    $T = LIBRARY_getTemplate(array(
+        'item'      => 'item_list',
+        'formjs'    => 'checkinout_js',
+    ) );
     $sortby = 'name';
     $sortdir = isset($_GET['sortdir']) && $_GET['sortdir'] == 'DESC' ? 'DESC' : 'ASC';
     $url_opts = '&sortdir=' . $sortdir;
@@ -33,15 +36,17 @@ function LIBRARY_ItemList()
         'pi_url'        => $_CONF_LIB['url'],
         'type_select'   => Library\MediaType::buildSelection($med_type),
         'cat_select'    => Library\Category::buildSelection($cat_id),
+        //'is_librarian'  => plugin_ismoderatorator_library(),
     ) );
+    $user_groups = implode(', ', $_GROUPS);
 
     // Get items from database
     $sql = " FROM {$_TABLES['library.items']} p
             LEFT JOIN {$_TABLES['library.categories']} c
                 ON p.cat_id = c.cat_id
             WHERE p.enabled=1
-            AND (c.enabled=1 OR c.enabled IS NULL) " .
-            COM_getPermSQL('AND', 0, 2, 'c');
+            AND (c.enabled=1 OR c.enabled IS NULL)
+            AND c.group_id IN ($user_groups) ";
 
     $pagenav_args = '?1=1';
 
@@ -80,7 +85,7 @@ function LIBRARY_ItemList()
                 $count = (int)$x['cnt'];
             else
                 $count = 0;
-            Library\Cache::set($key, $count);
+            Library\Cache::set($key, $count, 'items');
         }
 
         // Make sure page requested is reasonable, if not, fix it
@@ -102,7 +107,7 @@ function LIBRARY_ItemList()
         // Re-execute query with the limit clause in place
         $res = DB_query($sql1);
         $Items = DB_fetchAll($res, false);
-        Library\Cache::set($key, $Items);
+        Library\Cache::set($key, $Items, 'items');
     }
 
     if ($sortdir == 'DESC') {
@@ -115,9 +120,6 @@ function LIBRARY_ItemList()
         'sortdir'   => $sortdir,
     ) );
 
-    // Create an empty product object
-    $P = new Library\Item();
-
     if ($_CONF_LIB['ena_ratings'] == 1) {
         $ratedIds = RATING_getRatedIds('library');
     } else {
@@ -126,10 +128,8 @@ function LIBRARY_ItemList()
 
     // Display each product
     $T->set_block('item', 'ItemRow', 'IRow');
-    //while ($A = DB_fetchArray($res, false)) {
     foreach ($Items as $A) {
-
-        $P->SetVars($A, true);
+        $P = \Library\Item::getInstance($A);
 
         if ($_CONF_LIB['ena_ratings'] == 1) {
             if (in_array($P->id, $ratedIds)) {
@@ -188,6 +188,9 @@ function LIBRARY_ItemList()
             $T->set_var('small_pic', '');
         }
 
+        if (plugin_ismoderator_library()) {
+            $T->parse('checkinout_js', 'formjs');
+        }
         $T->parse('IRow', 'ItemRow', true);
     }
 
@@ -209,10 +212,10 @@ function LIBRARY_ItemList()
 
 
 /**
-*   Display a popup text message
-*
-*   @param string $msg Text to display
-*/
+ * Display a popup text message
+ *
+ * @param   string  $msg Text to display
+ */
 function LIBRARY_popupMsg($msg)
 {
     global $_CONF;
@@ -223,6 +226,12 @@ function LIBRARY_popupMsg($msg)
 }
 
 
+/**
+ * Create an error message to be displayed.
+ *
+ * @param   string  $msg    Message Text
+ * @return  string      HTML for message display
+ */
 function LIBRARY_errMsg($msg)
 {
     $retval = '<span class="alert">' . "\n";
@@ -233,10 +242,10 @@ function LIBRARY_errMsg($msg)
 
 
 /**
-*   Notify the first user on the waiting list that an item has become available.
-*
-*   @param  string  $id     Item ID
-*/
+ * Notify the first user on the waiting list that an item has become available.
+ *
+ * @param   string  $id     Item ID
+ */
 function LIBRARY_notifyWaitlist($id = '')
 {
     global $_TABLES,  $_CONF, $_CONF_LIB, $_LANG_LIB;
@@ -297,10 +306,11 @@ function LIBRARY_notifyWaitlist($id = '')
 
 
 /**
-*   Notify the librarian that an item has been requested.
-*
-*   @param  string  $item_id    Item ID being requested
-*/
+ * Notify the librarian that an item has been requested.
+ *
+ * @param   string  $item_id    Item ID being requested
+ * @param   integer $uid        User ID of requester.
+ */
 function LIBRARY_notifyLibrarian($item_id, $uid)
 {
     global $_TABLES,  $_CONF, $_CONF_LIB, $_LANG_LIB;
@@ -347,19 +357,19 @@ function LIBRARY_notifyLibrarian($item_id, $uid)
 
 
 /**
-*   Loads a custom language array.
-*   If $requested is an array, the first valid language file is loaded.
-*   If not, the $requested language file is loaded.
-*   If $requested doesn't refer to a vailid language, then $_CONF['language']
-*   is assumed.  If all else fails, english.php is loaded.
-*
-*   After loading the base language file, the same filename is loaded from
-*   language/custom, if available.  The admin can override language strings
-*   by creating a language file in that directory.
-*
-*   @param  mixed   $requested  A single or array of language strings
-*   @return array               $LANG_LIB, which is not global here.
-*/
+ * Loads a custom language array.
+ * If $requested is an array, the first valid language file is loaded.
+ * If not, the $requested language file is loaded.
+ * If $requested doesn't refer to a vailid language, then $_CONF['language']
+ * is assumed.  If all else fails, english.php is loaded.
+ *
+ * After loading the base language file, the same filename is loaded from
+ * language/custom, if available.  The admin can override language strings
+ * by creating a language file in that directory.
+ *
+ * @param   mixed   $requested  A single or array of language strings
+ * @return  array               $LANG_LIB, which is not global here.
+ */
 function LIBRARY_loadLanguage($requested='')
 {
     global $_CONF;
@@ -394,6 +404,64 @@ function LIBRARY_loadLanguage($requested='')
         }
     }
     return $LANG_LIB;
+}
+
+
+/**
+ * Provides the user selection options for the checkout form.
+ *
+ * @param   string  $item_id
+ * @return  array       Array of user selections
+ */
+function LIBRARY_userSelect($item_id='')
+{
+    global $_TABLES, $LANG_LIB;
+
+    $retval = '';
+    $wl_users = array();
+    $sel_user = '';
+    if ($item_id != '') {
+        // Get the next user on the waiting list
+        $sql = "SELECT wl.uid,u.fullname,u.username
+                FROM {$_TABLES['library.waitlist']} wl
+                LEFT JOIN {$_TABLES['users']} u
+                    ON u.uid = wl.uid
+                WHERE wl.item_id='" . COM_sanitizeId($item_id, false) . "'
+                ORDER BY wl.dt ASC";
+        $res = DB_query($sql,1);
+        while ($A = DB_fetchArray($res, false)) {
+            $wl_users[] = $A['uid'];
+            if ($sel_user == '') {      // set the first user as selected
+                $sel_user = $A['uid'];
+                $sel = 'selected="selected"';
+            } else {
+                $sel = '';
+            }
+            $userdisplay = "{$A['fullname']} ({$A['username']}) &lt;== " . $LANG_LIB['next_on_list'];
+            $retval .= "<option value='{$A['uid']}' $sel>$userdisplay</option>\n";
+        }
+    }
+
+    $sql = "SELECT uid, username, fullname
+            FROM {$_TABLES['users']}
+            WHERE uid > 1";
+    if (!empty($wl_users)) {
+        $sql .= ' AND uid NOT IN (' . implode(',', $wl_users) . ')';
+    }
+    $res = DB_query($sql,1);
+
+    while ($A = DB_fetchArray($res, false)) {
+        $userdisplay = "{$A['fullname']} ({$A['username']})";
+        if ($sel_user == '') {
+            $sel_user = $A['uid'];
+            $sel = 'selected="selected"';
+            $userdisplay = $userdisplay . ' &lt;== ' . $LANG_LIB['next_on_list'];
+        } else {
+            $sel = '';
+        }
+        $retval .= "<option value='{$A['uid']}' $sel>$userdisplay</option>\n";
+    }
+    return $retval;
 }
 
 ?>

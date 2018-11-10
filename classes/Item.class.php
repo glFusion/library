@@ -1,51 +1,54 @@
 <?php
 /**
-*   Class to manage library items
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
-*   @package    library
-*   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to manage library items
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2009-2018 Lee Garner <lee@leegarner.com>
+ * @package     library
+ * @version     0.0.1
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Library;
 
 /**
-*   Class for library item
-*   @package library
-*/
+ * Class for library item.
+ * @package library
+ */
 class Item
 {
     /** Property fields.  Accessed via Set() and Get()
-    *   @var array */
+     * @var array */
     private $properties;
 
     /** Indicate whether the current user is an administrator
-    *   @var boolean */
+     * @var boolean */
     private $isAdmin;
 
     /** Indicate that this is a new item
-    *   @var boolean */
+     * @var boolean */
     private $isNew;
 
     /** URL to item list, including search params
-    *   @var string */
+     * @var string */
     private $ListingUrl;
 
     /** Array of error messages
-    *   @var mixed */
+     * @var mixed */
     var $Error;
 
+    /** Category object for related category.
+     * @var object */
+    public $Category;
 
     /**
-    *  Constructor.
-    *  Reads in the specified class, if $id is set.  If $id is empty,
-    *  then a new entry is being created.
-    *
-    *  @param integer $id  Optional item ID
-    */
+     * Constructor.
+     * Reads in the specified class, if $id is set.  If $id is empty,
+     * then a new entry is being created.
+     *
+     * @param   string  $id     Optional item ID
+     */
     public function __construct($id = '')
     {
         global $_CONF_LIB;
@@ -72,6 +75,10 @@ class Item
             $this->keywords = '';
             $this->status = 0;
             $this->uid = 0;
+            $this->Category = NULL;
+        } elseif (is_array($id)) {
+            $this->setVars($id, true);
+            $this->Category = Category::getInstance($this->cat_id);
         } else {
             $this->id = $id;
             if (!$this->Read()) {
@@ -79,6 +86,7 @@ class Item
                 $this->isNew = true;
             } else {
                 $this->isNew = false;
+                $this->Category = Category::getInstance($this->cat_id);
             }
         }
         $this->ListingUrl = $_CONF_LIB['url'] . '/index.php';
@@ -87,11 +95,11 @@ class Item
 
 
     /**
-    *   Set a property's value.
-    *
-    *   @param  string  $var    Name of property to set.
-    *   @param  mixed   $value  New value for property.
-    */
+     * Set a property's value.
+     *
+     * @param   string  $var    Name of property to set.
+     * @param   mixed   $value  New value for property.
+     */
     public function __set($var, $value='')
     {
         switch ($var) {
@@ -121,7 +129,6 @@ class Item
             break;
 
         case 'dscp':
-        case 'short_dscp':
         case 'name':
         case 'keywords':
         case 'publisher':
@@ -144,11 +151,11 @@ class Item
 
 
     /**
-    *   Get the value of a property.
-    *
-    *   @param  string  $var    Name of property to retrieve.
-    *   @return mixed           Value of property, NULL if undefined.
-    */
+     * Get the value of a property.
+     *
+     * @param   string  $var    Name of property to retrieve.
+     * @return  mixed           Value of property, NULL if undefined.
+     */
     public function __get($var)
     {
         if (array_key_exists($var, $this->properties)) {
@@ -160,18 +167,56 @@ class Item
 
 
     /**
-    *   Sets all variables to the matching values from $rows.
-    *
-    *   @param  array   $row        Array of values, from DB or $_POST
-    *   @param  boolean $fromDB     True if read from DB, false if from $_POST
-    */
+     * Get an item object
+     *
+     * @param   string|array  $item_id    Item ID
+     * @return  object              Item Object
+     */
+    public static function getInstance($item_id)
+    {
+        global $_TABLES;
+        static $items = array();
+
+        if (empty($item_id)) {
+            return new self();
+        } elseif (is_array($item_id)) {
+            // Already have the DB record, load the vars
+            return new self($item_id);
+        } elseif (isset($items[$item_id])) {
+            return new self($items[$item_id]);
+        } else {
+            $item_id = COM_sanitizeId($item_id, false);
+            $key = 'item_' . $item_id;
+            $items[$item_id] = Cache::get($key);
+            if ($items[$item_id] === NULL) {
+                $result = DB_query("SELECT * FROM {$_TABLES['library.items']}
+                    WHERE id='$item_id'");
+                if (!$result || DB_numRows($result) != 1) {
+                    return new self();
+                } else {
+                    $items[$item_id] = DB_fetchArray($result, false);
+                    Cache::set($key, $items[$item_id], 'items');
+                    return new self($items[$item_id]);
+                }
+            } else {
+                return new self($items[$item_id]);
+            }
+        }
+    }
+
+
+    /**
+     * Sets all variables to the matching values from $rows.
+     *
+     * @param   array   $row        Array of values, from DB or $_POST
+     * @param   boolean $fromDB     True if read from DB, false if from $_POST
+     */
     public function setVars($row, $fromDB=false)
     {
         if (!is_array($row)) return;
 
         $this->id   = $row['id'];
         $this->dscp = $row['dscp'];
-        $this->short_dscp = $row['short_dscp'];
         $this->publisher = $row['publisher'];
         $this->pub_date = $row['pub_date'];
         $this->author = $row['author'];
@@ -199,11 +244,11 @@ class Item
 
 
     /**
-    *   Read a specific record and populate the local values.
-    *
-    *   @param  integer $id Optional ID.  Current ID is used if zero.
-    *   @return boolean     True if a record was read, False on failure
-    */
+     * Read a specific record and populate the local values.
+     *
+     * @param   string  $id     Optional ID.  Current ID is used if zero.
+     * @return  boolean     True if a record was read, False on failure
+     */
     public function Read($id = '')
     {
         global $_TABLES;
@@ -228,12 +273,12 @@ class Item
 
 
     /**
-    *   Save the current values to the database.
-    *   Appends error messages to the $Error property.
-    *
-    *   @param  array   $A      Optional array of values from $_POST
-    *   @return boolean         True if no errors, False otherwise
-    */
+     * Save the current values to the database.
+     * Appends error messages to the $Error property.
+     *
+     * @param   array   $A      Optional array of values from $_POST
+     * @return  boolean         True if no errors, False otherwise
+     */
     public function Save($A = '')
     {
         global $_TABLES, $_CONF_LIB;
@@ -266,7 +311,6 @@ class Item
                 publisher = '" . DB_escapeString($this->publisher) . "',
                 pub_date = '" . DB_escapeString($this->pub_date) . "',
                 author = '" . DB_escapeString($this->author) . "',
-                short_dscp = '" . DB_escapeString($this->short_dscp) . "',
                 keywords='" . DB_escapeString($this->keywords) . "',
                 daysonhold='{$this->daysonhold}',
                 maxcheckout='{$this->maxcheckout}',
@@ -287,8 +331,8 @@ class Item
             }
         }
         if (empty($this->Error)) {
-            self::Clone($this->id, $add_instances);
-            Cache::clear($this->id);
+            self::makeClone($this->id, $add_instances);
+            Cache::clear('items');
             PLG_itemSaved($this->id, $_CONF_LIB['pi_name']);
             return true;
         } else {
@@ -298,8 +342,8 @@ class Item
 
 
     /**
-    *   Delete the current product record from the database
-    */
+     * Delete the current item record from the database.
+     */
     public function Delete()
     {
         global $_TABLES, $_CONF_LIB;
@@ -326,12 +370,10 @@ class Item
 
 
     /**
-    *   Deletes a single image from disk.
-    *   Only needs the $img_id value, so this function may be called as a
-    *   standalone function.
-    *
-    *   @param  integer $img_id     DB ID of image to delete
-    */
+     * Deletes a single image from disk.
+     *
+     * @param   integer $img_id     DB ID of image to delete
+     */
     public function DeleteImage($img_id)
     {
         global $_TABLES, $_CONF_LIB;
@@ -353,10 +395,10 @@ class Item
 
 
     /**
-    *   Determines if the current record is valid.
-    *
-    *   @return boolean     True if ok, False when first test fails.
-    */
+     * Determines if the current record is valid.
+     *
+     * @return  boolean     True if ok, False when first test fails.
+     */
     private function isValidRecord()
     {
         // Check that basic required fields are filled in
@@ -369,11 +411,11 @@ class Item
 
 
     /**
-    *   Creates the edit form
-    *
-    *   @param  integer     $id Optional ID, current record used if zero
-    *   @return string      HTML for edit form
-    */
+     * Creates the edit form
+     *
+     * @param   integer     $id Optional ID, current record used if zero
+     * @return  string      HTML for edit form
+     */
     public function showForm($id = 0)
     {
         global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB, $LANG24,
@@ -387,7 +429,10 @@ class Item
         }
         $id = $this->id;
 
-        $T = LIBRARY_getTemplate('item_form', 'product');
+        $T = LIBRARY_getTemplate(array(
+            'product'   => 'item_form',
+            'tips'      => 'tooltipster',
+        ) );
         $action_url = $_CONF_LIB['admin_url'] . '/index.php';
         if ($this->oldid != '') {
             $retval = COM_startBlock($LANG_LIB['edit'] . ': ' . $this->name);
@@ -420,8 +465,6 @@ class Item
             'name'          => htmlspecialchars($this->name),
             'category'      => $this->cat_id,
             'dscp'          => htmlspecialchars($this->dscp),
-            'short_dscp'    =>
-                            htmlspecialchars($this->short_dscp),
             'publisher'     => $this->publisher,
             'pub_date'      => $this->pub_date,
             'author'        => $this->author,
@@ -431,11 +474,13 @@ class Item
             'keywords'      => htmlspecialchars($this->keywords),
             'cat_select'    => Category::buildSelection($this->cat_id),
             'pi_url'        => $_CONF_LIB['url'],
-            'doc_url'       => LIBRARY_getDocURL('product_form.html',
+            'doc_url'       => LIBRARY_getDocURL('item_form.html',
                                             $_CONF['language']),
             'type'          => $this->type,
             'lookup_method' => $_CONF_LIB['lookup_method'],
             'add_instances' => $this->isNew ? 1 : 0,
+            'total_instances' => sprintf($LANG_LIB['total_instances'],
+                    DB_count($_TABLES['library.instances'], 'item_id',$this->id)),
         ) );
 
         $T->set_block('product', 'TypeSelBlock', 'TypeSel');
@@ -512,6 +557,7 @@ class Item
         for ($j = $i; $j < $_CONF_LIB['max_images']; $j++) {
             $T->parse('UFLD', 'UploadFld', true);
         }
+        $T->parse('tooltipster', 'tips');
         $retval .= $T->parse('output', 'product');
         @setcookie($_CONF['cookie_name'].'fckeditor',
                 SEC_createTokenGeneral('advancededitor'),
@@ -520,18 +566,17 @@ class Item
 
         $retval .= COM_endBlock();
         return $retval;
-
     }   // function showForm()
 
 
     /**
-    *   Toggles the value of a field.
-    *
-    *   @param  integer $oldval     Original value to change
-    *   @param  string  $varname    Name of field
-    *   @param  string  $id         ID number of element to modify
-    *  @return         New value, or old value upon failure
-    */
+     * Toggles the value of a field.
+     *
+     * @param   integer $oldvalue   Original value to change
+     * @param   string  $varname    Name of field
+     * @param   string  $id         Item ID number of element to modify
+     * @return         New value, or old value upon failure
+     */
     private static function _toggle($oldvalue, $varname, $id)
     {
         global $_TABLES;
@@ -550,12 +595,12 @@ class Item
 
 
     /**
-    *   Sets the "enabled" field to the specified value.
-    *
-    *   @param  integer $oldvalue   Original value to be changed
-    *   @param  string  $id         ID number of element to modify
-    *   @return         New value, or old value upon failure
-    */
+     * Sets the "enabled" field to the specified value.
+     *
+     * @param   integer $oldvalue   Original value to be changed
+     * @param   string  $id         ID number of element to modify
+     * @return         New value, or old value upon failure
+     */
     public static function toggleEnabled($oldvalue, $id)
     {
         $oldvalue = $oldvalue == 0 ? 0 : 1;
@@ -565,12 +610,13 @@ class Item
 
 
     /**
-    *   Determine if this item has any transaction or waitlist records.
-    *   Typically used to prevent deletion of product records that have
-    *   dependencies.
-    *
-    *   @return boolean True if used, False if not
-    */
+     * Determine if this item has any transaction or waitlist records.
+     * Typically used to prevent deletion of product records that have
+     * dependencies.
+     *
+     * @param   string  $item_id    Library Item ID
+     * @return  boolean         True if used, False if not
+     */
     public static function isUsed($item_id)
     {
         global $_TABLES;
@@ -589,10 +635,10 @@ class Item
 
 
     /**
-    *   Display the detail page for the product.
-    *
-    *   @return string      HTML for the product page.
-    */
+     * Display the detail page for the product.
+     *
+     * @return  string      HTML for the product page.
+     */
     public function Detail()
     {
         global $_CONF, $_CONF_LIB, $_TABLES, $LANG_LIB, $_USER;
@@ -612,19 +658,15 @@ class Item
                         $_REQUEST['query']);
             $l_desc = COM_highlightQuery($this->dscp,
                         $_REQUEST['query']);
-            $s_desc = COM_highlightQuery($this->short_dscp,
-                        $_REQUEST['query']);
         } else {
             $name = $this->name;
             $l_desc = $this->dscp;
-            $s_desc = $this->short_dscp;
         }
         $T->set_var(array(
             'user_id'           => $_USER['uid'],
             'id'                => $this->id,
             'name'              => $name,
             'dscp'              => $l_desc,
-            'short_dscp'        => $s_desc,
             'img_cell_width'    => ($_CONF_LIB['max_thumb_size'] + 20),
             'pi_url'            => $_CONF_LIB['url'],
             'avail_blk'         => $this->AvailBlock(),
@@ -709,10 +751,10 @@ class Item
 
 
     /**
-    *   Create a formatted display-ready version of the error messages.
-    *
-    *   @return string      Formatted error messages.
-    */
+     * Create a formatted display-ready version of the error messages.
+     *
+     * @return  string      Formatted error messages.
+     */
     public function PrintErrors()
     {
         $retval = '';
@@ -724,13 +766,13 @@ class Item
 
 
     /**
-    *   Hightlight keywords found in text string.
-    *   Credits: http://www.bitrepository.com/
-    *
-    *   @param string $str Text to highlight
-    *   @param string $keywords String of keywords to highlight in $str
-    *   @return string New text with highlighting
-    */
+     * Hightlight keywords found in text string.
+     * Credits: http://www.bitrepository.com/
+     *
+     * @param   string  $str        Text to highlight
+     * @param   string  $keywords   String of keywords to highlight in $str
+     * @return  string          New text with highlighting
+     */
     private function highlight($str = '', $keywords = '')
     {
         $patterns = Array();
@@ -757,18 +799,19 @@ class Item
 
 
     /**
-    *   Check out this item to a user
-    *
-    *   @param  integer $to     User ID of the borrower
-    *   @param  string  $due    Optional due date
-    */
+     * Check out this item to a user.
+     *
+     * @param   integer $to     User ID of the borrower
+     * @param   string  $due    Optional due date
+     */
     public function checkOut($to, $due='')
     {
         $to = (int)$to;
         if ($to == 1)           // Can't check out to anonymous
             return;
-        if ($to == 0 && empty($_POST['co_username']))
+        if ($to == 0 && empty($_POST['co_username'])) {
             return;
+        }
 
         if (empty($due)) {
             $due = LIBRARY_dueDate($this->maxcheckout)->toUnix();
@@ -794,8 +837,10 @@ class Item
 
 
     /**
-    *   Check in an item.
-    */
+     * Check in an item.
+     *
+     * @param   integer $instance_id    Item instance ID
+     */
     public function checkIn($instance_id)
     {
         $I = new Instance($instance_id);
@@ -806,18 +851,19 @@ class Item
 
 
     /**
-    *   Creates a block showing the item availability and links.
-    *   Meant to be added to the detail or listing.
-    *
-    *   @return string      HTML for block.
-    */
+     * Creates a block showing the item availability and links.
+     * Meant to be added to the detail or listing.
+     *
+     * @return  string      HTML for block.
+     */
     public function AvailBlock()
     {
         global $_TABLES, $LANG_LIB, $_USER, $_CONF_LIB;
 
         $T = LIBRARY_getTemplate('avail_block', 'avail');
 
-        if (!SEC_hasRights('library.checkout,library.admin', 'OR')) {
+        //if (!SEC_hasRights('library.checkout,library.admin', 'OR')) {
+        if (!$this->canCheckout()) {
             $can_reserve = false;
             $is_reserved = false;
             $reserve_txt = $LANG_LIB['login_req'];
@@ -875,7 +921,10 @@ class Item
             'due_dt'        => '',
             'reserve_txt' => $reserve_txt,
             'id'            => $this->id,
-            'pi_url'        =>  $_CONF_LIB['url'],
+            'pi_url'        => $_CONF_LIB['url'],
+            'pi_admin_url'  => $_CONF_LIB['admin_url'],
+            'is_librarian'  => true,
+            'iconset'       => $_CONF_LIB['_iconset'],
         ) );
         $T->parse('output', 'avail');
         $retval = $T->finish($T->get_var('output'));
@@ -884,10 +933,10 @@ class Item
 
 
     /**
-    *   Allow the listing URL to be overridden with parameters, etc.
-    *
-    *   @param  string  $url    New complete listing URL
-    */
+     * Allow the listing URL to be overridden with parameters, etc.
+     *
+     * @param   string  $url    New complete listing URL
+     */
     public function setListUrl($url)
     {
         $this->ListingUrl = $url;
@@ -895,12 +944,12 @@ class Item
 
 
     /**
-    *   Add one or more instances of an item
-    *
-    *   @param  string  $item_id    Item ID
-    *   @param  integer $count      Number of instances to add
-    */
-    public static function Clone($item_id, $count = 1)
+     * Add one or more instances of an item
+     *
+     * @param   string  $item_id    Item ID
+     * @param   integer $count      Number of instances to add
+     */
+    public static function makeClone($item_id, $count = 1)
     {
         global $_TABLES;
 
@@ -921,10 +970,12 @@ class Item
 
 
     /**
-    *   0 = all
-    *   1 = available
-    *   2 = checked out
-    */
+     * Shortcut function to get all the instances of an item with a given status
+     *
+     * @param   string  $item_id    Item ID
+     * @param   integer $status     One of 0 = all, 1 = available, 2 = checked out, 3 = all
+     * @return  array       Array of instance records
+     */
     public static function getInstances($item_id, $status = 0)
     {
         static $retval = array();
@@ -932,6 +983,130 @@ class Item
             $retval[$status] = Instance::getAll($item_id, $status);
         }
         return $retval[$status];
+    }
+
+
+    /**
+     * Check if the current user can view this item.
+     * Just calls Category::hasAccess() if the category is valid.
+     *
+     * @return  boolean     True if view access is allowed.
+     */
+    public function canView()
+    {
+        if ($this->Category !== NULL &&
+            $this->Category->hasAccess()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * Check if the current user can check out this item.
+     * Requires view access to the category along with the checkout
+     * privilege.
+     *
+     * @return  boolean     True if the user can checkout this item.
+     */
+    public function canCheckout()
+    {
+        if ($this->canView() && SEC_hasRights('library.checkout')) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * Display the item checkin form.
+     *
+     * @param   string  $id     Item ID
+     * @return  string          HTML for the form
+     */
+    public static function checkinForm($id)
+    {
+        global $_CONF, $LANG_LIB, $_CONF_LIB;
+
+        $I = self::getInstance($id);
+        if ($I->isNew || $I->id == '') {
+            return 'Invalid Item Selected';
+        }
+
+        $instances = self::getInstances($id, LIB_STATUS_OUT);
+        $opts = '';
+        foreach ($instances as $inst_id=>$inst) {
+            $username = COM_getDisplayName($inst->uid);
+            $due = new Date($inst->due, $_CONF['timezone']);
+            $due = $due->format('Y-m-d', true);
+
+            $opts .= '<option value="' . $inst->instance_id . '">' .
+                $username . ' - ' . $LANG_LIB['dt_due'] . ': ' . $due .
+                '</option>';
+        }
+        $T = LIBRARY_getTemplate('checkin_form', 'form');
+        $T->set_var(array(
+            'title'         => $LANG_LIB['admin_title'],
+            'action_url'    => $_CONF_LIB['admin_url'] . '/index.php',
+            'pi_url'        => $_CONF_LIB['url'],
+            'item_id'       => $I->id,
+            'item_name'     => $I->name,
+            'item_desc'     => $I->dscp,
+            'instance_select' => $opts,
+        ) );
+        $T->parse('output', 'form');
+        return $T->finish($T->get_var('output'));
+    }
+
+
+    /**
+     * Display the item checkout form.
+     *
+     * @param   string  $id     Item ID
+     * @return  string          HTML for the form
+     */
+    function checkoutForm($id)
+    {
+        global $_CONF, $LANG_LIB, $_CONF_LIB;
+
+        $I = self::getInstance($id);
+        if ($I->isNew || $I->id == '') {
+            return '';
+        }
+
+        USES_library_functions();
+
+        // Get the ISO language.  This is to load the correct language for
+        // the calendar popup, so make sure a corresponding language file
+        // exists.  Default to English if not found.
+        $iso_lang = $_CONF['iso_lang'];
+        if (!is_file($_CONF['path_html'] . $_CONF_LIB['pi_name'] .
+            '/js/calendar/lang/calendar-' . $iso_lang . '.js')) {
+            $iso_lang = 'en';
+        }
+
+        // Default to the plugin config for maxcheckout if not set for
+        // this item.
+        if ($I->maxcheckout < 1) {
+            $I->maxcheckout = (int)$_CONF_LIB['maxcheckout'];
+        }
+
+        $T = LIBRARY_getTemplate('checkout_form', 'form');
+        $T->set_var(array(
+            'title'         => $LANG_LIB['admin_title'],
+            'action_url'    => $_CONF_LIB['admin_url'] . '/index.php',
+            'pi_url'        => $_CONF_LIB['url'],
+            'item_id'       => $I->id,
+            'item_name'     => $I->name,
+            'item_desc'     => $I->dscp,
+            'user_select'   => LIBRARY_userSelect($I->id),
+            'due'           => LIBRARY_dueDate($I->maxcheckout)->format('Y-m-d'),
+            'iso_lang'      => $iso_lang,
+        ) );
+        $T->parse('output', 'form');
+        return $T->finish($T->get_var('output'));
     }
 
 }   // class Item
