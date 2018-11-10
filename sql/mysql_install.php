@@ -89,11 +89,6 @@ $_SQL['library.categories'] = "CREATE TABLE `{$_TABLES['library.categories']}` (
   `dscp` varchar(255) default '',
   `enabled` tinyint(1) unsigned default '1',
   `group_id` mediumint(8) unsigned NOT NULL default '1',
-  `owner_id` mediumint(8) unsigned NOT NULL default '2',
-  `perm_owner` tinyint(1) unsigned NOT NULL default '3',
-  `perm_group` tinyint(1) unsigned NOT NULL default '3',
-  `perm_members` tinyint(1) unsigned NOT NULL default '2',
-  `perm_anon` tinyint(1) unsigned NOT NULL default '2',
   PRIMARY KEY  (`cat_id`),
   KEY `idxName` (`cat_name`,`cat_id`)
 ) ENGINE=MyISAM";

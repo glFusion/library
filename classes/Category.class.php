@@ -1,21 +1,21 @@
 <?php
 /**
-*   Class to manage library item categories
-*
-*   @author     Lee Garner <lee@leegarner.com>
-*   @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
-*   @package    library
-*   @version    0.0.1
-*   @license    http://opensource.org/licenses/gpl-2.0.php
-*               GNU Public License v2 or later
-*   @filesource
-*/
+ * Class to manage library item categories.
+ *
+ * @author     Lee Garner <lee@leegarner.com>
+ * @copyright  Copyright (c) 2009 Lee Garner <lee@leegarner.com>
+ * @package    library
+ * @version    0.0.1
+ * @license    http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Library;
 
 /**
-*   Class for categories
-*   @package library
-*/
+ * Class for categories.
+ * @package library
+ */
 class Category
 {
     /** Property fields.  Accessed via Set() and Get()
@@ -26,6 +26,8 @@ class Category
     *   @var boolean */
     var $isAdmin;
 
+    /** Indicate that this is a new category, vs. one read from the DB.
+     * @var boolean */
     var $isNew;
 
     //var $button_types = array();
@@ -36,31 +38,26 @@ class Category
 
 
     /**
-    *   Constructor.
-    *   Reads in the specified class, if $id is set.  If $id is zero,
-    *   then a new entry is being created.
+    * Reads in the specified class, if $id is set.  If $id is zero,
+    * then a new entry is being created.
     *
-    *   @param integer $id Optional type ID
+    * @param    integer $id     Optional category ID
+    * @param    array   $data   Optional database record
     */
     public function __construct($id=0, $data=NULL)
     {
+        global $_CONF_LIB;
+
         $this->properties = array();
         //$this->button_types = array('buy_now', 'add_cart'); // TODO
-
         $this->isNew = true;
 
         $id = (int)$id;
         if ($id < 1) {
             $this->cat_id = 0;
-            $this->parent_id = 0;
             $this->cat_name = '';
             $this->dscp = '';
-            $this->group_id = 1;
-            $this->owner_id = 2;
-            $this->perm_owner = 3;
-            $this->perm_group = 3;
-            $this->perm_members = 2;
-            $this->perm_anon = 2;
+            $this->group_id = $_CONF_LIB['def_group_id'];
             $this->enabled = 1;
         } else {
             $this->cat_id = $id;
@@ -79,29 +76,22 @@ class Category
 
 
     /**
-    *   Set a property's value.
-    *   Emulates the __set() magic function in PHP 5.
-    *
-    *   @param  string  $var    Name of property to set.
-    *   @param  mixed   $value  New value for property.
-    */
+     * Set a property's value.
+     * Emulates the __set() magic function in PHP 5.
+     *
+     * @param   string  $var    Name of property to set.
+     * @param   mixed   $value  New value for property.
+     */
     public function __set($var, $value='')
     {
         switch ($var) {
         case 'cat_id':
-        case 'parent_id':
-        case 'perm_owner':
-        case 'perm_group':
-        case 'perm_members':
-        case 'perm_anon':
         case 'group_id':
-        case 'owner_id':
             // Integer values
             $this->properties[$var] = (int)$value;
             break;
 
         case 'cat_name':
-        case 'disp_name':
         case 'dscp':
             // String values
             $this->properties[$var] = trim($value);
@@ -120,11 +110,11 @@ class Category
 
 
     /**
-    *   Get the value of a property.
-    *
-    *   @param  string  $var    Name of property to retrieve.
-    *   @return mixed           Value of property, NULL if undefined.
-    */
+     * Get the value of a property.
+     *
+     * @param   string  $var    Name of property to retrieve.
+     * @return  mixed           Value of property, NULL if undefined.
+     */
     public function __get($var)
     {
         if (array_key_exists($var, $this->properties)) {
@@ -135,56 +125,57 @@ class Category
     }
 
 
+    /**
+     * Get an instance of a category object.
+     * Caches objects in a static variable.
+     *
+     * @param   integer $cat_id     Category ID
+     * @return  object              Category object
+     */
     public static function getInstance($cat_id)
     {
         static $cats = array();
-        if (!isset($cats[$cat_id])) {
-            $cats[$cat_id] = new self($cat_id);
+        $cat_id = (int)$cat_id;
+        if ($cat_id < 1) {
+            return new self();
+        } elseif (isset($cats[$cat_id])) {
+            return $cats[$cat_id];
+        } else{
+            $key = 'category_' . $cat_id;
+            $cats[$cat_id] = Cache::get($key);
+            if ($cats[$cat_id] === NULL) {
+                $cats[$cat_id] = new self($cat_id);
+            }
+            Cache::set($key, $cats[$cat_id], 'categories');
         }
         return $cats[$cat_id];
     }
 
 
     /**
-    *   Sets all variables to the matching values from $rows
-    *
-    *   @param array $row Array of values, from DB or $_POST
-    */
+     * Sets all variables to the matching values from $row
+     *
+     * @param   array $row          Array of values, from DB or $_POST
+     * @param   boolean $fromDB     True if this is from the databse.
+     */
     public function setVars($row, $fromDB=true)
     {
         if (!is_array($row)) return;
 
         $this->cat_id = $row['cat_id'];
-        //$this->parent_id = $row['parent_id'];
         $this->dscp = $row['dscp'];
         $this->enabled = $row['enabled'];
         $this->cat_name = $row['cat_name'];
-        $this->disp_name = isset($row['disp_name']) ? $row['disp_name'] : $row['cat_name'];
         $this->group_id = $row['group_id'];
-        $this->owner_id = $row['owner_id'];
-        if ($fromDB) {
-            $this->perm_owner = $row['perm_owner'];
-            $this->perm_group = $row['perm_group'];
-            $this->perm_members = $row['perm_members'];
-            $this->perm_anon = $row['perm_anon'];
-        } else {
-            list($perm_owner,$perm_group,$perm_members,$perm_anon) =
-                SEC_getPermissionValues($row['perm_owner'] ,$row['perm_group'],
-                    $row['perm_members'] ,$row['perm_anon']);
-            $this->perm_owner = $perm_owner;
-            $this->perm_group = $perm_group;
-            $this->perm_members = $perm_members;
-            $this->perm_anon = $perm_anon;
-        }
     }
 
 
     /**
-    *   Read a specific record and populate the local values.
-    *
-    *   @param  integer $id Optional ID.  Current ID is used if zero.
-    *   @return boolean     True if a record was read, False on failure
-    */
+     * Read a specific record and populate the local values.
+     *
+     * @param   integer $id     Optional ID.  Current ID is used if zero.
+     * @return  boolean         True if a record was read, False on failure
+     */
     public function Read($id = 0)
     {
         global $_TABLES;
@@ -211,11 +202,11 @@ class Category
 
 
     /**
-    *   Save the current values to the database.
-    *
-    *   @param  array   $A      Optional array of values from $_POST
-    *   @return boolean         True if no errors, False otherwise
-    */
+     * Save the current values to the database.
+     *
+     * @param   array   $A      Optional array of values from $_POST
+     * @return  boolean         True if no errors, False otherwise
+     */
     public function Save($A = array())
     {
         global $_TABLES, $_CONF_LIB;
@@ -237,12 +228,7 @@ class Category
             $sql2 = "cat_name = '" . DB_escapeString($this->cat_name) . "',
                 dscp = '" . DB_escapeString($this->dscp) . "',
                 enabled = '{$this->enabled}',
-                owner_id = '{$this->owner_id}',
-                group_id = '{$this->group_id}',
-                perm_owner = '{$this->perm_owner}',
-                perm_group = '{$this->perm_group}',
-                perm_members = '{$this->perm_members}',
-                perm_anon = '{$this->perm_anon}'";
+                group_id = '{$this->group_id}'";
             //echo $sql1.$sql2.$sql3;die;
             DB_query($sql1 . $sql2 . $sql3, 1);
             if (DB_error()) {
@@ -251,7 +237,7 @@ class Category
         }
 
         if (empty($this->Errors)) {
-            Cache::clear('library_cats');
+            Cache::clear('categories');
             return true;
         } else {
             return false;
@@ -260,29 +246,31 @@ class Category
 
 
     /**
-    *   Delete the current category record from the database
-    */
+     * Delete the current category record from the database
+     *
+     * @return  boolean True if deleted, False if not
+     */
     public function Delete()
     {
         global $_TABLES;
 
         // Can't delete root category
-        if ($this->cat_id <= 1)
+        if ($this->cat_id > 1) {
+            DB_delete($_TABLES['library.categories'], 'cat_id', $this->cat_id);
+            Cache::clear('categories');
+            $this->cat_id = 0;
+            return true;
+        } else {
             return false;
-
-        $this->DeleteImage();
-        DB_delete($_TABLES['library.categories'],
-                'cat_id', $this->cat_id);
-        $this->cat_id = 0;
-        return true;
+        }
     }
 
 
     /**
-    *   Determines if the current record is valid.
-    *
-    *   @return boolean     True if ok, False when first test fails.
-    */
+     * Determines if the current record is valid.
+     *
+     * @return  boolean     True if ok, False when first test fails.
+     */
     public function isValidRecord()
     {
         // Check that basic required fields are filled in
@@ -295,11 +283,11 @@ class Category
 
 
     /**
-    *   Creates the edit form.
-    *
-    *   @param  integer $id Optional ID, current record used if zero
-    *   @return string      HTML for edit form
-    */
+     * Creates the edit form.
+     *
+     * @param   integer $id Optional ID, current record used if zero
+     * @return  string      HTML for edit form
+     */
     public function showForm()
     {
         global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB;
@@ -321,13 +309,8 @@ class Category
             'cat_name'      => $this->cat_name,
             'dscp'          => $this->dscp,
             'ena_chk'       => $this->enabled == 1 ? 'checked="checked"' : '',
-            'parent_sel' => self::buildSelection(false),
             'candelete'     => !self::isUsed($this->cat_id),
-            'owner_dropdown' => COM_optionList($_TABLES['users'],
-                    'uid,username', $this->owner_id, 1, 'uid > 1'),
             'group_dropdown' => SEC_getGroupDropdown($this->group_id, 3),
-            'permissions_editor' => SEC_getPermissionsHTML($this->perm_owner,
-                    $this->perm_group, $this->perm_members, $this->perm_anon),
             'doc_url'       => LIBRARY_getDocURL('cat_form.html', $_CONF['language']),
         ) );
         $T->parse('tooltipster', 'tips');
@@ -344,12 +327,13 @@ class Category
 
 
     /**
-    *   Sets the "enabled" field to the specified value.
-    *
-    *   @param  integer $id ID number of element to modify
-    *   @param  integer $value New value to set
-    *   @return         New value, or old value upon failure
-    */
+     * Sets the "enabled" field to the specified value.
+     *
+     * @param   integer $oldvalue   Original value
+     * @param   string  $varname    Field name to update
+     * @param   integer $id         Category ID
+     * @return  integer     New value, or old value upon failure
+     */
     private static function _toggle($oldvalue, $varname, $id=0)
     {
         global $_TABLES;
@@ -380,12 +364,12 @@ class Category
 
 
     /**
-    *   Sets the "enabled" field to the specified value.
-    *
-    *   @param  integer $id ID number of element to modify
-    *   @param  integer $value New value to set
-    *   @return         New value, or old value upon failure
-    */
+     * Sets the "enabled" field to the specified value.
+     *
+     * @param   integer $oldvalue Current, original value
+     * @param   integer $id     ID number of element to modify
+     * @return  integer     New value, or old value upon failure
+     */
     public static function toggleEnabled($oldvalue, $id=0)
     {
         $oldvalue = $oldvalue == 0 ? 0 : 1;
@@ -398,12 +382,13 @@ class Category
 
 
     /**
-    *   Determine if this product is mentioned in any purchase records.
-    *   Typically used to prevent deletion of product records that have
-    *   dependencies.
-    *
-    *   @return boolean True if used, False if not
-    */
+     * Determine if this product is mentioned in any purchase records.
+     * Typically used to prevent deletion of product records that have
+     * dependencies.
+     *
+     * @param   integer $cat_id     ID of category to check
+     * @return  boolean             True if used, False if not
+     */
     public static function isUsed($cat_id=0)
     {
         global $_TABLES;
@@ -421,11 +406,11 @@ class Category
 
 
     /**
-    *   Add an error message to the Errors array.  Also could be used to
-    *   log certain errors or perform other actions.
-    *
-    *   @param  string  $msg    Error message to append
-    */
+     * Add an error message to the Errors array.
+     * Also could be used to log certain errors or perform other actions.
+     *
+     * @param   string  $msg    Error message to append
+     */
     public function AddError($msg)
     {
         $this->Errors[] = $msg;
@@ -433,10 +418,10 @@ class Category
 
 
     /**
-    *   Create a formatted display-ready version of the error messages.
-    *
-    *   @return string      Formatted error messages.
-    */
+     * Create a formatted display-ready version of the error messages.
+     *
+     * @return  string      Formatted error messages.
+     */
     public function PrintErrors()
     {
         $retval = '';
@@ -449,16 +434,13 @@ class Category
 
 
     /**
-    *   Recurse through the category table building an option list
-    *   sorted by id.
-    *
-    *   @param integer  $sel        Category ID to be selected in list
-    *   @param integer  $root       Root category ID
-    *   @param string   $char       Indenting characters
-    *   @param string   $not        'NOT' to exclude $items, '' to include
-    *   @param string   $items      Optional comma-separated list of items to include or exclude
-    *   @return string              HTML option list, without <select> tags
-    */
+     * Recurse through the category table building an option list
+     * sorted by id.
+     *
+     * @param   integer $sel        Category ID to be selected in list
+     * @param   boolean $enabled    True to get only enabled categories
+     * @return  string              HTML option list, without <select> tags
+     */
     public static function buildSelection($sel=0, $enabled=true)
     {
         global $_TABLES;
@@ -467,16 +449,9 @@ class Category
         $root = 1;
         $Cats = self::getTree($enabled);
         foreach ($Cats as $Cat) {
-            if (SEC_hasAccess($Cat->owner_id, $Cat->group_id,
-                    $Cat->perm_owner, $Cat->perm_group,
-                    $Cat->perm_members, $Cat->perm_anon) < 3) {
-                $disabled = 'disabled="disabled"';
-            } else {
-                $disabled = '';
-            }
             $selected = $Cat->cat_id == $sel ? 'selected="selected"' : '';
-            $str .= "<option value=\"{$Cat->cat_id}\" $selected $disabled>";
-            $str .= $Cat->disp_name;
+            $str .= "<option value=\"{$Cat->cat_id}\" $selected>";
+            $str .= $Cat->dscp;
             $str .= "</option>\n";
         }
         return $str;
@@ -484,11 +459,11 @@ class Category
 
 
     /**
-    *   Read all the categories into a static array.
-    *
-    *   @param  integer $root   Root category ID
-    *   @return array           Array of category objects
-    */
+     * Read all the categories into a static array.
+     *
+     * @param   integer $enabled    True to get only enabled categories
+     * @return  array           Array of category objects
+     */
     public static function getTree($enabled = false)
     {
         global $_TABLES;
@@ -505,7 +480,7 @@ class Category
             //echo $sql;die;
             $result = DB_query($sql);
             $cats = DB_fetchAll($result, false);
-            Cache::set($key, $cats, 'library_cats');
+            Cache::set($key, $cats, 'categories');
         }
         foreach ($cats as $A) {
             $All[$A['cat_id']] = new self($A['cat_id'], $A);
@@ -515,43 +490,11 @@ class Category
 
 
     /**
-    *   Rebuild the MPT tree starting at a given parent and "left" value
-    *
-    *   @param  integer $parent     Starting category ID
-    *   @param  integer $left       Left value of the given category
-    *   @return integer         New Right value (only when called recursively)
-    */
-    public static function rebuildTree($parent, $left)
-    {
-        global $_TABLES;
-
-        // the right value of this node is the left value + 1
-        $right = $left + 1;
-
-        // get all children of this node
-        $sql = "SELECT cat_id FROM {$_TABLES['library.categories']}
-                WHERE parent_id ='$parent'";
-        $result = DB_query($sql);
-        while ($row = DB_fetchArray($result, false)) {
-            // recursive execution of this function for each
-            // child of this node
-            // $right is the current right value, which is
-            // incremented by the rebuild_tree function
-            $right = self::rebuildTree($row['cat_id'], $right);
-        }
-
-        // we've got the left value, and now that we've processed
-        // the children of this node we also know the right value
-        $sql1 = "UPDATE {$_TABLES['library.categories']}
-                SET lft = '$left', rgt = '$right'
-                WHERE cat_id = '$parent'";
-        DB_query($sql1);
-
-        // return the right value of this node + 1
-        return $right + 1;
-    }
-
-
+     * Check if the current or specified user has view/checkout access.
+     *
+     * @param   integer $uid    Optional user ID, current user if empty
+     * @return  boolean         True if user has access
+     */
     public function hasAccess($uid=0)
     {
         global $_GROUPS, $_USER;
