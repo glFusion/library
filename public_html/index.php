@@ -59,10 +59,11 @@ if (!empty($action)) {
     }
 }
 if ($action == 'mode') $action = $actionval;
+$page = $action;    // Unless overridden by the action
 switch ($action) {
 case 'addwait':
-    if (SEC_hasRights('library.checkout')) {
-        $Item = new Library\Item($id);
+    $Item = \Library\Item::getInstance($id);
+    if ($Item->canCheckout()) {
         if (!$Item->isNew) {
             Library\Waitlist::Add($Item);
             if ($Item->status == LIB_STATUS_AVAIL && $_CONF_LIB['notify_checkout'] == 1) {
@@ -126,10 +127,10 @@ if (SEC_hasRights('library.admin')) {
 }
 
 $display = LIBRARY_siteHeader();
-$T = new Template($_CONF_LIB['pi_path'] . '/templates');
-$T->set_file('title', 'library_title.thtml');
-$T->set_var('title', $LANG_LIB['main_title']);
-$display .= $T->parse('', 'title');
+//$T = new Template($_CONF_LIB['pi_path'] . '/templates');
+//$T->set_file('title', 'library_title.thtml');
+//$T->set_var('title', $LANG_LIB['main_title']);
+//$display .= $T->parse('', 'title');
 $display .= $content;
 $display .= LIBRARY_siteFooter();
 echo $display;
