@@ -912,7 +912,8 @@ class Item
                 $avail_icon = 'red.png';
             }
         }
-        if (count(self::getInstances($this->id, LIB_STATUS_OUT)) > 0) {
+        $total_instances = count(self::getInstances($this->id));
+        if ($total_instances > $num_avail) {
             $can_checkin = true;
         } else {
             $can_checkin = false;
@@ -932,7 +933,7 @@ class Item
             'iconset'       => $_CONF_LIB['_iconset'],
             'can_checkout'  => $num_avail,
             'can_checkin'   => $can_checkin,
-            'num_avail'     => sprintf($LANG_LIB['avail_cnt'], count($avail)),
+            'num_avail'     => sprintf($LANG_LIB['avail_cnt'], count($avail) . '/' . $total_instances),
         ) );
         $T->parse('output', 'avail');
         $retval = $T->finish($T->get_var('output'));
