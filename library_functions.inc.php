@@ -455,7 +455,6 @@ function LIBRARY_userSelect($item_id='')
         if ($sel_user == '') {
             $sel_user = $A['uid'];
             $sel = 'selected="selected"';
-            $userdisplay = $userdisplay . ' &lt;== ' . $LANG_LIB['next_on_list'];
         } else {
             $sel = '';
         }
