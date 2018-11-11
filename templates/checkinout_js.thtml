@@ -18,7 +18,7 @@ function showCheckInOutForm(item_id, action)
         success: function(result) {
             try {
                 if (result.status == 0) {
-                    lib_actions_modal = UIkit.lib_actions_modal.blockUI(result.content);
+                    lib_actions_modal = UIkit.modal.blockUI(result.content);
                 }
             }
             catch(err) {
@@ -29,7 +29,6 @@ function showCheckInOutForm(item_id, action)
         }
     });
     return false;
-//    showCheckInOutDialog(item_id, action);
 }
 
 function LIBR_doAction()
