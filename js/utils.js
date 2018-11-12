@@ -59,6 +59,7 @@ var LIBR_astoreLookup = function(isbn) {
                         CKEDITOR.instances["dscp"].setData(res.dscp);
                     }
                     LIBR_updateField(res.publish_date, "f_pub_date");
+                    $.UIkit.notify("Data Updated", {timeout: 1000,pos:'top-center'});
                 } else {
                     $.UIkit.notify(res.error, {timeout: 1000,pos:'top-center'});
                 }
