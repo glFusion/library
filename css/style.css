@@ -30,9 +30,10 @@ display: block
 }
 .libListItemImage {
     float: left;
-    width: 110px;
+    width: 15%;
     text-align: left;
-    margin-right: 5px;
+    margin-right: 10px;
+    margin-bottom:5px;
 }
 .libListItemImage a {
     text-decoration: none;
