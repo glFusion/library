@@ -24,14 +24,14 @@
     <span style="float:left;">{num_avail}</span>
   <div style="float:right;">
 {!if can_checkin}
-    <i class="{iconset}-sign-in lib-icon-info tooltip"
+    <i data-uk-tooltip class="{iconset}-sign-in lib-icon-info"
         title="{$LANG_LIB['checkin']}"
         onclick="javascript:showCheckInOutForm('{id}', 'checkin');"></i>
 {!else}
     <i class="{iconset}-sign-in"></i>
 {!endif}
 {!if can_checkout}
-    <i class="{iconset}-sign-out lib-icon-info tooltip"
+    <i data-uk-tooltip class="{iconset}-sign-out lib-icon-info"
         title="{$LANG_LIB['checkout']}"
         onclick="javascript:showCheckInOutForm('{id}', 'checkout');"></i>
 {!else}
