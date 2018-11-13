@@ -54,6 +54,7 @@ class Item
         global $_CONF_LIB;
 
         $this->properties = array();
+        $this->user_ckout_limit = $_CONF_LIB['def_checkout_limit'];
         if ($id == '') {
             $this->isNew = true;
             $this->id = COM_makeSid();
@@ -119,6 +120,7 @@ class Item
         case 'uid':
         case 'status':
         case 'due':
+        case 'user_ckout_limit':
             // Integer values
             $this->properties[$var] = (int)$value;
             break;
@@ -476,27 +478,12 @@ class Item
             'pi_url'        => $_CONF_LIB['url'],
             'doc_url'       => LIBRARY_getDocURL('item_form.html',
                                             $_CONF['language']),
-            'type'          => $this->type,
             'lookup_method' => $_CONF_LIB['lookup_method'],
             'add_instances' => $this->isNew ? 1 : 0,
             'total_instances' => sprintf($LANG_LIB['total_instances'],
                     DB_count($_TABLES['library.instances'], 'item_id',$this->id)),
-        ) );
-
-        $T->set_block('product', 'TypeSelBlock', 'TypeSel');
-        $res = DB_query("SELECT id, name FROM {$_TABLES['library.types']}");
-        while ($A = DB_fetchArray($res, false)) {
-            $T->set_var(array(
-                'type_id'   => $A['id'],
-                'type_name' => $A['name'],
-                'selected'  => $A['id'] == $this->type ?
-                                'selected="selected"' : '',
-            ) );
-            $T->parse('TypeSel', 'TypeSelBlock', true);
-        }
-
-        $T->set_var('ena_chk',
-                $this->enabled == 1 ? ' checked="checked"' : '');
+            'type_select'   => MediaType::buildSelection($this->type, false),
+            'ena_chk'       => $this->enabled == 1 ? ' checked="checked"' : '',
 
         if (!$this->isNew && !self::isUsed($this->id)) {
             $T->set_var('candelete', 'true');
@@ -865,7 +852,6 @@ class Item
         $avail = Instance::getAll($this->id, LIB_STATUS_AVAIL);
         $num_avail = max(count($avail) - $waitlisters, 0);
 
-        //if (!SEC_hasRights('library.checkout,library.admin', 'OR')) {
         if (!$this->canCheckout()) {
             $can_reserve = false;
             $is_reserved = false;
@@ -893,6 +879,7 @@ class Item
         $item_checked_out = Instance::UserHasItem($this->id, $_USER['uid']);
         $all_checked_out= Instance::countByUser($_USER['uid']);
         if ($item_checked_out) {
+        //if ($all_checked_out >= $this->user_ckout_limit) {
             $avail_txt = $LANG_LIB['by_you'];
             $can_reserve = false;
             $wait_action_txt = '';
@@ -1015,13 +1002,26 @@ class Item
      *
      * @return  boolean     True if the user can checkout this item.
      */
-    public function canCheckout()
+    public function canCheckout($uid = 0)
     {
-        if ($this->canView() && SEC_hasRights('library.checkout')) {
-            return true;
-        } else {
+        global $_USER;
+        static $ckouts = array();
+
+        if (!$this->canView() || !SEC_hasRights('library.checkout')) {
             return false;
         }
+/*
+        if ($uid == 0) {
+            $uid = $_USER['uid'];
+        }
+        $uid = (int)$uid;
+        $checkouts = Instance::countByUser($uid);
+        if ($checkouts >= $this->user_ckout_limit) {
+            return false;
+        }
+ */
+        // Didn't fail any conditions, return OK
+        return true;
     }
 
 

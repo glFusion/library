@@ -228,11 +228,11 @@ class MediaType
         }
 
         if (empty($this->Errors)) {
+            Cache::clear('mediatypes');
             return true;
         } else {
             return false;
         }
-
     }
 
 
@@ -338,17 +338,28 @@ class MediaType
      * Get the options for a selection list.
      *
      * @param   integer $sel_type   Selected media type
+     * @param   boolean $used_only  True to include only types with related items
      * @return  string      HTML for options
      */
-    public static function buildSelection($sel_type = 0)
+    public static function buildSelection($sel_type = 0, $used_only = false)
     {
         global $_TABLES;
 
-        $retval = '';
-        $res = DB_query("SELECT * from {$_TABLES['library.types']}", 1);
-        while ($A = DB_fetchArray($res, false)) {
-            $sel = $A['id'] == $sel_type ? 'selected="selected"' : '';
-            $retval .= "<option value='{$A['id']}' $sel>{$A['name']}</option>" . LB;
+        $cache_key = 'mt_select_' . ($used_only ? 'used' : 'all');
+        $A = Cache::get($cache_key);
+        if ($A === NULL) {
+            $sql = "SELECT m.* from {$_TABLES['library.types']} m";
+            if ($used_only) {
+                $sql .= " RIGHT JOIN {$_TABLES['library.items']} i
+                    ON i.type = m.id GROUP BY m.id";
+            }
+            $res = DB_query($sql, 1);
+            $A = DB_fetchAll($res);
+            Cache::set($cache_key, $A, array('mediatypes', 'items'));
+        }
+        foreach ($A as $data) {
+            $sel = $data['id'] == $sel_type ? 'selected="selected"' : '';
+            $retval .= "<option value='{$data['id']}' $sel>{$data['name']}</option>" . LB;
         }
         return $retval;
     }

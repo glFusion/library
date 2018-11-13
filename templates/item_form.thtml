@@ -98,9 +98,7 @@
       </label>
     <div class="uk-form-controls">
       <select id="type" name="type">
-<!-- BEGIN TypeSelBlock -->
-        <option value="{type_id}" {selected}>{type_name}</option>
-<!-- END TypeSelBlock -->
+        {type_select}
       </select>
     </div>
   </div>

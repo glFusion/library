@@ -34,7 +34,7 @@ function LIBRARY_ItemList()
 
     $T->set_var(array(
         'pi_url'        => $_CONF_LIB['url'],
-        'type_select'   => Library\MediaType::buildSelection($med_type),
+        'type_select'   => Library\MediaType::buildSelection($med_type, true),
         'cat_select'    => Library\Category::buildSelection($cat_id),
         //'is_librarian'  => plugin_ismoderatorator_library(),
     ) );
