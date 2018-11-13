@@ -345,6 +345,7 @@ class MediaType
     {
         global $_TABLES;
 
+        $retval = '';
         $cache_key = 'mt_select_' . ($used_only ? 'used' : 'all');
         $A = Cache::get($cache_key);
         if ($A === NULL) {

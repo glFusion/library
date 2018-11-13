@@ -484,7 +484,7 @@ class Item
                     DB_count($_TABLES['library.instances'], 'item_id',$this->id)),
             'type_select'   => MediaType::buildSelection($this->type, false),
             'ena_chk'       => $this->enabled == 1 ? ' checked="checked"' : '',
-
+        ) );
         if (!$this->isNew && !self::isUsed($this->id)) {
             $T->set_var('candelete', 'true');
         }
@@ -850,6 +850,7 @@ class Item
         $T = LIBRARY_getTemplate('avail_block', 'avail');
 
         $avail = Instance::getAll($this->id, LIB_STATUS_AVAIL);
+        $waitlisters = Waitlist::countByItem($this->id);
         $num_avail = max(count($avail) - $waitlisters, 0);
 
         if (!$this->canCheckout()) {
@@ -861,7 +862,7 @@ class Item
             $waitlist_txt = '';
         } else {
             $waitlist_pos = Waitlist::getUserPosition($this->id, $_USER['uid']);
-            $waitlisters = Waitlist::countByItem($this->id);
+            //$waitlisters = Waitlist::countByItem($this->id);
             $user_wait_items = Waitlist::countByUser($_USER['uid']);
             $reserve_txt = $waitlisters ? sprintf($LANG_LIB['has_waitlist'], $waitlisters) : '';
             $waitlist_txt = '';
@@ -1075,7 +1076,7 @@ class Item
      * @param   boolean $ajax   True if this is an AJAX form
      * @return  string          HTML for the form
      */
-    function checkoutForm($id, $ajax=false)
+    public static function checkoutForm($id, $ajax=false)
     {
         global $_CONF, $LANG_LIB, $_CONF_LIB;
 
@@ -1083,7 +1084,6 @@ class Item
         if ($I->isNew || $I->id == '') {
             return '';
         }
-
         USES_library_functions();
 
         // Get the ISO language.  This is to load the correct language for
