@@ -174,7 +174,6 @@ case 'history':
     break;
 
 case 'edititem':
-    $view ='itemlist';
     $id = LGLIB_getVar($_REQUEST, 'id');
     $P = \Library\Item::getInstance($id);
     // Pick any field.  If it exists, then this is probably a rejected save
@@ -205,7 +204,6 @@ case 'editcat':
     break;
 
 case 'editmedia':
-    $view ='medialist';
     $id = isset($_REQUEST['id']) ? (int)$_REQUEST['id'] : 0;
     $C = \Library\MediaType::getInstance($id);
     if ($id == 0 && isset($_POST['name'])) {
@@ -683,7 +681,6 @@ function LIBRARY_adminMenu($mode='')
 {
     global $_CONF, $_CONF_LIB, $LANG_ADMIN, $LANG_LIB;
 
-    if ($mode == '') $mode = 'itemlist';
     $menu_arr = array(
         array(
             'url'   => $_CONF_LIB['admin_url'] . '/index.php',
@@ -701,7 +698,7 @@ function LIBRARY_adminMenu($mode='')
             'active' => $mode == 'medialist' ? true : false,
         ),
         array(
-            'url'   => $_CONF_LIB['admin_url'] . '/index.php?overdue=x',
+            'url'   => $_CONF_LIB['admin_url'] . '/index.php?status=4',
             'text'  => $LANG_LIB['overdue'],
             'active' => $mode == 'overdue' ? true : false,
         ),
@@ -711,38 +708,13 @@ function LIBRARY_adminMenu($mode='')
         ),
     );
 
-    //$new_item_span = '<span class="libNewAdminItem">%s</span>';
     $admin_hdr = 'admin_item_hdr';
-    /*if ($mode == 'itemlist' || $mode == '') {
-        $menu_arr[] = array(
-                    'url'  => $_CONF_LIB['admin_url'] . '/index.php?mode=edititem',
-                    'text' => sprintf($new_item_span, $LANG_LIB['new_item']));
-    }
-
-    if ($mode == 'catlist') {
-        $menu_arr[] = array(
-                    'url'  => $_CONF_LIB['admin_url'] . '/index.php?mode=editcat',
-                    'text' => $LANG_LIB['new_category']);
-    } else {
-        $menu_arr[] = array(
-                    'url'  => $_CONF_LIB['admin_url'] . '/index.php?mode=catlist',
-                    'text' => $LANG_LIB['categories']);
-    }
-     */
-    /*if ($mode == 'medialist') {
-        $menu_arr[] = array(
-                    'url'  => $_CONF_LIB['admin_url'] . '/index.php?editmedia=x',
-                    'text' => sprintf($new_item_span, $LANG_LIB['new_mediatype']));
-        $admin_hdr = 'admin_media_hdr';
-    }*/
-
     $T = new Template($_CONF_LIB['pi_path'] . '/templates');
     $T->set_file('title', 'library_title.thtml');
     $T->set_var('title', $LANG_LIB['admin_title']);
     $retval = $T->parse('', 'title');
     $retval .= ADMIN_createMenu($menu_arr, $LANG_LIB[$admin_hdr],
             plugin_geticon_library());
-
     return $retval;
 }
 
@@ -1120,7 +1092,7 @@ function LIBRARY_admin_getSQL($cat_id, $status = 0)
             LEFT JOIN {$_TABLES['library.types']} t
                 ON p.type = t.id
             LEFT JOIN {$_TABLES['library.categories']} c
-                ON c.cat_id = p.cat_id";
+                ON c.cat_id = p.cat_id ";
     switch ($status) {
     case 0:     // All
         break;
@@ -1146,6 +1118,7 @@ function LIBRARY_admin_getSQL($cat_id, $status = 0)
         $sql .= " GROUP BY  p.id ";
         break;
     }
+    //echo $sql;die;
     return $sql;
 }
 
