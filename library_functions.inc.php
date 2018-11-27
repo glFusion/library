@@ -438,7 +438,7 @@ function LIBRARY_userSelect($item_id='')
                 $sel = '';
             }
             //$userdisplay = "{$A['fullname']} ({$A['username']}) &lt;== " . $LANG_LIB['next_on_list'];
-            $userdisplay = "{$A['fullname']} ({$A['username']}) &lt;== " . dgettext('library', 'Next on Waiting List');
+            $userdisplay = "{$A['fullname']} ({$A['username']}) &lt;== " . __('Next on Waiting List', 'library');
             $retval .= "<option value='{$A['uid']}' $sel>$userdisplay</option>\n";
         }
     }

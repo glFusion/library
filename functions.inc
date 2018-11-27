@@ -78,6 +78,7 @@ $results = setlocale(LC_MESSAGES, $LANG_LOCALE);
 bind_textdomain_codeset($domain, 'UTF-8');
 bindtextdomain($domain, __DIR__ . "/locale");
 
+if (!function_exists('__')) {
 /**
  * Call dgettext to get a translated string from a .mo file.
  *
@@ -85,9 +86,16 @@ bindtextdomain($domain, __DIR__ . "/locale");
  * @param   string  $domain Message domain
  * @return  string          Translated string
  */
-function __($str, $domain='glfusion')
+function __($str, $domain='default')
 {
     return dgettext($domain, $str);
+}
+}
+
+if (!function_exists('_n')) {
+    function _n( $single, $plural, $number, $domain = 'default' ) {
+        return dngettext($domain, $single, $plural, $number);
+    }
 }
 
 /**
@@ -171,7 +179,7 @@ function plugin_getmenuitems_library()
 
     $menuitems = array();
     if ($_CONF_LIB['menuitem'] && SEC_hasRights('library.view,library.admin', 'OR')) {
-        $txt = dgettext('library', 'Library');
+        $txt = __('Library', 'library');
         $menuitems[$txt] = $_CONF_LIB['url'] . '/index.php';
     }
     return $menuitems;
@@ -477,11 +485,11 @@ function library_access_check($rights = 'library.user,library.admin')
         $display .= COM_siteHeader();
         $display .= COM_startBlock('Access Denied');
         $display .= LIBRARY_errorMessage(
-            dgettext('library', 'You do not have access to this page.') . '<p />' .
-            dgettext('library', 'If you believe you have reached this message in error, please contact your site administrator.') . '<p />' .
-            dgettext('library', 'All attempts to access this page are logged.'),
+            __('You do not have access to this page.', 'library') . '<p />' .
+            __('If you believe you have reached this message in error, please contact your site administrator.', 'library') . '<p />' .
+            __('All attempts to access this page are logged.', 'library'),
             'alert',
-            dgettext('library', 'Access Denied')
+            __('Access Denied', 'library')
         );
         $display .= COM_endBlock();
         $display .= COM_siteFooter();
@@ -554,7 +562,7 @@ function plugin_searchtypes_library()
 {
     global $_CONF_LIB, $LANG_LIB;
     return array(
-        $_CONF_LIB['pi_name'] => dgettext('library', 'Library'),
+        $_CONF_LIB['pi_name'] => __('Library', 'library'),
     );
 }
 
@@ -614,7 +622,7 @@ return;
                 p.enabled = 1
             ";
 
-    $search = new SearchCriteria($_CONF_LIB['pi_name'], dgettext('library', 'Library'));
+    $search = new SearchCriteria($_CONF_LIB['pi_name'], __('Library', 'library'));
     $columns = array('p.name', 'p.dscp',
                     'p.keywords', 'c.cat_name', 'c.dscp');
     list($sql, $ftsql) = $search->buildSearchSQL($keyType, $query, $columns, $sql);
@@ -908,19 +916,19 @@ function LIBRARY_errorMessage($msg = '', $type = '', $header = '')
     switch (strtolower($type)) {
     case 'info':
         $class = 'info';
-        if ($header == '') $header = dgettext('library', 'Information');
+        if ($header == '') $header = __('Information', 'library');
         break;
 
     case 'note':
     case 'warn':
         $class = 'note';
-        if ($header == '') $header = dgettext('library', 'Warning');
+        if ($header == '') $header = __('Warning', 'library');
         break;
 
     case 'alert':
     default:
         $class = 'alert';
-        if ($header == '') $header = dgettext('libarary', 'Alert');
+        if ($header == '') $header = __('Alert', 'library');
         break;
     }
 
