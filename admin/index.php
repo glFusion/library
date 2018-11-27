@@ -109,7 +109,7 @@ case 'deletecat':
         if (!$C->isUsed()) {
             $C->Delete();
         } else {
-            $content .= "Category has related products, can't delete.";
+            $content .= dgettext('library', "Category has related products, can't delete.");
         }
         $view = 'catlist';
     }
@@ -145,7 +145,7 @@ case 'saveitem':
 case 'savecat':
     $C = \Library\Category::getInstance($_POST['cat_id']);
     if (!$C->Save($_POST)) {
-        $content .= LIBRARY_popupMsg($LANG_LIB['invalid_form']);
+        $content .= LIBRARY_popupMsg(dgettext('library', 'The submitted form has missing or invalid fields'));
         $view = 'editcat';
     } else {
         COM_refresh($_CONF_LIB['admin_url'] . '/index.php?catlist');
@@ -313,27 +313,27 @@ function LIBRARY_adminlist_Instances($item_id=0, $status=0)
                 'field' => 'instance_id',
                 'sort'  => true,
             ),
-        array(  'text'  => $LANG_LIB['item_id'],
+        array(  'text'  => dgettext('library', 'Item ID'),
                 'field' => 'item_id',
                 'sort'  => true,
             ),
-        array(  'text'  => $LANG_LIB['checkout_user'],
+        array(  'text'  => dgettext('library', 'Check out to user'),
                 'field' => 'uid',
                 'sort'  => true,
             ),
-        array(  'text'  => $LANG_LIB['checkedout'],
+        array(  'text'  => dgettext('library', 'Checked Out'),
                 'field' => 'checkout',
                 'sort'  => true,
             ),
-        array(  'text'  => $LANG_LIB['dt_due'],
+        array(  'text'  => dgettext('library', 'Due Date'),
                 'field' => 'due',
                 'sort'  => true,
             ),
-        array(  'text'  => $LANG_LIB['checkin'],
+        array(  'text'  => dgettext('library', 'Check In'),
                 'field' => 'checkin',
                 'sort'  => false,
             ),
-        array(  'text'  => $LANG_ADMIN['delete'],
+        array(  'text'  => dgettext('library', 'Delete'),
                 'field' => 'delete',
                 'sort'  => true,
             ),
@@ -380,55 +380,55 @@ function LIBRARY_adminlist_Items($cat_id = 0, $status = 0)
 
     $display = '';
     $header_arr = array(
-        array(  'text'  => $LANG_ADMIN['edit'],
+        array(  'text'  => dgettext('library', 'Edit'),
                 'field' => 'edit',
                 'sort'  => false,
                 'align' => 'center',
             ),
-        array(  'text'  => $LANG_ADMIN['copy'],
+        array(  'text'  => dgettext('library', 'Copy'),
                 'field' => 'copy',
                 'sort'  => false,
                 'align' => 'center',
             ),
-        array(  'text'  => 'ID',
+        array(  'text'  => dgettext('library', 'ID'),
                 'field' => 'id',
                 'sort'  => true,
             ),
-        array(  'text'  => $LANG_LIB['enabled'],
+        array(  'text'  => dgettext('library', 'Enabled'),
                 'field' => 'enabled',
                 'sort'  => false,
                 'align' => 'center',
             ),
-        array(  'text'  => $LANG_LIB['item_name'],
+        array(  'text'  => dgettext('library', 'Item Name'),
                 'field' => 'name',
                 'sort'  => true,
             ),
-        array(  'text'  => $LANG_LIB['type'],
+        array(  'text'  => dgettext('library', 'Media Type'),
                 'field' => 'typename',
                 'sort'  => true,
             ),
-        array(  'text'  => $LANG_LIB['category'],
+        array(  'text'  => dgettext('library', 'Category'),
                 'field' => 'cat_name',
                 'sort'  => true,
             ),
-        array(  'text'  => $LANG_LIB['available'],
+        array(  'text'  => dgettext('library', 'Available'),
                 'field' => 'status',
                 'sort'  => false,
                 'align' => 'center',
             ),
-        array(  'text'  => $LANG_LIB['history'],
+        array(  'text'  => dgettext('library', 'History'),
                 'field' => 'history',
                 'sort'  => false,
             ),
-        array(  'text'  => $LANG_LIB['checkout'],
+        array(  'text'  => dgettext('library', 'Check Out'),
                 'field' => 'checkout',
                 'sort'  => false,
             ),
-        array(  'text'  => $LANG_LIB['checkin'],
+        array(  'text'  => dgettext('library', 'Check In'),
                 'field' => 'checkin',
                 'sort'  => false,
             ),
-        array(  'text'  => $LANG_ADMIN['delete'],
+        array(  'text'  => dgettext('library', 'Delete'),
                 'field' => 'delete',
                 'sort'  => false,
                 'align' => 'center',
@@ -461,7 +461,7 @@ function LIBRARY_adminlist_Items($cat_id = 0, $status = 0)
         $_GET['query_limit'] = 20;
     }
 
-    $display .= '<div class="floatright">' . COM_createLink($LANG_LIB['new_item'],
+    $display .= '<div class="floatright">' . COM_createLink(dgettext('library', 'New Item'),
         $_CONF_LIB['admin_url'] . '/index.php?edititem=0',
         array('class' => 'uk-button uk-button-success')
     ) . '</div>';
@@ -516,8 +516,11 @@ function LIBRARY_getAdminField_Instance($fieldname, $fieldvalue, $A, $icon_arr)
             $retval .= COM_createLink(
                 '<i class="' . LIBRARY_getIcon('trash-o', 'danger') . '"></i>',
                 $_CONF_LIB['admin_url']. '/index.php?deleteinstance=x&amp;id=' . $A['instance_id'],
-                array('onclick'=>'return confirm(\''.$LANG_LIB['conf_delitem'].'\');',
-                    'title' => $LANG_LIB['deleteitem'],
+                array(
+                    'onclick'=>'return confirm(\''.
+                    dgettext('library', 'Are you sure you want to delete this item?').
+                    '\');',
+                    'title' => dgettext('library', 'Delete Item'),
                     'class' => 'tooltip',
                 )
             );
@@ -558,7 +561,7 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
         $retval = COM_createLink($fieldvalue,
             $_CONF_LIB['admin_url'] . '/index.php?instances=x&item_id=' . $fieldvalue,
             array(
-                'title' => $LANG_LIB['view_instances'],
+                'title' => dgettext('library', 'View Instances'),
                 'class' => 'tooltip',
             ) );
         break;
@@ -582,8 +585,11 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
             $retval .= COM_createLink(
                     '<i class="' . LIBRARY_getIcon('trash-o', 'danger') . '"></i>',
                 $_CONF_LIB['admin_url']. '/index.php?deleteitem=x&amp;id=' . $A['id'],
-                array('onclick'=>'return confirm(\''.$LANG_LIB['conf_delitem'].'\');',
-                    'title' => $LANG_LIB['deleteitem'],
+                array(
+                    'onclick'=>'return confirm(\'' .
+                    dgettext('library', 'Are you sure you want to delete this item?') .
+                    '\');',
+                    'title' => dgettext('library', 'Delete Item'),
                     'class' => 'tooltip',
                 )
             );
@@ -601,13 +607,13 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
         $retval = COM_createLink($fieldvalue,
                 $_CONF_LIB['url'] . '/index.php?detail=x&id=' . $A['id'],
             array(
-                'title' => $LANG_LIB['view_item'],
+                'title' => dgettext('library', 'View Item'),
                 'class' => 'tooltip',
             ) );
         break;
 
     case 'type':
-        $retval = LGLIB_getVar($LANG_LIB['types'], $A['type'], 'string', 'Unknown');
+        $retval = LGLIB_getVar(dgettext('library', 'Media Types'), $A['type'], 'string', 'Unknown');
         break;
 
     case 'status':
@@ -616,17 +622,17 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
         if ($fieldvalue == LIB_STATUS_OUT) {
             if ($A['due'] < LIBRARY_now()) {
                 $cls = 'danger';
-                $msg = $LANG_LIB['overdue'];
+                $msg = dgettext('library', 'Overdue');
             } else {
                 $cls = 'unknown';
-                $msg = $LANG_LIB['checkedout'];
+                $msg = dgettext('library', 'Checked Out');
             }
         } elseif (isset($A['wait_count']) && $A['wait_count'] > 0) {
             $cls = 'warning';
-            $msg = $LANG_LIB['waitlisted'];
+            $msg = dgettext('library', 'Waitlisted');
         } elseif ($fieldvalue == LIB_STATUS_AVAIL) {
             $cls = 'ok';
-            $msg = $LANG_LIB['available'];
+            $msg = dgettext('library', 'Available');
         } else {
             $cls = 'unknown';
             $msg = '';
@@ -656,7 +662,7 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
             $retval .= COM_createLink('<i class="uk-icon uk-icon-file-text-o"></i>',
                 $_CONF_LIB['admin_url'] . '/index.php?history=x&id=' . $A['id'],
                 array(
-                    'title' => $LANG_LIB['view_history'],
+                    'title' => dgettext('library', 'View History'),
                     'class' => 'tooltip',
                 ) );
         }
@@ -684,34 +690,34 @@ function LIBRARY_adminMenu($mode='')
     $menu_arr = array(
         array(
             'url'   => $_CONF_LIB['admin_url'] . '/index.php',
-            'text'  => $LANG_LIB['item_list'],
+            'text'  => dgettext('library', 'Item List'),
             'active' => $mode == 'itemlist' ? true : false,
         ),
         array(
             'url'  => $_CONF_LIB['admin_url'] . '/index.php?mode=catlist',
-            'text' => $LANG_LIB['categories'],
+            'text' => dgettext('library', 'Categories'),
             'active' => $mode == 'catlist' ? true : false,
         ),
         array(
             'url'   => $_CONF_LIB['admin_url'] . '/index.php?medialist=x',
-            'text'  => $LANG_LIB['media_list'],
+            'text'  => dgettext('library', 'Media Types'),
             'active' => $mode == 'medialist' ? true : false,
         ),
         array(
             'url'   => $_CONF_LIB['admin_url'] . '/index.php?status=4',
-            'text'  => $LANG_LIB['overdue'],
+            'text'  => dgettext('library', 'Overdue'),
             'active' => $mode == 'overdue' ? true : false,
         ),
         array(
             'url'   => $_CONF['site_admin_url'],
-            'text'  => $LANG_ADMIN['admin_home'],
+            'text'  => dgettext('library', 'Admin Home'),
         ),
     );
 
     $admin_hdr = 'admin_item_hdr';
     $T = new Template($_CONF_LIB['pi_path'] . '/templates');
     $T->set_file('title', 'library_title.thtml');
-    $T->set_var('title', $LANG_LIB['admin_title']);
+    $T->set_var('title', dgettext('library', 'Library Administration'));
     $retval = $T->parse('', 'title');
     $retval .= ADMIN_createMenu($menu_arr, $LANG_LIB[$admin_hdr],
             plugin_geticon_library());
@@ -731,18 +737,39 @@ function LIBRARY_adminlist_Category()
             FROM {$_TABLES['library.categories']} cat";
 
     $header_arr = array(
-        array('text' => $LANG_ADMIN['edit'],
-                'field' => 'edit', 'sort' => false, 'align' => 'center'),
-        array('text' => 'ID',
-                'field' => 'cat_id', 'sort' => true),
-        array('text' => $LANG_ADMIN['enabled'],
-                'field' => 'enabled', 'sort' => false, 'align' => 'center'),
-        array('text' => $LANG_LIB['category'],
-                'field' => 'cat_name', 'sort' => true),
-        array('text' => $LANG_LIB['dscp'],
-                'field' => 'dscp', 'sort' => true),
-        array('text' => $LANG_ADMIN['delete'],
-                'field' => 'delete', 'sort' => false, 'align' => 'center'),
+        array(
+            'text' => dgettext('library', 'Edit'),
+            'field' => 'edit',
+            'sort' => false,
+            'align' => 'center',
+        ),
+        array(
+            'text' => dgettext('library', 'ID'),
+            'field' => 'cat_id',
+            'sort' => true,
+        ),
+        array(
+            'text' => dgettext('library', 'Enabled'),
+            'field' => 'enabled',
+            'sort' => false,
+            'align' => 'center',
+        ),
+        array(
+            'text' => dgettext('library', 'Category'),
+            'field' => 'cat_name',
+            'sort' => true,
+        ),
+        array(
+            'text' => dgettext('library', 'Description'),
+            'field' => 'dscp',
+            'sort' => true,
+        ),
+        array(
+            'text' => dgettext('library', 'Delete'),
+            'field' => 'delete',
+            'sort' => false,
+            'align' => 'center',
+        ),
     );
     $display .= COM_startBlock('', '', COM_getBlockTemplate('_admin_block', 'header'));
 
@@ -763,9 +790,13 @@ function LIBRARY_adminlist_Category()
         $_GET['query_limit'] = 20;
     }
 
-    $display .= '<div class="floatright">' . COM_createLink($LANG_LIB['new_category'],
+    $display .= '<div class="floatright">';
+    $display .= COM_createLink(
+        dgettext('library', 'New Category'),
         $_CONF_LIB['admin_url'] . '/index.php?editcat=0',
-        array('class' => 'uk-button uk-button-success')
+        array(
+            'class' => 'uk-button uk-button-success',
+        )
     ) . '</div>';
 
     $display .= ADMIN_list('library', 'LIBRARY_getAdminField_Category',
@@ -798,7 +829,7 @@ function LIBRARY_getAdminField_Category($fieldname, $fieldvalue, $A, $icon_arr)
             '<i class="' . LIBRARY_getIcon('edit') . '"></i>',
             $_CONF_LIB['admin_url'] . "/index.php?mode=editcat&amp;id={$A['cat_id']}",
             array(
-                'title' => $LANG_ADMIN['edit'],
+                'title' => dgettext('library', 'Edit'),
                 'class' => 'tooltip',
             )
         );
@@ -818,13 +849,15 @@ function LIBRARY_getAdminField_Category($fieldname, $fieldvalue, $A, $icon_arr)
                 '<i class="' . LIBRARY_getIcon('trash', 'danger') . '"></i>',
                 $_CONF_LIB['admin_url']. '/index.php?deletecat&id=' . $A['cat_id'],
                 array(
-                    'onclick' => 'return confirm(\'' . $LANG_LIB['conf_delitem'] . '\');',
-                    'title' => $LANG_LIB['deleteitem'],
+                    'onclick' => 'return confirm(\'' .
+                    dgettext('library', 'Are you sure you want to delete this item?'),
+                    '\');',
+                    'title' => dgettext('library', 'Delete Item'),
                     'class' => 'tooltip',
                 ));
         } else {
             $retval .= '<i class="tooltip ' . LIBRARY_getIcon('trash', 'unknown') .
-                    '" title="' . $LANG_LIB['nodel_cat'] . '"></i>';
+                    '" title="' . dgettext('library', 'Cannot delete categories that are in use.') . '"></i>';
         }
         break;
 
@@ -848,16 +881,16 @@ function LIBRARY_adminlist_MediaType()
             FROM {$_TABLES['library.types']} ";
 
     $header_arr = array(
-        array(  'text'  => $LANG_ADMIN['edit'],
+        array(  'text'  => dgettext('library', 'Edit'),
                 'field' => 'edit',
                 'sort'  => false,
                 'align' => 'center',
             ),
-        array(  'text'  => $LANG_LIB['type'],
+        array(  'text'  => dgettext('library', 'Media Type'),
                 'field' => 'name',
                 'sort'  => true,
             ),
-        array(  'text'  => $LANG_ADMIN['delete'],
+        array(  'text'  => dgettext('library', 'Delete'),
                 'field' => 'delete',
                 'sort'  => false,
                 'align' => 'center',
@@ -884,10 +917,14 @@ function LIBRARY_adminlist_MediaType()
         $_GET['query_limit'] = 20;
     }
 
-    $display .= '<div class="floatright">' . COM_createLink($LANG_LIB['new_mediatype'],
-        $_CONF_LIB['admin_url'] . '/index.php?editmedia=0',
-        array('class' => 'uk-button uk-button-success')
-    ) . '</div>';
+    $display .= '<div class="floatright">' .
+        COM_createLink(
+            dgettext('library', 'New Media Type'),
+            $_CONF_LIB['admin_url'] . '/index.php?editmedia=0',
+            array(
+                'class' => 'uk-button uk-button-success',
+            )
+        ) . '</div>';
 
     $display .= ADMIN_list('library', 'LIBRARY_getAdminField_MediaType',
             $header_arr, $text_arr, $query_arr, $defsort_arr,
@@ -917,7 +954,7 @@ function LIBRARY_getAdminField_MediaType($fieldname, $fieldvalue, $A, $icon_arr)
                 $_CONF_LIB['admin_url'] . "/index.php?editmedia=x&amp;id={$A['id']}",
                 array(
                     'class' => 'tooltip',
-                    'title' => $LANG_ADMIN['edit'],
+                    'title' => dgettext('library', 'Edit'),
                 ) );
         break;
 
@@ -927,13 +964,16 @@ function LIBRARY_getAdminField_MediaType($fieldname, $fieldvalue, $A, $icon_arr)
                 '<i class="' . LIBRARY_getIcon('trash', 'danger') . '"></i>',
                 $_CONF_LIB['admin_url']. '/index.php?deletemedia=x&id=' . $A['id'],
                 array(
-                    'onclick'=>'return confirm(\''.$LANG_LIB['conf_delitem'].'\');',
-                    'title' => $LANG_ADMIN['delete'],
+                    'onclick'=>'return confirm(\''.
+                    dgettext('library', 'Are you sure you want to delete this item?') .
+                    '\');',
+                    'title' => dgettext('library', 'Delete'),
                     'class' => 'tooltip',
                 )
             );
         } else {
-            $retval = $LANG_LIB['in_use'];
+            $retval = '<i class="' . LIBRARY_getIcon('trash', 'disabled') . ' tooltip"' .
+                'title="' . dgettext('library', 'In Use') . '"></i>';
         }
         break;
 

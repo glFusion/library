@@ -1,0 +1,262 @@
+# French translations for PACKAGE package.
+# Copyright (C) 2018 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# root <root@dogbert.leegarner.com>, 2018.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-11-27 09:23-0800\n"
+"PO-Revision-Date: 2018-11-21 14:02-0800\n"
+"Last-Translator: root <root@dogbert.leegarner.com>\n"
+"Language-Team: French\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: classes/Item.class.php:429 classes/Item.class.php:646
+msgid "Invalid Item ID"
+msgstr "ID d'article invalide"
+
+#: classes/Item.class.php:441 admin/index.php:383 admin/index.php:741
+#: admin/index.php:832 admin/index.php:884 admin/index.php:957
+msgid "Edit"
+msgstr "Éditer"
+
+#: classes/Item.class.php:443 admin/index.php:464
+msgid "New Item"
+msgstr "Nouvel article"
+
+#: classes/Item.class.php:466
+msgid "Item Information"
+msgstr "Informations sur l'article"
+
+#: classes/Item.class.php:490
+#, php-format
+msgid "%d instance in the database"
+msgid_plural "%d total instances in the database"
+msgstr[0] "%d instance dans la base de données"
+msgstr[1] "%d instances dans la base de données"
+
+#: classes/Item.class.php:867
+msgid "Login Required"
+msgstr "Connexion requise"
+
+#: classes/Item.class.php:875
+#, php-format
+msgid "Pending reservations: %d"
+msgstr "Réservations en attente"
+
+#: classes/Item.class.php:880
+#, fuzzy, php-format
+msgid "You're #%d on the waiting list"
+msgstr "Suivant sur la liste d'attente"
+
+#: classes/Item.class.php:892
+msgid "by you"
+msgstr "par toi"
+
+#: classes/Item.class.php:899 classes/Item.class.php:933
+#, php-format
+msgid "%d available"
+msgstr "disponible"
+
+#: classes/Item.class.php:901
+#, php-format
+msgid "You can reserve up to <br />%d items at a time."
+msgstr "Vous pouvez réserver jusqu'à <br />%d articles à la fois."
+
+#: classes/Item.class.php:907 admin/index.php:324 admin/index.php:628
+msgid "Checked Out"
+msgstr "Extrait"
+
+#: classes/Item.class.php:1062 admin/index.php:328
+msgid "Due Date"
+msgstr "Date d'échéance"
+
+#: classes/Item.class.php:1067 classes/Item.class.php:1115 admin/index.php:720
+msgid "Library Administration"
+msgstr "Administration de la Bibliothèque"
+
+#: library_functions.inc.php:441
+msgid "Next on Waiting List"
+msgstr "Suivant sur la liste d'attente"
+
+#: admin/index.php:112
+msgid "Category has related products, can't delete."
+msgstr "Catégorie a des produits connexes, ne peut pas supprimer."
+
+#: admin/index.php:148
+msgid "The submitted form has missing or invalid fields"
+msgstr "Le formulaire soumis a des champs manquants ou invalides"
+
+#: admin/index.php:316
+#, fuzzy
+msgid "Item ID"
+msgstr "ID d'article invalide"
+
+#: admin/index.php:320
+msgid "Check out to user"
+msgstr "Commander à l'utilisateur"
+
+#: admin/index.php:332 admin/index.php:427
+#, fuzzy
+msgid "Check In"
+msgstr "Extrait"
+
+#: admin/index.php:336 admin/index.php:431 admin/index.php:768
+#: admin/index.php:893
+msgid "Delete"
+msgstr "Supprimer"
+
+#: admin/index.php:388
+msgid "Copy"
+msgstr "Copie"
+
+#: admin/index.php:393 admin/index.php:747
+msgid "ID"
+msgstr "ID"
+
+#: admin/index.php:397 admin/index.php:752
+msgid "Enabled"
+msgstr "Activé"
+
+#: admin/index.php:402
+msgid "Item Name"
+msgstr "Nom d'article"
+
+#: admin/index.php:406 admin/index.php:889
+msgid "Media Type"
+msgstr "Type de média"
+
+#: admin/index.php:410 admin/index.php:758
+msgid "Category"
+msgstr "Catégorie"
+
+#: admin/index.php:414 admin/index.php:635
+#, fuzzy
+msgid "Available"
+msgstr "disponible"
+
+#: admin/index.php:419
+msgid "History"
+msgstr "Histoire"
+
+#: admin/index.php:423
+#, fuzzy
+msgid "Check Out"
+msgstr "Extrait"
+
+#: admin/index.php:521 admin/index.php:590 admin/index.php:853
+#: admin/index.php:968
+msgid "Are you sure you want to delete this item?"
+msgstr "Êtes-vous sûr de vouloir supprimer cet élément?"
+
+#: admin/index.php:523 admin/index.php:592 admin/index.php:855
+#, fuzzy
+msgid "Delete Item"
+msgstr "Nouvel article"
+
+#: admin/index.php:564
+msgid "View Instances"
+msgstr "Voir les instances"
+
+#: admin/index.php:610
+#, fuzzy
+msgid "View Item"
+msgstr "Nouvel article"
+
+#: admin/index.php:616 admin/index.php:703
+#, fuzzy
+msgid "Media Types"
+msgstr "Type de média"
+
+#: admin/index.php:625 admin/index.php:708
+msgid "Overdue"
+msgstr "En retard"
+
+#: admin/index.php:632
+msgid "Waitlisted"
+msgstr "En liste d'attente"
+
+#: admin/index.php:665
+#, fuzzy
+msgid "View History"
+msgstr "Voir l'historique"
+
+#: admin/index.php:693
+#, fuzzy
+msgid "Item List"
+msgstr "ID d'article invalide"
+
+#: admin/index.php:698
+#, fuzzy
+msgid "Categories"
+msgstr "Catégorie"
+
+#: admin/index.php:713
+msgid "Admin Home"
+msgstr "Admin Accueil"
+
+#: admin/index.php:763
+msgid "Description"
+msgstr "Description"
+
+#: admin/index.php:795
+#, fuzzy
+msgid "New Category"
+msgstr "Catégorie"
+
+#: admin/index.php:860
+msgid "Cannot delete categories that are in use."
+msgstr "Impossible de supprimer les catégories en cours d'utilisation."
+
+#: admin/index.php:922
+#, fuzzy
+msgid "New Media Type"
+msgstr "Type de média"
+
+#: admin/index.php:975
+msgid "In Use"
+msgstr "En cours d'utilisation"
+
+#: functions.inc:174 functions.inc:557 functions.inc:617
+msgid "Library"
+msgstr "Bibliothèque"
+
+#: functions.inc:480
+msgid "You do not have access to this page."
+msgstr "Vous n'avez pas accès à cette page."
+
+#: functions.inc:481
+#, fuzzy
+msgid ""
+"If you believe you have reached this message in error, please contact your "
+"site administrator."
+msgstr ""
+"Si vous pensez que ce message est erroné, contactez l'administrateur de "
+"votre site."
+
+#: functions.inc:482
+msgid "All attempts to access this page are logged."
+msgstr "Toutes les tentatives d'accès à cette page sont consignées."
+
+#: functions.inc:484
+msgid "Access Denied"
+msgstr "Accès refusé"
+
+#: functions.inc:911
+#, fuzzy
+msgid "Information"
+msgstr "Informations sur l'article"
+
+#: functions.inc:917
+msgid "Warning"
+msgstr "Avertissement"
+
+#: functions.inc:923
+msgid "Alert"
+msgstr "Alerte"

@@ -19,7 +19,7 @@
  */
 function LIBRARY_ItemList()
 {
-    global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB, $_USER, $_GROUPS;
+    global $_TABLES, $_CONF, $_CONF_LIB, $_USER, $_GROUPS;
 
     $T = LIBRARY_getTemplate(array(
         'item'      => 'item_list',
@@ -248,7 +248,7 @@ function LIBRARY_errMsg($msg)
  */
 function LIBRARY_notifyWaitlist($id = '')
 {
-    global $_TABLES,  $_CONF, $_CONF_LIB, $_LANG_LIB;
+    global $_TABLES,  $_CONF, $_CONF_LIB;
 
     // require a valid item ID
     $id = COM_sanitizeID($id);
@@ -313,7 +313,7 @@ function LIBRARY_notifyWaitlist($id = '')
  */
 function LIBRARY_notifyLibrarian($item_id, $uid)
 {
-    global $_TABLES,  $_CONF, $_CONF_LIB, $_LANG_LIB;
+    global $_TABLES,  $_CONF, $_CONF_LIB;
 
     USES_lib_user();
 
@@ -437,7 +437,8 @@ function LIBRARY_userSelect($item_id='')
             } else {
                 $sel = '';
             }
-            $userdisplay = "{$A['fullname']} ({$A['username']}) &lt;== " . $LANG_LIB['next_on_list'];
+            //$userdisplay = "{$A['fullname']} ({$A['username']}) &lt;== " . $LANG_LIB['next_on_list'];
+            $userdisplay = "{$A['fullname']} ({$A['username']}) &lt;== " . dgettext('library', 'Next on Waiting List');
             $retval .= "<option value='{$A['uid']}' $sel>$userdisplay</option>\n";
         }
     }

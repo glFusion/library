@@ -58,7 +58,51 @@ if (file_exists("$langpath/custom/$langfile")) {
     /** Include the custom language file, if any */
     include_once "$langpath/custom/$langfile";
 }
+/*
+$LANG_LOCALE='de_DE';
+$domain = $_CONF_LIB['pi_name'];
+$results = setlocale(LC_MESSAGES, $LANG_LOCALE);
+if ($results) {
+    bind_textdomain_codeset($domain, 'UTF-8');
+    bindtextdomain($domain, __DIR__ . "/locale");
+ //   textdomain($domain);
 
+ //   COM_errorLog(_("Good Morning"));
+} else {
+var_dump($results);
+}
+*/
+$LANG_LOCALE='fr_FR';
+$domain = $_CONF_LIB['pi_name'];
+$results = setlocale(LC_MESSAGES, $LANG_LOCALE);
+bind_textdomain_codeset($domain, 'UTF-8');
+bindtextdomain($domain, __DIR__ . "/locale");
+
+/**
+ * Call dgettext to get a translated string from a .mo file.
+ *
+ * @param   string  $str    String to translate
+ * @param   string  $domain Message domain
+ * @return  string          Translated string
+ */
+function __($str, $domain='glfusion')
+{
+    return dgettext($domain, $str);
+}
+
+/**
+ * Call dngettext to get a translated string where there may be a plural form.
+ *
+ * @param   string          $str1   Singular string
+ * @param   string          $str2   Plural string
+ * @param   integer|float   $num    Number of items
+ * @param   string          $domain Message domain
+ * @return  string          Translated string
+ */
+function __n($str1, $str2, $num, $domain='glfusion')
+{
+    return dngettext($domain, $str1, $str2, $num);
+}
 //  Set user ID = 1 for anonymous users.
 if (empty($_USER['uid'])) {
     $_USER['uid'] = 1;
@@ -127,7 +171,8 @@ function plugin_getmenuitems_library()
 
     $menuitems = array();
     if ($_CONF_LIB['menuitem'] && SEC_hasRights('library.view,library.admin', 'OR')) {
-        $menuitems[$LANG_LIB['mnu_library']] = $_CONF_LIB['url'] . '/index.php';
+        $txt = dgettext('library', 'Library');
+        $menuitems[$txt] = $_CONF_LIB['url'] . '/index.php';
     }
     return $menuitems;
 }
@@ -431,8 +476,13 @@ function library_access_check($rights = 'library.user,library.admin')
     if (!SEC_hasRights($rights, 'OR')) {
         $display .= COM_siteHeader();
         $display .= COM_startBlock('Access Denied');
-        $display .= LIBRARY_errorMessage($LANG_LIB['access_denied_msg'],
-                    'alert', $LANG_LIB['access_denied']);
+        $display .= LIBRARY_errorMessage(
+            dgettext('library', 'You do not have access to this page.') . '<p />' .
+            dgettext('library', 'If you believe you have reached this message in error, please contact your site administrator.') . '<p />' .
+            dgettext('library', 'All attempts to access this page are logged.'),
+            'alert',
+            dgettext('library', 'Access Denied')
+        );
         $display .= COM_endBlock();
         $display .= COM_siteFooter();
         COM_accessLog("Unauthorized user {$_USER['username']} from "
@@ -503,7 +553,9 @@ function library_filterVars($vars, &$arr) {
 function plugin_searchtypes_library()
 {
     global $_CONF_LIB, $LANG_LIB;
-    return array($_CONF_LIB['pi_name'] => $LANG_LIB['srchtitle']);
+    return array(
+        $_CONF_LIB['pi_name'] => dgettext('library', 'Library'),
+    );
 }
 
 
@@ -562,7 +614,7 @@ return;
                 p.enabled = 1
             ";
 
-    $search = new SearchCriteria($_CONF_LIB['pi_name'], $LANG_LIB['srchtitle']);
+    $search = new SearchCriteria($_CONF_LIB['pi_name'], dgettext('library', 'Library'));
     $columns = array('p.name', 'p.dscp',
                     'p.keywords', 'c.cat_name', 'c.dscp');
     list($sql, $ftsql) = $search->buildSearchSQL($keyType, $query, $columns, $sql);
@@ -710,7 +762,7 @@ function plugin_autouninstall_library()
  */
 function plugin_getiteminfo_library($id, $what, $uid=0, $options=array())
 {
-    global $_TABLES, $_CONF, $LANG_LIB;
+    global $_TABLES, $_CONF;
 
     $properties = explode(',', $what);
     $fields = array();
@@ -856,19 +908,19 @@ function LIBRARY_errorMessage($msg = '', $type = '', $header = '')
     switch (strtolower($type)) {
     case 'info':
         $class = 'info';
-        if ($header == '') $header = $LANG_LIB['info'];
+        if ($header == '') $header = dgettext('library', 'Information');
         break;
 
     case 'note':
     case 'warn':
         $class = 'note';
-        if ($header == '') $header = $LANG_LIB['warning'];
+        if ($header == '') $header = dgettext('library', 'Warning');
         break;
 
     case 'alert':
     default:
         $class = 'alert';
-        if ($header == '') $header = $LANG_LIB['alert'];
+        if ($header == '') $header = dgettext('libarary', 'Alert');
         break;
     }
 
