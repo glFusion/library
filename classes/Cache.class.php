@@ -27,6 +27,7 @@ class Cache
      * @param   string  $key    Item key
      * @param   mixed   $data   Data, typically an array
      * @param   mixed   $tag    Single or array of tags
+     * @return  boolean     True on success, False on error
      */
     public static function set($key, $data, $tag='')
     {
@@ -41,7 +42,7 @@ class Cache
         else
             $tag = array($tag, self::TAG);
         $key = self::_makeKey($key, $tag);
-        \glFusion\Cache::getInstance()->set($key, $data, $tag);
+        return \glFusion\Cache\Cache::getInstance()->set($key, $data, $tag);
     }
 
 
@@ -51,6 +52,7 @@ class Cache
      * Entries matching all tags, including default tag, are removed.
      *
      * @param   mixed   $tag    Single or array of tags
+     * @return  boolean     True on success, False on error
      */
     public static function clear($tag = '')
     {
@@ -61,7 +63,7 @@ class Cache
             if (!is_array($tag)) $tag = array($tag);
             $tags = array_merge($tags, $tag);
         }
-        \glFusion\Cache::getInstance()->deleteItemsByTagsAll($tags);
+        return \glFusion\Cache\Cache::getInstance()->deleteItemsByTagsAll($tags);
     }
 
 
@@ -92,8 +94,8 @@ class Cache
         if (version_compare(GVERSION, self::MIN_GVERSION, '<')) return NULL;
 
         $key = self::_makeKey($key, $tag);
-        if (\glFusion\Cache::getInstance()->has($key)) {
-            return \glFusion\Cache::getInstance()->get($key);
+        if (\glFusion\Cache\Cache::getInstance()->has($key)) {
+            return \glFusion\Cache\Cache::getInstance()->get($key);
         } else {
             return NULL;
         }
