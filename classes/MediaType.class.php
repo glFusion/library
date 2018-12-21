@@ -280,7 +280,7 @@ class MediaType
         $T->set_var(array(
             'action_url'    => $_CONF_LIB['admin_url'],
             'name'          => $this->name,
-            'candelete'     => !$this->isNew && !self::isUsed($this->id),
+            'candelete'     => !$this->isNew && self::canDelete($this->id),
         ) );
         $retval .= $T->parse('output', 'type');
         $retval .= COM_endBlock();
@@ -290,19 +290,21 @@ class MediaType
 
     /**
      * Determine if this media type is associated with any items.
+     * Caches the result for an ID since this might be called standalone
+     * and also by canDelete().
      *
      * @param   integer $id     Media Type ID
      * @return  boolean True if used, False if not
      */
-    public static function isUsed($id = 0)
+    public static function isUsed($id)
     {
         global $_TABLES;
 
-        // Check if any products are under this media type
-        if (DB_count($_TABLES['library.items'], 'type', $id) > 0) {
-            return true;
+        static $ids = array();
+        if (!isset($ids[$id])) {
+            $ids[$id] = (int)DB_count($_TABLES['library.items'], 'type', $id);
         }
-        return false;
+        return ($ids[$id] > 0);
     }
 
 
@@ -364,6 +366,21 @@ class MediaType
         }
         return $retval;
     }
+
+
+    /**
+     * Determine if a specified media type can be deleted.
+     * There must be one media type, so check that the ID is greater than one
+     * and that it is not used by any items.
+     *
+     * @param   integer $id     Media type ID to check
+     * @return  boolean     True if the type can be deleted
+     */
+    public static function canDelete($id)
+    {
+        return ($id > 1) && !self::isUsed($id);
+    }
+
 
 }   // class MediaType
 

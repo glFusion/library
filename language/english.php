@@ -97,6 +97,7 @@ $LANG_LIB = array (
 'saveitem'          => 'Save Item',
 'deleteitem'        => 'Delete Item',
 'nodel_cat'         => 'Cannot delete categories that are in use.',
+'nodel_type'        => 'Unable to delete this media type',
 'savecat'           => 'Save Category',
 'deletecat'         => 'Delete Category',
 'product_id'        => 'Product ID',

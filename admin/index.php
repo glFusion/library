@@ -922,16 +922,21 @@ function LIBRARY_getAdminField_MediaType($fieldname, $fieldvalue, $A, $icon_arr)
         break;
 
     case 'delete':
-        if (!Library\MediaType::isUsed($A['id'])) {
-            $retval = COM_createLink(
-                '<i class="' . LIBRARY_getIcon('trash', 'danger') . '"></i>',
-                $_CONF_LIB['admin_url']. '/index.php?deletemedia=x&id=' . $A['id'],
-                array(
-                    'onclick'=>'return confirm(\''.$LANG_LIB['conf_delitem'].'\');',
-                    'title' => $LANG_ADMIN['delete'],
-                    'class' => 'tooltip',
-                )
-            );
+        if (!\Library\MediaType::isUsed($A['id'])) {
+            if (\Library\MediaType::canDelete($A['id'])) {
+                $retval = COM_createLink(
+                    '<i class="' . LIBRARY_getIcon('trash', 'danger') . '"></i>',
+                    $_CONF_LIB['admin_url']. '/index.php?deletemedia=x&id=' . $A['id'],
+                    array(
+                        'onclick'=>'return confirm(\''.$LANG_LIB['conf_delitem'].'\');',
+                        'title' => $LANG_ADMIN['delete'],
+                        'class' => 'tooltip',
+                    )
+                );
+            } else {
+                $retval = '<i class="' . LIBRARY_getIcon('trash', 'disabled') .
+                    ' tooltip" title="' . $LANG_LIB['nodel_type'] . '"></i>';
+            }
         } else {
             $retval = $LANG_LIB['in_use'];
         }
