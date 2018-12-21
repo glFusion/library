@@ -898,6 +898,7 @@ class Item
             'can_checkout'  => ($total_instances - $checkedout),
             'can_checkin'   => $can_checkin,
             'num_avail'     => sprintf(__('%d available', 'library'), count($avail) . '/' . $total_instances),
+            'lang_add_waitlist' => __('Place your reservation', 'library'),
         ) );
         $T->parse('output', 'avail');
         $retval = $T->finish($T->get_var('output'));
