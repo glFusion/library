@@ -572,7 +572,7 @@ class Item
      * @param   integer $oldvalue   Original value to change
      * @param   string  $varname    Name of field
      * @param   string  $id         Item ID number of element to modify
-     * @return         New value, or old value upon failure
+     * @return  integer     New value, or old value upon failure
      */
     private static function _toggle($oldvalue, $varname, $id)
     {
@@ -652,9 +652,9 @@ class Item
         // Highlight the query terms if coming from a search
         if (isset($_REQUEST['query']) && !empty($_REQUEST['query'])) {
             $name = COM_highlightQuery($this->name,
-                        $_REQUEST['query']);
+                $_REQUEST['query']);
             $l_desc = COM_highlightQuery($this->dscp,
-                        $_REQUEST['query']);
+                $_REQUEST['query']);
         } else {
             $name = $this->name;
             $l_desc = $this->dscp;
@@ -759,39 +759,6 @@ class Item
             $retval .= "<li>$msg</li>\n";
         }
         return $retval;
-    }
-
-
-    /**
-     * Hightlight keywords found in text string.
-     * Credits: http://www.bitrepository.com/
-     *
-     * @param   string  $str        Text to highlight
-     * @param   string  $keywords   String of keywords to highlight in $str
-     * @return  string          New text with highlighting
-     */
-    private function highlight($str = '', $keywords = '')
-    {
-        $patterns = Array();
-        $replaces = Array();
-        $style = 'background: #66FF66;';
-
-        if ($keywords == "") {
-            return $str;
-        }
-
-        $words = explode(" ", $keywords);
-
-        foreach($words as $word) {
-
-            $patterns[] = '/' . $word . '/i';
-            $replaces[] = "<span style=\"$style\">$0</span>";
-
-        }
-
-        return preg_replace($patterns, $replaces, $str);
-
-        return $str;
     }
 
 
@@ -1010,6 +977,7 @@ class Item
      * Requires view access to the category along with the checkout
      * privilege.
      *
+     * @param   integer $uid    User ID being checked. @deprecated.
      * @return  boolean     True if the user can checkout this item.
      */
     public function canCheckout($uid = 0)

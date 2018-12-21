@@ -72,27 +72,36 @@ if ($results) {
 var_dump($results);
 }
 */
-$LANG_LOCALE='fr_FR';
+//$LANG_LOCALE='fr_FR';
 $domain = $_CONF_LIB['pi_name'];
 $results = setlocale(LC_MESSAGES, $LANG_LOCALE);
 bind_textdomain_codeset($domain, 'UTF-8');
 bindtextdomain($domain, __DIR__ . "/locale");
 
 if (!function_exists('__')) {
-/**
- * Call dgettext to get a translated string from a .mo file.
- *
- * @param   string  $str    String to translate
- * @param   string  $domain Message domain
- * @return  string          Translated string
- */
-function __($str, $domain='default')
-{
-    return dgettext($domain, $str);
-}
+    /**
+     * Call dgettext to get a translated string from a .mo file.
+     *
+     * @param   string  $str    String to translate
+     * @param   string  $domain Message domain
+     * @return  string          Translated string
+     */
+    function __($str, $domain='default')
+    {
+        return dgettext($domain, $str);
+    }
 }
 
 if (!function_exists('_n')) {
+    /**
+     * Call dngettext to get a translated string from a .mo file.
+     *
+     * @param   string  $single Singular string
+     * @param   string  $plural Plural string
+     * @param   float   $number Number being represented
+     * @param   string  $domain Message domain
+     * @return  string          Translated string
+     */
     function _n( $single, $plural, $number, $domain = 'default' ) {
         return dngettext($domain, $single, $plural, $number);
     }
