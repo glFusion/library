@@ -49,4 +49,5 @@
 <div style="clear:both;">
   {usercomments}
 </div>
+{checkinout_js}
 {# end {templatelocation} #}
