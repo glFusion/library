@@ -21,9 +21,10 @@ function LIBRARY_ItemList()
 {
     global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB, $_USER, $_GROUPS;
 
-    $T = LIBRARY_getTemplate(array(
-        'item'      => 'item_list',
-        'formjs'    => 'checkinout_js',
+    $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
+    $T->set_file(array(
+        'item'      => 'item_list.thtml',
+        'formjs'    => 'checkinout_js.thtml',
     ) );
     $sortby = 'name';
     $sortdir = isset($_GET['sortdir']) && $_GET['sortdir'] == 'DESC' ? 'DESC' : 'ASC';
