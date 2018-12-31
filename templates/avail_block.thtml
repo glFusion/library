@@ -21,22 +21,24 @@
 {!endif}
 {!if is_librarian}
   <br />
+  <div class="adminAvail">
     <span style="float:left;">{num_avail}</span>
   <div style="float:right;">
 {!if can_checkin}
-    <i data-uk-tooltip class="{iconset}-sign-in lib-icon-info"
+    <i data-uk-tooltip class="uk-icon uk-icon-sign-in lib-icon-info"
         title="{$LANG_LIB['checkin']}"
         onclick="javascript:showCheckInOutForm('{id}', 'checkin');"></i>
 {!else}
-    <i class="{iconset}-sign-in"></i>
+    <i class="uk-icon uk-icon-sign-in"></i>
 {!endif}
 {!if can_checkout}
-    <i data-uk-tooltip class="{iconset}-sign-out lib-icon-info"
+    <i data-uk-tooltip class="uk-icon uk-icon-sign-out lib-icon-info"
         title="{$LANG_LIB['checkout']}"
         onclick="javascript:showCheckInOutForm('{id}', 'checkout');"></i>
 {!else}
-    <i class="{iconset}-sign-out"></i>
+    <i class="uk-icon uk-icon-sign-out"></i>
 {!endif}
+  </div>
   </div>
 {!endif}
 </div>

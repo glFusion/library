@@ -50,6 +50,15 @@ div.libAvailBlk {
     float:right;
     position:relative;
     background-color:#EEE;
+    padding: .5rem;
+    margin: .2rem;
+}
+
+div.libAvailBlk .adminAvail {
+    background-color:#fcc;
+    float: left;
+    width: 95%;
+    padding: 2px;
 }
 
 .lib_itemlist div {
