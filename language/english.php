@@ -179,7 +179,6 @@ $LANG_LIB_HELP = array(
 'cat_group' => 'Select the category group. This can be used to limit read access to a specific group.',
 'cat_perms' => 'Select the permissions for this category. Only Read permission is used.',
 'cat_enabled' => 'Select whether this category is enabled. Disabling a category prevents any of its items from being displayed.',
-'mt_type' => 'Enter a name for this media type. This should be unique.',
 'add_instances' => 'Enter the number of instances to add for this item.',
 'checkin_instance' => 'Select the specific item instance to check in.',
 );

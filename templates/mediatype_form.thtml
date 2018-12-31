@@ -6,7 +6,7 @@
   <div class="uk-form-row">
     <label for="item_name" class="uk-form-label">
       {$LANG_LIB['type']}:
-      <i class="uk-icon uk-icon-question-circle tooltip" title="{$LANG_LIB_HELP['mt_type']}"></i>
+      <span id="hlp_mediatype" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls">
       <input required type="text" id="item_name" name="name" value="{name}" size="40" maxlength="255" />
@@ -23,4 +23,5 @@
     </div>
   </div>
 </form>
+{tooltipster}
 {# end {templatelocation} #}
