@@ -264,7 +264,11 @@ class MediaType
     {
         global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB;
 
-        $T = LIBRARY_getTemplate('mediatype_form', 'type');
+        $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
+        $T->set_file(array(
+            'type'  =>'mediatype_form.thtml',
+            'tips'  => 'tooltipster.thtml',
+        ) );
 
         // If we have a nonzero media type ID, then we edit the existing record.
         // Otherwise, we're creating a new item.  Also set the $not and $items
@@ -281,7 +285,9 @@ class MediaType
             'action_url'    => $_CONF_LIB['admin_url'],
             'name'          => $this->name,
             'candelete'     => !$this->isNew && self::canDelete($this->id),
+            'doc_url'       => LIBRARY_getDocURL('cat_form.html', $_CONF['language']),
         ) );
+        $T->parse('tooltipster', 'tips');
         $retval .= $T->parse('output', 'type');
         $retval .= COM_endBlock();
         return $retval;
