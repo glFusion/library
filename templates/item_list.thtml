@@ -1,21 +1,21 @@
 {# begin {templatelocation} #}
 <div>
   <form action="{pi_url}/index.php" method="get">
-  {$LANG_LIB['search']}:&nbsp;
+  {lang_search}:&nbsp;
   <input type="text" name="query" value="{query}"><br />
-  {$LANG_LIB['sort']}:&nbsp;
+  {lang_sort}:&nbsp;
   <select name="sortdir" onchange="this.form.submit();">
-    <option value="ASC" {sortdir_asc_sel}>{$LANG_LIB['ascending']}</option>
-    <option value="DESC" {sortdir_desc_sel}>{$LANG_LIB['descending']}</option>
+    <option value="ASC" {sortdir_asc_sel}>{lang_ascending]}</option>
+    <option value="DESC" {sortdir_desc_sel}>{lang_descending}</option>
   </select> &nbsp;&nbsp;
   {$LANG_LIB['type']}:&nbsp;
   <select name="type" onchange="this.form.submit();">
-    <option value="0">-- {$LANG_LIB['all']} --</option>
+    <option value="0">-- {lang_all} --</option>
     {type_select}
   </select>&nbsp&nbsp;
   {$LANG_LIB['category']}:&nbsp;
   <select name="cat_id" onchange="this.form.submit();">
-    <option value="0">-- {$LANG_LIB['all']} --</option>
+    <option value="0">-- {lang_all} --</option>
     {cat_select}
   </select>
 
@@ -45,7 +45,7 @@
       </a>
 {!if can_edit}
       <a href="{site_admin_url}/plugins/library/index.php?edititem=x&id={id}">
-        <i class="uk-icon uk-icon-edit" data-uk-tooltip title="{$LANG_ADMIN['edit']}"></i>
+        <i class="uk-icon uk-icon-edit" data-uk-tooltip title="{lang_edit}"></i>
       </a>
 {!endif}
       <br />

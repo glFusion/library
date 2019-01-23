@@ -10,7 +10,7 @@
  *              GNU Public License v2 or later
  * @filesource
  */
-
+use \Library\_;
 
 /**
  * Diaplay the product catalog items.
@@ -36,6 +36,13 @@ function LIBRARY_ItemList()
         'pi_url'        => $_CONF_LIB['url'],
         'type_select'   => Library\MediaType::buildSelection($med_type, true),
         'cat_select'    => Library\Category::buildSelection($cat_id),
+        'lang_search'   => _('Search'),
+        'lang_all'      => _('All'),
+        'lang_ascending' => _('Ascending'),
+        'lang_descending' => _('Descending'),
+        'lang_category' => _('Category'),
+        'lang_edit' => _('Edit'),
+        'lang_sort' => _('Sort'),
         //'is_librarian'  => plugin_ismoderatorator_library(),
     ) );
     $user_groups = implode(', ', $_GROUPS);
@@ -437,8 +444,7 @@ function LIBRARY_userSelect($item_id='')
             } else {
                 $sel = '';
             }
-            //$userdisplay = "{$A['fullname']} ({$A['username']}) &lt;== " . $LANG_LIB['next_on_list'];
-            $userdisplay = "{$A['fullname']} ({$A['username']}) &lt;== " . __('Next on Waiting List', 'library');
+            $userdisplay = "{$A['fullname']} ({$A['username']}) &lt;== " . _('Next on Waiting List');
             $retval .= "<option value='{$A['uid']}' $sel>$userdisplay</option>\n";
         }
     }

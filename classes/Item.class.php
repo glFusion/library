@@ -426,8 +426,7 @@ class Item
         if ($id != '') {
             // If an id is passed in, then read that record
             if (!$this->Read($id)) {
-                return LIBRARY_errorMessage(__('Invalid Item ID', 'library'), 'info');
-                //return LIBRARY_errorMessage($LANG_LIB['invalid_item_id'], 'info');
+                return LIBRARY_errorMessage(_('Invalid Item ID'), 'info');
             }
         }
         $id = $this->id;
@@ -438,9 +437,9 @@ class Item
         ) );
         $action_url = $_CONF_LIB['admin_url'] . '/index.php';
         if ($this->oldid != '') {
-            $retval = COM_startBlock(__('Edit', 'library') . ': ' . $this->name);
+            $retval = COM_startBlock(_('Edit') . ': ' . $this->name);
         } else {
-            $retval = COM_startBlock(__('New Item', 'library'));
+            $retval = COM_startBlock(_('New Item'));
         }
 
         // Set up the wysiwyg editor, if available
@@ -463,7 +462,7 @@ class Item
         $total_instances = count(Instance::getAll($this->id));
 
         $T->set_var(array(
-            'lang_item_info' => __('Item Information', 'library'),
+            'lang_item_info' => _('Item Information'),
             'oldid'         => $this->oldid,
             'dt_add'        => $this->dt_add,
             'id'            => $this->id,
@@ -643,7 +642,7 @@ class Item
         USES_lib_comments();
 
         if ($this->id == '') {
-            return LIBRARY_errorMessage(__('Invalid Item ID', 'library'), 'info');
+            return LIBRARY_errorMessage(_('Invalid Item ID'), 'info');
         }
 
         $retval = COM_startBlock();
@@ -831,7 +830,7 @@ class Item
         if (!$this->canCheckout()) {
             $can_reserve = false;
             $is_reserved = false;
-            $reserve_txt = __('Login Required', 'library');
+            $reserve_txt = _('Login Required');
             $waitlisters = 0;
             $user_wait_items = 0;
             $waitlist_txt = '';
@@ -839,12 +838,12 @@ class Item
             $waitlist_pos = Waitlist::getUserPosition($this->id, $_USER['uid']);
             //$waitlisters = Waitlist::countByItem($this->id);
             $user_wait_items = Waitlist::countByUser($_USER['uid']);
-            $reserve_txt = $waitlisters ? sprintf(__('Pending reservations: %d', 'library'), $waitlisters) : '';
+            $reserve_txt = $waitlisters ? sprintf(_('Pending reservations: %d'), $waitlisters) : '';
             $waitlist_txt = '';
             if ($waitlist_pos > 0) {
                 $can_reserve = false;
                 $is_reserved = true;
-                $waitlist_txt = sprintf(__('You\'re #%d on the waiting list', 'library'), $waitlist_pos);
+                $waitlist_txt = sprintf(_('You\'re #%d on the waiting list'), $waitlist_pos);
             } else {
                 $can_reserve = $user_wait_items < $_CONF_LIB['max_wait_items'] ? true : false;
                 $is_reserved = false;
@@ -856,22 +855,22 @@ class Item
         $all_checked_out= Instance::countByUser($_USER['uid']);
         if ($item_checked_out) {
         //if ($all_checked_out >= $this->user_ckout_limit) {
-            $avail_txt = __('by you', 'library');
+            $avail_txt = _('by you');
             $can_reserve = false;
             $wait_action_txt = '';
             $reserve_txt = '';
         } else {
             if ($num_avail > 0) {
                 if (($user_wait_items + $all_checked_out) < $_CONF_LIB['max_wait_items']) {
-                    $avail_txt = sprintf(__('%d available', 'library'), $num_avail);
+                    $avail_txt = sprintf(_('%d available'), $num_avail);
                 } elseif (!$is_reserved) {
-                    $avail_txt = sprintf(__('You can reserve up to <br />%d items at a time.', 'library'), $_CONF_LIB['max_wait_items']);
+                    $avail_txt = sprintf(_('You can reserve up to <br />%d items at a time.'), $_CONF_LIB['max_wait_items']);
                     $can_reserve = false;
                 } else {
                     $avail_txt = '';
                 }
             } else {
-                $avail_txt = __('Checked Out', 'library');
+                $avail_txt = _('Checked Out');
                 $avail_icon = 'red.png';
             }
         }
@@ -897,8 +896,8 @@ class Item
             'iconset'       => $_CONF_LIB['_iconset'],
             'can_checkout'  => ($total_instances - $checkedout),
             'can_checkin'   => $can_checkin,
-            'num_avail'     => sprintf(__('%d available', 'library'), count($avail) . '/' . $total_instances),
-            'lang_add_waitlist' => __('Place your reservation', 'library'),
+            'num_avail'     => sprintf(_('%d available'), count($avail) . '/' . $total_instances),
+            'lang_add_waitlist' => _('Place your reservation'),
         ) );
         $T->parse('output', 'avail');
         $retval = $T->finish($T->get_var('output'));
@@ -1028,12 +1027,12 @@ class Item
             $due = $due->format('Y-m-d', true);
 
             $opts .= '<option value="' . $inst->instance_id . '">' .
-                $username . ' - ' . __('Due Date', 'library') . ': ' . $due .
+                $username . ' - ' . _('Due Date') . ': ' . $due .
                 '</option>';
         }
         $T = LIBRARY_getTemplate('checkin_form', 'form');
         $T->set_var(array(
-            'title'         => __('Library Administration', 'library'),
+            'title'         => _('Library Administration'),
             'action_url'    => $_CONF_LIB['admin_url'] . '/index.php',
             'pi_url'        => $_CONF_LIB['url'],
             'item_id'       => $I->id,
@@ -1081,7 +1080,7 @@ class Item
 
         $T = LIBRARY_getTemplate('checkout_form', 'form');
         $T->set_var(array(
-            'title'         => __('Library Administration', 'library'),
+            'title'         => _('Library Administration'),
             'action_url'    => $_CONF_LIB['admin_url'] . '/index.php',
             'pi_url'        => $_CONF_LIB['url'],
             'item_id'       => $I->id,

@@ -1,0 +1,243 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-01-23 15:13-0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: functions.inc:179 functions.inc:562 functions.inc:622
+msgid "Library"
+msgstr ""
+
+#: functions.inc:485
+msgid "You do not have access to this page."
+msgstr ""
+
+#: functions.inc:486
+msgid ""
+"If you believe you have reached this message in error, please contact your "
+"site administrator."
+msgstr ""
+
+#: functions.inc:487
+msgid "All attempts to access this page are logged."
+msgstr ""
+
+#: functions.inc:489
+msgid "Access Denied"
+msgstr ""
+
+#: functions.inc:916
+msgid "Information"
+msgstr ""
+
+#: functions.inc:922
+msgid "Warning"
+msgstr ""
+
+#: functions.inc:928
+msgid "Alert"
+msgstr ""
+
+#: classes/Item.class.php:429 classes/Item.class.php:645
+msgid "Invalid Item ID"
+msgstr ""
+
+#: classes/Item.class.php:440 admin/index.php:384 admin/index.php:742
+#: admin/index.php:833 admin/index.php:885 admin/index.php:958
+msgid "Edit"
+msgstr ""
+
+#: classes/Item.class.php:442 admin/index.php:465
+msgid "New Item"
+msgstr ""
+
+#: classes/Item.class.php:465
+msgid "Item Information"
+msgstr ""
+
+#: classes/Item.class.php:833
+msgid "Login Required"
+msgstr ""
+
+#: classes/Item.class.php:841
+#, php-format
+msgid "Pending reservations: %d"
+msgstr ""
+
+#: classes/Item.class.php:846
+#, php-format
+msgid "You're #%d on the waiting list"
+msgstr ""
+
+#: classes/Item.class.php:858
+msgid "by you"
+msgstr ""
+
+#: classes/Item.class.php:865 classes/Item.class.php:899
+#, php-format
+msgid "%d available"
+msgstr ""
+
+#: classes/Item.class.php:867
+#, php-format
+msgid "You can reserve up to <br />%d items at a time."
+msgstr ""
+
+#: classes/Item.class.php:873 admin/index.php:325 admin/index.php:629
+msgid "Checked Out"
+msgstr ""
+
+#: classes/Item.class.php:900
+msgid "Place your reservation"
+msgstr ""
+
+#: classes/Item.class.php:1030 admin/index.php:329
+msgid "Due Date"
+msgstr ""
+
+#: classes/Item.class.php:1035 classes/Item.class.php:1083 admin/index.php:721
+msgid "Library Administration"
+msgstr ""
+
+#: library_functions.inc.php:440
+msgid "Next on Waiting List"
+msgstr ""
+
+#: admin/index.php:113
+msgid "Category has related products, can't delete."
+msgstr ""
+
+#: admin/index.php:149
+msgid "The submitted form has missing or invalid fields"
+msgstr ""
+
+#: admin/index.php:317
+msgid "Item ID"
+msgstr ""
+
+#: admin/index.php:321
+msgid "Check out to user"
+msgstr ""
+
+#: admin/index.php:333 admin/index.php:428
+msgid "Check In"
+msgstr ""
+
+#: admin/index.php:337 admin/index.php:432 admin/index.php:769
+#: admin/index.php:894 admin/index.php:971
+msgid "Delete"
+msgstr ""
+
+#: admin/index.php:389
+msgid "Copy"
+msgstr ""
+
+#: admin/index.php:394 admin/index.php:748
+msgid "ID"
+msgstr ""
+
+#: admin/index.php:398 admin/index.php:753
+msgid "Enabled"
+msgstr ""
+
+#: admin/index.php:403
+msgid "Item Name"
+msgstr ""
+
+#: admin/index.php:407 admin/index.php:890
+msgid "Media Type"
+msgstr ""
+
+#: admin/index.php:411 admin/index.php:759
+msgid "Category"
+msgstr ""
+
+#: admin/index.php:415 admin/index.php:636
+msgid "Available"
+msgstr ""
+
+#: admin/index.php:420
+msgid "History"
+msgstr ""
+
+#: admin/index.php:424
+msgid "Check Out"
+msgstr ""
+
+#: admin/index.php:522 admin/index.php:591 admin/index.php:854
+#: admin/index.php:969
+msgid "Are you sure you want to delete this item?"
+msgstr ""
+
+#: admin/index.php:524 admin/index.php:593 admin/index.php:856
+msgid "Delete Item"
+msgstr ""
+
+#: admin/index.php:565
+msgid "View Instances"
+msgstr ""
+
+#: admin/index.php:611
+msgid "View Item"
+msgstr ""
+
+#: admin/index.php:617 admin/index.php:704
+msgid "Media Types"
+msgstr ""
+
+#: admin/index.php:626 admin/index.php:709
+msgid "Overdue"
+msgstr ""
+
+#: admin/index.php:633
+msgid "Waitlisted"
+msgstr ""
+
+#: admin/index.php:666
+msgid "View History"
+msgstr ""
+
+#: admin/index.php:694
+msgid "Item List"
+msgstr ""
+
+#: admin/index.php:699
+msgid "Categories"
+msgstr ""
+
+#: admin/index.php:714
+msgid "Admin Home"
+msgstr ""
+
+#: admin/index.php:764
+msgid "Description"
+msgstr ""
+
+#: admin/index.php:796
+msgid "New Category"
+msgstr ""
+
+#: admin/index.php:861
+msgid "Cannot delete categories that are in use."
+msgstr ""
+
+#: admin/index.php:923
+msgid "New Media Type"
+msgstr ""
+
+#: admin/index.php:977
+msgid "In Use"
+msgstr ""
