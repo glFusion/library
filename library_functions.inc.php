@@ -26,7 +26,7 @@ function LIBRARY_ItemList()
         'item'      => 'item_list.thtml',
         'formjs'    => 'checkinout_js.thtml',
     ) );
-    $sortby = 'name';
+    $sortby = 'title';
     $sortdir = isset($_GET['sortdir']) && $_GET['sortdir'] == 'DESC' ? 'DESC' : 'ASC';
     $url_opts = '&sortdir=' . $sortdir;
     $med_type = isset($_GET['type']) ? (int)$_GET['type'] : 0;
@@ -154,24 +154,24 @@ function LIBRARY_ItemList()
         // Highlight the query terms if coming from a search
         if (!empty($query)) {
             $url_opts .= '&query=' . urlencode($query);
-            $hi_name = COM_highlightQuery(htmlspecialchars($P->name),
+            $hi_name = COM_highlightQuery(htmlspecialchars($P->title),
                         $query);
             $l_desc = COM_highlightQuery(htmlspecialchars($P->dscp),
                         $query);
-            $s_desc = COM_highlightQuery(htmlspecialchars($P->short_dscp),
+            $subtitle = COM_highlightQuery(htmlspecialchars($P->subtitle),
                         $query);
         } else {
-            $hi_name = htmlspecialchars($P->name);
+            $hi_name = htmlspecialchars($P->title);
             $l_desc = htmlspecialchars($P->dscp);
-            $s_desc = htmlspecialchars($P->short_dscp);
+            $subtitle = htmlspecialchars($P->subtitle);
         }
 
         $T->set_var(array(
             'id'        => $A['id'],
-            'name'      => $P->name,
+            'title'     => $P->title,
             'hi_name'   => $hi_name,
-            'dscp' => PLG_replacetags($l_desc),
-            'short_dscp' => $s_desc,
+            'dscp'      => PLG_replacetags($l_desc),
+            'subtitle'  => $subtitle,
             'img_cell_width' => ($_CONF_LIB['max_thumb_size'] + 20),
             'avail_blk' => $P->AvailBlock(),
             'author'    => $P->author,
@@ -290,19 +290,19 @@ function LIBRARY_notifyWaitlist($id = '')
         'username'      => $username,
         'pi_url'        => $_CONF_LIB['url'],
         'item_id'       => $A['item_id'],
-        'item_descrip'  => $A['name'],
+        'item_descrip'  => $A['title'],
         'daysonhold'    => $daysonhold,
     ) );
     $T->parse('output','message');
     $message = $T->finish($T->get_var('output'));
 
     COM_mail(
-            $A['email'],
-            "{$LANG['subj_item_avail']}",
-            "$message",
-            "{$_CONF['site_name']} <{$_CONF['site_mail']}>",
-            true
-        );
+        $A['email'],
+        $LANG['subj_item_avail'],
+        $message,
+        "{$_CONF['site_name']} <{$_CONF['site_mail']}>",
+        true
+    );
 }
 
 
@@ -341,7 +341,7 @@ function LIBRARY_notifyLibrarian($item_id, $uid)
     if ($Item->isNew) return;   // invalid item id
 
     $msg = '<p>Someone has requested a library item.</p>' . LB .
-        '<p>Item Name: ' . $Item->name . '</p>' . LB .
+        '<p>Item Name: ' . $Item->title . '</p>' . LB .
         '<p>Requested By: ' . $user . '</p>' . LB;
 
     while ($A = DB_fetchArray($res, false)) {

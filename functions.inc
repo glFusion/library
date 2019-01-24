@@ -399,8 +399,11 @@ function plugin_autotags_library ($op, $content = '', $autotag = '') {
         // Allow the author to use different text for the link.  Default
         // is the stored product name.
         if (empty($autotag['parm2'])) {
-            $linktext = stripslashes(DB_getItem($_TABLES['library.items'],
-                        'name', "id = '$id'"));
+            $linktext = stripslashes(DB_getItem(
+                $_TABLES['library.items'],
+                'title',
+                "id = '$id'"
+            ));
         } else {
             $linktext = $autotag['parm2'];
         }
@@ -724,16 +727,16 @@ function plugin_getiteminfo_library($id, $what, $uid=0, $options=array())
             $fields[] = 'id';
             break;
         case 'title':
-            $fields[] = 'name';
+            $fields[] = 'title';
             break;
         case 'content':
         case 'description':
-            $fields[] = 'short_dscp';
+            $fields[] = 'subtitle';
             $fields[] = 'dscp';
             break;
         case 'searchidx':
-            $fields[] = 'name';
-            $fields[] = 'short_dscp';
+            $fields[] = 'title';
+            $fields[] = 'subtitle';
             $fields[] = 'dscp';
             $fields[] = 'keywords';
             $fields[] = 'publisher';
@@ -776,10 +779,10 @@ function plugin_getiteminfo_library($id, $what, $uid=0, $options=array())
                 break;
             case 'excerpt':
             case 'content':
-                $props[$p] = $A['name'] . ' ' . $A['short_dscp'] . ' ' . $A['dscp'];
+                $props[$p] = $A['title'] . ' ' . $A['subtitle'] . ' ' . $A['dscp'];
                 break;
             case 'title':
-                $props[$p] = $A['name'];
+                $props[$p] = $A['title'];
                 break;
             case 'author':
             case 'author_name':
@@ -789,7 +792,7 @@ function plugin_getiteminfo_library($id, $what, $uid=0, $options=array())
                 $props[$p] = $A['dt_add'];
                 break;
             case 'searchidx':
-                $props[$p] = $A['name'] . ' ' . $A['short_dscp'] . ' ' .
+                $props[$p] = $A['title'] . ' ' . $A['subtitle'] . ' ' .
                         $A['dscp'] . ' ' . $A['keywords'] . ' ' . $A['publisher'] .
                         ' ' . $A['author'];
                 break;
