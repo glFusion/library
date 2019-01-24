@@ -7,36 +7,35 @@
   {reserve_txt}<br />
 {!endif}
 {!if can_reserve}
-    <a href="{pi_url}/index.php?addwait=x&id={id}">
+  <a href="{pi_url}/index.php?addwait=x&id={id}">
     <button class="uk-button uk-button-success">{lang_add_waitlist}</button>
-    </a>
+  </a>
 {#        onclick="javascript:LIBR_ajaxReserve('{id}', 'addwait');">{lang_add_waitlist}</button>#}
 {!endif}
 {!if is_reserved}
   {waitlist_txt}<br />
-    <a href="{pi_url}/index.php?rmvwait=x&id={id}">
+  <a href="{pi_url}/index.php?rmvwait=x&id={id}">
     <button class="uk-button uk-button-danger">{lang_click_to_remove}</button>
-    </a>
+  </a>
 {#        onclick="javascript:LIBR_ajaxReserve('{id}', 'rmvwait');">{lang_click_to_remove}</button>#}
 {!endif}
 {!if is_librarian}
   <div style="margin-left:5px;margin-right:5px;text-align:center">
     <div style="float:left;width:16px;">
 {!if can_checkin}
-    <i data-uk-tooltip class="{iconset}-sign-in lib-icon-info"
+    <i data-uk-tooltip class="uk-icon uk-icon-sign-in lib-icon-info"
         title="{lang_checkin}"
         onclick="javascript:showCheckInOutForm('{id}', 'checkin');"></i>
 {!endif}
     </div>
     <div style="float:right;width:16px;">
 {!if can_checkout}
-    <i data-uk-tooltip class="{iconset}-sign-out lib-icon-info"
+    <i data-uk-tooltip class="uk-icon uk-icon-sign-out lib-icon-info"
         title="{lang_checkout}"
         onclick="javascript:showCheckInOutForm('{id}', 'checkout');"></i>
 {!endif}
     </div>
     <div style="display:inline;">{num_avail}</div>
-  </div>
   </div>
 {!endif}
 </div>
