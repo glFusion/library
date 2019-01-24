@@ -14,7 +14,7 @@
 /** Include required glFusion common functions */
 require_once '../../../lib-common.php';
 
-use \Library\_;
+use Library\_;
 
 // This is for administrators only.  It's called by Javascript,
 // so don't try to display a message

@@ -12,7 +12,7 @@
  * @filesource
  */
 
-use \Library\_;
+use Library\_;
 
 /** Import Required glFusion libraries */
 require_once('../../../lib-common.php');

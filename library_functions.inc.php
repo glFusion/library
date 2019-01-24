@@ -10,7 +10,7 @@
  *              GNU Public License v2 or later
  * @filesource
  */
-use \Library\_;
+use Library\_;
 
 /**
  * Diaplay the product catalog items.
