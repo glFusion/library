@@ -430,9 +430,10 @@ class Item
         }
         $id = $this->id;
 
-        $T = LIBRARY_getTemplate(array(
-            'product'   => 'item_form',
-            'tips'      => 'tooltipster',
+        $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
+        $T->set_file(array(
+            'product'   => 'item_form.thtml',
+            'tips'      => 'tooltipster.thtml',
         ) );
         $action_url = $_CONF_LIB['admin_url'] . '/index.php';
         if ($this->oldid != '') {
@@ -670,7 +671,11 @@ class Item
         }
 
         $retval = COM_startBlock();
-        $T = LIBRARY_getTemplate('item_detail', 'item');
+        $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
+        $T->set_file(array(
+            'item' => 'item_detail.thtml',
+            'formjs' => 'checkinout_js.thtml',
+        ) );
 
         // Highlight the query terms if coming from a search
         if (isset($_REQUEST['query']) && !empty($_REQUEST['query'])) {
@@ -760,6 +765,10 @@ class Item
             $T->set_var('rating_bar', $rating_box);
         } else {
             $T->set_var('ratign_bar', '');
+        }
+
+        if (plugin_ismoderator_library()) {
+            $T->parse('checkinout_js', 'formjs');
         }
 
         $retval .= $T->parse('output', 'item');
@@ -853,7 +862,8 @@ class Item
     {
         global $_TABLES, $_USER, $_CONF_LIB;
 
-        $T = LIBRARY_getTemplate('avail_block', 'avail');
+        $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
+        $T->set_file('avail', 'avail_block.thtml');
         $avail = Instance::getAll($this->id, LIB_STATUS_AVAIL);
         $waitlisters = Waitlist::countByItem($this->id);
         $num_avail = max(count($avail) - $waitlisters, 0);
@@ -905,8 +915,7 @@ class Item
             }
         }
         $total_instances = count(self::getInstances($this->id));
-        $checkedout = count(self::getInstances($this->id, LIB_STATUS_OUT));
-        if ($total_instances > $checkedout) {
+        if ($total_instances > count($avail)) {
             $can_checkin = true;
         } else {
             $can_checkin = false;
@@ -923,8 +932,7 @@ class Item
             'pi_url'        => $_CONF_LIB['url'],
             'pi_admin_url'  => $_CONF_LIB['admin_url'],
             'is_librarian'  => plugin_ismoderator_library(),
-            'iconset'       => $_CONF_LIB['_iconset'],
-            'can_checkout'  => ($total_instances - $checkedout),
+            'can_checkout'  => count($avail),
             'can_checkin'   => $can_checkin,
             'num_avail'     => sprintf(_('%s available'), count($avail) . '/' . $total_instances),
             'lang_add_waitlist' => _('Place your reservation'),
@@ -1064,7 +1072,8 @@ class Item
                 $username . ' - ' . _('Due Date') . ': ' . $due .
                 '</option>';
         }
-        $T = LIBRARY_getTemplate('checkin_form', 'form');
+        $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
+        $T->set_file('form', 'checkin_form.thtml');
         $T->set_var(array(
             'title'         => _('Library Administration'),
             'action_url'    => $_CONF_LIB['admin_url'] . '/index.php',
@@ -1118,7 +1127,8 @@ class Item
             $I->maxcheckout = (int)$_CONF_LIB['maxcheckout'];
         }
 
-        $T = LIBRARY_getTemplate('checkout_form', 'form');
+        $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
+        $T->set_file('form', 'checkout_form.thtml');
         $T->set_var(array(
             'title'         => _('Library Administration'),
             'action_url'    => $_CONF_LIB['admin_url'] . '/index.php',

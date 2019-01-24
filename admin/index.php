@@ -515,7 +515,7 @@ function LIBRARY_getAdminField_Instance($fieldname, $fieldvalue, $A, $icon_arr)
     case 'delete':
         if ($A['uid'] == 0) {
             $retval .= COM_createLink(
-                '<i class="' . LIBRARY_getIcon('trash-o', 'danger') . '"></i>',
+                '<i class="uk-icon uk-icon-trash-o uk-text-danger"></i>',
                 $_CONF_LIB['admin_url']. '/index.php?deleteinstance=x&amp;id=' . $A['instance_id'],
                 array(
                     'onclick'=>'return confirm(\''.
@@ -569,14 +569,14 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
 
     case 'edit':
         $retval .= COM_createLink(
-                '<i class="' . LIBRARY_getIcon('edit') . '"></i>',
+                '<i class="uk-icon uk-icon-edit"></i>',
                 $_CONF_LIB['admin_url'] . "/index.php?edititem=x&amp;id={$A['id']}"
             );
         break;
 
     case 'copy':
         $retval .= COM_createLink(
-                '<i class="' . LIBRARY_getIcon('copy') . '"></i>',
+                '<i class="uk-icon uk-icon-copy"></i>',
                 $_CONF_LIB['admin_url'] . "/index.php?copyitem=x&amp;id={$A['id']}"
             );
         break;
@@ -584,7 +584,7 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
     case 'delete':
         if (!Library\Item::isUsed($A['id'])) {
             $retval .= COM_createLink(
-                    '<i class="' . LIBRARY_getIcon('trash-o', 'danger') . '"></i>',
+                    '<i class="uk-icon uk-icon-trash-o uk-text-danger"></i>',
                 $_CONF_LIB['admin_url']. '/index.php?deleteitem=x&amp;id=' . $A['id'],
                 array(
                     'onclick'=>'return confirm(\'' .
@@ -638,7 +638,7 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
             $cls = 'unknown';
             $msg = '';
         }
-        $retval .= '<i class="' . LIBRARY_getIcon('circle', $cls) .
+        $retval .= '<i class="uk-icon uk-icon-circle uk-icon-' . $cls .
             '" title="' . $msg . '" class="tooltip"></i>';
         break;
 
@@ -828,7 +828,7 @@ function LIBRARY_getAdminField_Category($fieldname, $fieldvalue, $A, $icon_arr)
     switch($fieldname) {
     case 'edit':
         $retval .= COM_createLink(
-            '<i class="' . LIBRARY_getIcon('edit') . '"></i>',
+            '<i class="uk-icon uk-icon-edit"></i>',
             $_CONF_LIB['admin_url'] . "/index.php?mode=editcat&amp;id={$A['cat_id']}",
             array(
                 'title' => _('Edit'),
@@ -848,7 +848,7 @@ function LIBRARY_getAdminField_Category($fieldname, $fieldvalue, $A, $icon_arr)
     case 'delete':
         if (!Library\Category::isUsed($A['cat_id'])) {
             $retval .= COM_createLink(
-                '<i class="' . LIBRARY_getIcon('trash', 'danger') . '"></i>',
+                '<i class="uk-icon uk-icon-trash uk-text-danger"></i>',
                 $_CONF_LIB['admin_url']. '/index.php?deletecat&id=' . $A['cat_id'],
                 array(
                     'onclick' => 'return confirm(\'' .
@@ -952,7 +952,7 @@ function LIBRARY_getAdminField_MediaType($fieldname, $fieldvalue, $A, $icon_arr)
     switch($fieldname) {
     case 'edit':
         $retval = COM_createLink(
-                '<i class="' . LIBRARY_getIcon('edit') . '"></i>',
+                '<i class="uk-icon uk-icon-edit"></i>',
                 $_CONF_LIB['admin_url'] . "/index.php?editmedia=x&amp;id={$A['id']}",
                 array(
                     'class' => 'tooltip',

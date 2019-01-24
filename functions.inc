@@ -37,8 +37,6 @@ $_CONF_LIB['pi_path']= __DIR__;
 $_CONF_LIB['url'] = "{$_CONF['site_url']}/{$_CONF_LIB['pi_name']}";
 $_CONF_LIB['admin_url'] = "{$_CONF['site_admin_url']}/plugins/{$_CONF_LIB['pi_name']}";
 $_CONF_LIB['image_dir'] = $_CONF['path'] . 'data/library/images/items';
-$_CONF_LIB['_is_uikit'] = $_SYSTEM['framework'] == 'uikit' ? 'true' : '';
-$_CONF_LIB['_iconset'] = $_CONF_LIB['_is_uikit'] ? 'uk-icon uk-icon' : 'fa fa';
 
 //  Additional config items and table definitions are added here
 if (file_exists(__DIR__ . '/config.php')) {
@@ -1087,64 +1085,6 @@ function LIBRARY_dueDate($days = 0)
     global $_CONF_LIB;
     if ($days == 0) $days = $_CONF_LIB['maxcheckout'];
     return LIBRARY_now()->add(new \DateInterval("P{$days}D"));
-}
-
-
-/**
- * Get an icon from the CSS icon set, either UIkit or FontAwesome.
- *
- * @param   string  $name   Base name of icon, e.g. "edit" for "uk-icon-edit"
- * @param   string  $style  Style name from local CSS
- * @return  string      Class names for icon
- */
-function LIBRARY_getIcon($name, $style='info')
-{
-    global $_CONF_LIB;
-
-    if ($style != '')
-        $style = ' lib-icon-' . $style;
-    return $_CONF_LIB['_iconset'] . '-' . $name . $style;
-}
-
-
-/**
- * Helper function to get a template object.
- *
- * @param   string  $name   Base name of template file, e.g. "editor"
- * @param   string  $id     ID of template, e.g. "editform"
- * @param   string  $path   Optional path if not "templates/"
- * @return  string      Full filename, e.g. "editor.uikit.thtml"
- */
-function LIBRARY_getTemplate($name, $id='', $path='')
-{
-    global $_CONF_LIB;
-
-    $templates = array();
-
-    // Put parameters into an array if not already.
-    if (!is_array($name) && !empty($id)) {
-        $templates = array($id => $name);
-    } elseif (is_array($name)) {
-        $templates = $name;
-    }
-
-    // Add additional path info if needed
-    if (substr($path, 0, 9) != 'templates') {
-        $path = 'templates/' . $path;
-    }
-
-    // May use "switch" later, for now there are only two options
-    $tpltype = $_CONF_LIB['_is_uikit'] ? '' : '.legacy';
-    foreach ($templates as $t_id =>$t_name) {
-        if (file_exists(__DIR__ . "/$path/$t_name$tpltype.thtml")) {
-            $templates[$t_id] = "$t_name$tpltype.thtml";
-        } else {
-            $templates[$t_id] = "$t_name.thtml";
-        }
-    }
-    $T = new Template(__DIR__ . '/' . $path);
-    $T->set_file($templates);
-    return $T;
 }
 
 ?>

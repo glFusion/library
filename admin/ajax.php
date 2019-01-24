@@ -66,9 +66,14 @@ case 'toggle':
 case 'lookup':
     $isbn = isset($_POST['isbn']) ? $_POST['isbn'] : '';
     if (empty($isbn)) exit;
-    $status = LGLIB_invokeService('astore', 'getiteminfo',
-        array('keytype' => 'isbn', 'keyval' => $isbn),
-        $item, $svc_msg);
+    $status = PLGinvokeService('astore', 'getiteminfo',
+        array(
+            'keytype' => 'isbn',
+            'keyval' => $isbn,
+        ),
+        $item,
+        $svc_msg
+    );
     if ($status == PLG_RET_OK) {
         if (is_array($item)) $item = array_shift($item);
         if (is_array($item->EditorialReviews->EditorialReview)) {

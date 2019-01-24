@@ -264,7 +264,11 @@ class MediaType
     {
         global $_TABLES, $_CONF, $_CONF_LIB;
 
-        $T = LIBRARY_getTemplate('mediatype_form', 'type');
+        $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
+        $T->set_file(array(
+            'type'  =>'mediatype_form.thtml',
+            'tips'  => 'tooltipster.thtml',
+        ) );
 
         // If we have a nonzero media type ID, then we edit the existing record.
         // Otherwise, we're creating a new item.  Also set the $not and $items
@@ -286,7 +290,9 @@ class MediaType
             'lang_save'     => _('Save'),
             'lang_cancel'   => _('Cancel'),
             'lang_delete'   => _('Delete'),
+            'doc_url'       => LIBRARY_getDocURL('cat_form.html', $_CONF['language']),
         ) );
+        $T->parse('tooltipster', 'tips');
         $retval .= $T->parse('output', 'type');
         $retval .= COM_endBlock();
         return $retval;
@@ -295,19 +301,21 @@ class MediaType
 
     /**
      * Determine if this media type is associated with any items.
+     * Caches the result for an ID since this might be called standalone
+     * and also by canDelete().
      *
      * @param   integer $id     Media Type ID
      * @return  boolean True if used, False if not
      */
-    public static function isUsed($id = 0)
+    public static function isUsed($id)
     {
         global $_TABLES;
 
-        // Check if any products are under this media type
-        if (DB_count($_TABLES['library.items'], 'type', $id) > 0) {
-            return true;
+        static $ids = array();
+        if (!isset($ids[$id])) {
+            $ids[$id] = (int)DB_count($_TABLES['library.items'], 'type', $id);
         }
-        return false;
+        return ($ids[$id] > 0);
     }
 
 
@@ -369,6 +377,21 @@ class MediaType
         }
         return $retval;
     }
+
+
+    /**
+     * Determine if a specified media type can be deleted.
+     * There must be one media type, so check that the ID is greater than one
+     * and that it is not used by any items.
+     *
+     * @param   integer $id     Media type ID to check
+     * @return  boolean     True if the type can be deleted
+     */
+    public static function canDelete($id)
+    {
+        return ($id > 1) && !self::isUsed($id);
+    }
+
 
 }   // class MediaType
 

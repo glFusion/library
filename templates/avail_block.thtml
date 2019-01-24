@@ -37,6 +37,7 @@
     </div>
     <div style="display:inline;">{num_avail}</div>
   </div>
+  </div>
 {!endif}
 </div>
 
