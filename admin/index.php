@@ -974,7 +974,7 @@ function LIBRARY_history($item_id)
             ON t.doneby = uby.uid
         WHERE t.item_id = '$item_id'";
 
-    $item_name = DB_getItem($_TABLES['library.items'], 'name', "id='$item_id'");
+    $item_name = DB_getItem($_TABLES['library.items'], 'title', "id='$item_id'");
 
     $base_url = $_CONF_LIB['admin_url'];
 

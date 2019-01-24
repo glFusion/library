@@ -16,7 +16,7 @@
       {$LANG_LIB['item_name']}:
     </label>
     <div class="uk-form-controls">
-      {item_name}
+      {title}
     </div>
   </div>
 

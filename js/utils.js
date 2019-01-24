@@ -53,8 +53,8 @@ var LIBR_astoreLookup = function(isbn) {
                 if (res.error == '') {
                     LIBR_updateField(res.by_statement, "author");
                     LIBR_updateField(res.publisher, "publisher");
-                    LIBR_updateField(res.title, "item_name");
-                    LIBR_updateField(res.dscp, "dscp");
+                    LIBR_updateField(res.title, "f_title");
+                    LIBR_updateField(res.dscp, "f_dscp");
                     if (window.CKEDITOR) {
                         CKEDITOR.instances["dscp"].setData(res.dscp);
                     }
