@@ -64,7 +64,7 @@ case 'toggle':
 case 'lookup':
     $isbn = isset($_POST['isbn']) ? $_POST['isbn'] : '';
     if (empty($isbn)) exit;
-    $status = PLGinvokeService('astore', 'getiteminfo',
+    $status = PLG_invokeService('astore', 'getiteminfo',
         array(
             'keytype' => 'isbn',
             'keyval' => $isbn,
