@@ -110,11 +110,13 @@ var LIBR_openlibLookup = function(isbn) {
         success: function(result, textStatus, jqXHR) {
             try {
                 var res = result[key];
+                console.log(res.title);
                 LIBR_updateField(res.by_statement, "author");
                 LIBR_updateField(res.publishers[0].name, "publisher");
-                LIBR_updateField(res.title, "item_name");
-                LIBR_updateField(res.subtitle, "short_desc");
+                LIBR_updateField(res.title, "f_title");
+                LIBR_updateField(res.subtitle, "f_subtitle");
                 LIBR_updateField(res.publish_date, "f_pub_date");
+                LIBR_updateField(res.excerpt, "f_dscp");
             }
             catch(err) {
                 console.log(data);
@@ -140,8 +142,10 @@ var LIBR_openlibLookup = function(isbn) {
 */
 function LIBR_updateField(value, elem_id)
 {
-    if (typeof(value) != "undefined")
+    console.log("Setting " + elem_id + " to " + value);
+    if (typeof(value) != "undefined") {
         document.getElementById(elem_id).value = value;
+    }
 }
 
 /**

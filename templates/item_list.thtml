@@ -31,7 +31,7 @@
     <div class="libListItemImage">
 {!if small_pic}
       <a href="{pi_url}/index.php?detail=x&id={id}{url_opts}">
-        <img src="{small_pic}" alt="{name}" style="border: none" />
+        <img src="{small_pic}" alt="{title}" style="border: none" />
       </a>
 {!else}
       &nbsp;
@@ -50,9 +50,6 @@
 {!endif}
       <br />
       {#<small>{id}</small><br />#}
-{!if short_dscp}
-        {short_dscp}<br />
-{!endif}
 {!if publisher}
         {publisher}<br />
 {!endif}

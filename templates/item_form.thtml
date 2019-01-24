@@ -45,7 +45,17 @@
         <span id="hlp_item_name" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls">
-      <input type="text" name="name" value="{name}" size="40" maxlength="255" />
+      <input type="text" id="f_title" name="title" value="{title}" size="40" maxlength="40" />
+    </div>
+  </div>
+
+  <div class="uk-form-row">
+    <label class="uk-form-label">
+      {$LANG_LIB['subtitle']}:
+        <span id="hlp_subtitle" class="tooltip_cfg tooltipstered"></span>
+    </label>
+    <div class="uk-form-controls">
+      <input type="text" id="f_subtitle" name="subtitle" value="{subtitle}" size="40" maxlength="128" />
     </div>
   </div>
 
@@ -109,7 +119,7 @@
         <span id="hlp_dscp" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls">
-      <textarea id="dscp" name="dscp" cols="35" rows="10" style="width:70%">{dscp}</textarea>
+      <textarea id="f_dscp" name="dscp" cols="35" rows="10" style="width:70%">{dscp}</textarea>
     </div>
   </div>
 

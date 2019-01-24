@@ -278,7 +278,7 @@ function LIBRARY_adminlist_Instances($item_id=0, $status=0)
 
     $display = '';
 
-    $sql = "SELECT inst.*, item.name FROM {$_TABLES['library.instances']} inst
+    $sql = "SELECT inst.*, item.title FROM {$_TABLES['library.instances']} inst
             LEFT JOIN {$_TABLES['library.items']} item
                 ON item.id = inst.item_id ";
     $stat_join = '';
@@ -399,7 +399,7 @@ function LIBRARY_adminlist_Items($cat_id = 0, $status = 0)
                 'align' => 'center',
             ),
         array(  'text'  => _('Item Name'),
-                'field' => 'name',
+                'field' => 'title',
                 'sort'  => true,
             ),
         array(  'text'  => _('Media Type'),
@@ -604,9 +604,10 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
                 onclick='LIBR_toggle(this,\"{$A['id']}\",\"enabled\",\"item\");'>".LB;
         break;
 
-    case 'name':
-        $retval = COM_createLink($fieldvalue,
-                $_CONF_LIB['url'] . '/index.php?detail=x&id=' . $A['id'],
+    case 'title':
+        $retval = COM_createLink(
+            $fieldvalue,
+            $_CONF_LIB['url'] . '/index.php?detail=x&id=' . $A['id'],
             array(
                 'title' => _('View Item'),
                 'class' => 'tooltip',

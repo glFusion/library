@@ -1,6 +1,9 @@
 {# begin {templatelocation} #}
 <div class="floatleft">
-    <h1>{name}</h1>
+    <h1>{title}</h1>
+{!if subtitle}
+    <h2><i>{subtitle}</i></h2>
+{!endif}
 </div>
 <div style="float:right;">
 {!if can_edit}
@@ -11,9 +14,6 @@
     <a href="{listing_url}">{lang_back_to_list}</a>
 </div>
 <div style="clear:both;margin-bottom:15px"">
-{!if short_dscp}
-    <strong>{short_dscp}</strong><br />
-{!endif}
 {!if publisher}
     <strong>{lang_publisher}:</strong>&nbsp;&nbsp;{publisher}<br />
 {!endif}

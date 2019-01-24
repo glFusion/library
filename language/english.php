@@ -27,6 +27,7 @@ $LANG_LIB = array (
 'mnu_admin'         => 'Admin',
 'item_id'           => 'Item ID or SKU',
 'item_name'         => 'Name or Title',
+'subtitle'          => 'Subtitle',
 'qty'               => 'Qty',
 'dscp'              => 'Description',
 'short_dscp'        => 'Short Description',

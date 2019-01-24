@@ -19,9 +19,9 @@ global $_TABLES;
 $_SQL = array();
 $_SQL['library.items'] = "CREATE TABLE `{$_TABLES['library.items']}` (
   `id` varchar(40) NOT NULL,
-  `name` varchar(128) NOT NULL,
+  `title` varchar(128) NOT NULL,
+  `subtitle` varchar(128) DEFAULT NULL,
   `cat_id` int(11) unsigned NOT NULL DEFAULT '0',
-  `short_dscp` varchar(255) NOT NULL DEFAULT '',
   `dscp` text,
   `keywords` varchar(255) DEFAULT '',
   `author` varchar(255) DEFAULT '',
@@ -40,7 +40,7 @@ $_SQL['library.items'] = "CREATE TABLE `{$_TABLES['library.items']}` (
   `votes` int(11) unsigned NOT NULL DEFAULT '0',
   `status` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `item_name` (`name`)
+  KEY `item_name` (`title`)
 ) ENGINE=MyISAM";
 
 $_SQL['library.instances'] = "CREATE TABLE `{$_TABLES['library.instances']}` (

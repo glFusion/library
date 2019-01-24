@@ -59,7 +59,8 @@ class Item
             $this->isNew = true;
             $this->id = COM_makeSid();
             $this->oldid = '';
-            $this->name = '';
+            $this->title = '';
+            $this->subtitle = '';
             $this->cat_id = '';
             $this->dscp= '';
             $this->publisher = '';
@@ -131,7 +132,8 @@ class Item
             break;
 
         case 'dscp':
-        case 'name':
+        case 'title':
+        case 'subtitle':
         case 'keywords':
         case 'publisher':
         case 'pub_date':
@@ -223,7 +225,8 @@ class Item
         $this->pub_date = $row['pub_date'];
         $this->author = $row['author'];
         $this->enabled = isset($row['enabled']) ? 1 : 0;
-        $this->name = $row['name'];
+        $this->title = $row['title'];
+        $this->subtitle = $row['subtitle'];
         $this->cat_id = $row['cat_id'];
         $this->daysonhold = $row['daysonhold'];
         $this->maxcheckout = $row['maxcheckout'];
@@ -306,7 +309,8 @@ class Item
                 $sql3 = " WHERE id = '" . DB_escapeString($this->oldid) . "'";
             }
             $sql2 = "id = '" . DB_escapeString($this->id) . "',
-                name='" . DB_escapeString($this->name) . "',
+                title ='" . DB_escapeString($this->title) . "',
+                subtitle ='" . DB_escapeString($this->subtitle) . "',
                 cat_id = '{$this->cat_id}',
                 type = '{$this->type}',
                 dscp = '" . DB_escapeString($this->dscp) . "',
@@ -404,7 +408,7 @@ class Item
     private function isValidRecord()
     {
         // Check that basic required fields are filled in
-        if ($this->name == '') {
+        if ($this->title == '') {
             return false;
         }
 
@@ -437,7 +441,7 @@ class Item
         ) );
         $action_url = $_CONF_LIB['admin_url'] . '/index.php';
         if ($this->oldid != '') {
-            $retval = COM_startBlock(_('Edit') . ': ' . $this->name);
+            $retval = COM_startBlock(_('Edit') . ': ' . $this->title);
         } else {
             $retval = COM_startBlock(_('New Item'));
         }
@@ -466,7 +470,8 @@ class Item
             'oldid'         => $this->oldid,
             'dt_add'        => $this->dt_add,
             'id'            => $this->id,
-            'name'          => htmlspecialchars($this->name),
+            'title'         => htmlspecialchars($this->title),
+            'subtitle'      => htmlspecialchars($this->subtitle),
             'category'      => $this->cat_id,
             'dscp'          => htmlspecialchars($this->dscp),
             'publisher'     => $this->publisher,
@@ -679,18 +684,19 @@ class Item
 
         // Highlight the query terms if coming from a search
         if (isset($_REQUEST['query']) && !empty($_REQUEST['query'])) {
-            $name = COM_highlightQuery($this->name,
-                $_REQUEST['query']);
-            $l_desc = COM_highlightQuery($this->dscp,
-                $_REQUEST['query']);
+            $title = COM_highlightQuery($this->title, $_REQUEST['query']);
+            $subtitle = COM_highlightQuery($this->subtitle, $_REQUEST['query']);
+            $l_desc = COM_highlightQuery($this->dscp, $_REQUEST['query']);
         } else {
-            $name = $this->name;
+            $title = $this->title;
+            $subtitle = $this->subtitle;
             $l_desc = $this->dscp;
         }
         $T->set_var(array(
             'user_id'           => $_USER['uid'],
             'id'                => $this->id,
-            'name'              => $name,
+            'title'             => $title,
+            'subtitle'          => $subtitle,
             'dscp'              => $l_desc,
             'img_cell_width'    => ($_CONF_LIB['max_thumb_size'] + 20),
             'pi_url'            => $_CONF_LIB['url'],
@@ -743,7 +749,7 @@ class Item
                 $mode = $this->comments_enabled;
             }
             $T->set_var('usercomments',
-                CMT_userComments($this->id, $this->name, 'library', '',
+                CMT_userComments($this->id, $this->title, 'library', '',
                     '', 0, 1, false, false, $mode));
         }
 
@@ -1079,7 +1085,8 @@ class Item
             'action_url'    => $_CONF_LIB['admin_url'] . '/index.php',
             'pi_url'        => $_CONF_LIB['url'],
             'item_id'       => $I->id,
-            'item_name'     => $I->name,
+            'title'         => $I->title,
+            'subtitle'      => $I->subtitle,
             'item_desc'     => $I->dscp,
             'instance_select' => $opts,
             'is_ajax'       => $ajax,
@@ -1134,7 +1141,8 @@ class Item
             'action_url'    => $_CONF_LIB['admin_url'] . '/index.php',
             'pi_url'        => $_CONF_LIB['url'],
             'item_id'       => $I->id,
-            'item_name'     => $I->name,
+            'title'         => $I->title,
+            'subtitle'      => $I->subtitle,
             'item_desc'     => $I->dscp,
             'user_select'   => LIBRARY_userSelect($I->id),
             'due'           => LIBRARY_dueDate($I->maxcheckout)->format('Y-m-d'),
