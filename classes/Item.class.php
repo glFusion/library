@@ -420,8 +420,7 @@ class Item
      */
     public function showForm($id = 0)
     {
-        global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB, $LANG24,
-                $LANG_postmodes;
+        global $_TABLES, $_CONF, $_CONF_LIB;
 
         if ($id != '') {
             // If an id is passed in, then read that record
@@ -493,6 +492,31 @@ class Item
                 $total_instances),
             'type_select'   => MediaType::buildSelection($this->type, false),
             'ena_chk'       => $this->enabled == 1 ? ' checked="checked"' : '',
+            'lang_add_instances' => _('Add Instances'),
+            'lang_search_openlib' => _('Search OpenLib'),
+            'lang_item_id'  => _('Item ID'),
+            'lang_item_info' => _('Item Information'),
+            'lang_item_name' => _('Item Name'),
+            'lang_category' => _('Category'),
+            'lang_author' => _('Author'),
+            'lang_publisher' => _('Publisher'),
+            'lang_pub_date' => _('Date Published'),
+            'lang_type' => _('Type'),
+            'lang_dscp' => _('Description'),
+            'lang_keywords' => _('Keywords'),
+            'lang_images' => _('Images'),
+            'lang_delete' => _('Delete'),
+            'lang_maxcheckout' => _('Max Checkout Days'),
+            'lang_daysonhold' => _('Days to hold for waitlist'),
+            'lang_enabled' => _('Enabled'),
+            'lang_comments' => _('Enable Comments'),
+            'lang_saveitem' => _('Save Item'),
+            'lang_clearform' => _('Reset Form'),
+            'lang_cancel' => _('Cancel'),
+            'lang_delete' => _('Delete'),
+            'lang_conf_del_item' => _('Are you sure you want to delete this item?'),
+            'lang_yes' => _('Yes'),
+            'lang_no' => _('No'),
         ) );
         if (!$this->isNew && !self::isUsed($this->id)) {
             $T->set_var('candelete', 'true');
@@ -637,7 +661,7 @@ class Item
      */
     public function Detail()
     {
-        global $_CONF, $_CONF_LIB, $_TABLES, $LANG_LIB, $_USER;
+        global $_CONF, $_CONF_LIB, $_TABLES, $_USER;
 
         USES_lib_comments();
 
@@ -671,6 +695,12 @@ class Item
             'author'            => $this->author,
             'listing_url'       => $this->ListingUrl,
             'can_edit'          => plugin_ismoderator_library(),
+            'lang_edit'         => _('Edit'),
+            'lang_back_to_list' => _('Back to List'),
+            'lang_publisher'    => _('Publisher'),
+            'lang_pub_date'     => _('Date Published'),
+            'lang_author'       => _('Author'),
+            'lang_click_to_enlarge' => _('Click to Enlarge Image'),
         ) );
 
         // Retrieve the photos and put into the template
@@ -821,7 +851,7 @@ class Item
      */
     public function AvailBlock()
     {
-        global $_TABLES, $LANG_LIB, $_USER, $_CONF_LIB;
+        global $_TABLES, $_USER, $_CONF_LIB;
 
         $T = LIBRARY_getTemplate('avail_block', 'avail');
         $avail = Instance::getAll($this->id, LIB_STATUS_AVAIL);
@@ -855,7 +885,7 @@ class Item
         $all_checked_out= Instance::countByUser($_USER['uid']);
         if ($item_checked_out) {
         //if ($all_checked_out >= $this->user_ckout_limit) {
-            $avail_txt = _('by you');
+            $avail_txt = _('Checked out by you');
             $can_reserve = false;
             $wait_action_txt = '';
             $reserve_txt = '';
@@ -896,8 +926,12 @@ class Item
             'iconset'       => $_CONF_LIB['_iconset'],
             'can_checkout'  => ($total_instances - $checkedout),
             'can_checkin'   => $can_checkin,
-            'num_avail'     => sprintf(_('%d available'), count($avail) . '/' . $total_instances),
+            'num_avail'     => sprintf(_('%s available'), count($avail) . '/' . $total_instances),
             'lang_add_waitlist' => _('Place your reservation'),
+            'lang_click_to_remove' => _('Cancel Reservation'),
+            'lang_checkin'  => _('Check In'),
+            'lang_checkout' => _('Check Out'),
+            'lang_due'      => _('Due'),
         ) );
         $T->parse('output', 'avail');
         $retval = $T->finish($T->get_var('output'));
@@ -1012,7 +1046,7 @@ class Item
      */
     public static function checkinForm($id, $ajax=false)
     {
-        global $_CONF, $LANG_LIB, $_CONF_LIB;
+        global $_CONF, $_CONF_LIB;
 
         $I = self::getInstance($id);
         if ($I->isNew || $I->id == '') {
@@ -1040,6 +1074,12 @@ class Item
             'item_desc'     => $I->dscp,
             'instance_select' => $opts,
             'is_ajax'       => $ajax,
+            'lang_item_id'  => _('Item ID'),
+            'lang_item_name' => _('Item Name'),
+            'lang_checkin'  => _('Check In'),
+            'lang_instance' => _('Instance'),
+            'lang_hlp_checkin_instance' => _('Select the specific item instance to check in.'),
+            'lang_cancel'   => _('Cancel'),
         ) );
         $T->parse('output', 'form');
         return $T->finish($T->get_var('output'));
@@ -1055,7 +1095,7 @@ class Item
      */
     public static function checkoutForm($id, $ajax=false)
     {
-        global $_CONF, $LANG_LIB, $_CONF_LIB;
+        global $_CONF, $_CONF_LIB;
 
         $I = self::getInstance($id);
         if ($I->isNew || $I->id == '') {
@@ -1090,6 +1130,14 @@ class Item
             'due'           => LIBRARY_dueDate($I->maxcheckout)->format('Y-m-d'),
             'iso_lang'      => $iso_lang,
             'is_ajax'       => $ajax,
+            'lang_item_id'  => _('Item ID'),
+            'lang_item_name' => _('Item Name'),
+            'lang_checkout_user' => _('Check out to user'),
+            'lang_checkout' => _('Check Out'),
+            'lang_dt_due'   => _('Date Due'),
+            'lang_hlp_checkout_user' => _('Select the user to check out this item. The user at the top of the waiting list is shown first.'),
+            'lang_hlp_dt_due' => _('Enter or select the due date for the item.'),
+            'lang_cancel'   => _('Cancel'),
         ) );
         $T->parse('output', 'form');
         return $T->finish($T->get_var('output'));

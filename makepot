@@ -1,1 +1,1 @@
-xgettext --lang=PHP -o messages.pot functions.inc `find . -name "*.php"`
+xgettext --lang=PHP -o library.pot functions.inc `find . -name "*.php"` --default-domain=library --from-code=UTF-8

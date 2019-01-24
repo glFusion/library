@@ -105,15 +105,13 @@ case 'deletecatimage':
     break;
 
 case 'deletecat':
-    if (!empty($LANG_LIB['deletecat'])) {
-        $C = \Library\Category::getInstance($_REQUEST['id']);
-        if (!$C->isUsed()) {
-            $C->Delete();
-        } else {
-            $content .= _("Category has related products, can't delete.");
-        }
-        $view = 'catlist';
+    $C = \Library\Category::getInstance($_REQUEST['id']);
+    if (!$C->isUsed()) {
+        $C->Delete();
+    } else {
+        $content .= _("Category has related products, can't delete.");
     }
+    $view = 'catlist';
     break;
 
 case 'delete_img':
@@ -276,7 +274,7 @@ exit;
  */
 function LIBRARY_adminlist_Instances($item_id=0, $status=0)
 {
-    global $_CONF, $_CONF_LIB, $_TABLES, $LANG_LIB, $_USER, $LANG_ADMIN;
+    global $_CONF, $_CONF_LIB, $_TABLES, $_USER;
 
     $display = '';
 
@@ -375,7 +373,7 @@ function LIBRARY_adminlist_Instances($item_id=0, $status=0)
  */
 function LIBRARY_adminlist_Items($cat_id = 0, $status = 0)
 {
-    global $_CONF, $_CONF_LIB, $_TABLES, $LANG_LIB, $_USER, $LANG_ADMIN;
+    global $_CONF, $_CONF_LIB, $_TABLES, $_USER;
 
     $sql = LIBRARY_admin_getSQL($cat_id, $status);
 
@@ -486,7 +484,7 @@ function LIBRARY_adminlist_Items($cat_id = 0, $status = 0)
  */
 function LIBRARY_getAdminField_Instance($fieldname, $fieldvalue, $A, $icon_arr)
 {
-    global $_CONF, $_CONF_LIB, $LANG_LIB, $_TABLES, $LANG_ADMIN;
+    global $_CONF, $_CONF_LIB, $_TABLES;
 
     $retval = '';
     static $usernames = array();
@@ -508,8 +506,10 @@ function LIBRARY_getAdminField_Instance($fieldname, $fieldvalue, $A, $icon_arr)
         break;
     case 'checkin':
         if ($A['uid'] > 0) {
-            $retval .= COM_createLink('CheckIn',
-                $_CONF_LIB['admin_url'] . '/index.php?checkinform=x&id=' . $A['item_id']);
+            $retval .= COM_createLink(
+                _('Check In'),
+                $_CONF_LIB['admin_url'] . '/index.php?checkinform=x&id=' . $A['item_id']
+            );
         }
         break;
     case 'delete':
@@ -549,7 +549,7 @@ function LIBRARY_getAdminField_Instance($fieldname, $fieldvalue, $A, $icon_arr)
  */
 function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
 {
-    global $_CONF, $_CONF_LIB, $LANG_LIB, $_TABLES, $LANG_ADMIN;
+    global $_CONF, $_CONF_LIB, $_TABLES;
 
     $retval = '';
 
@@ -644,17 +644,19 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
 
     case 'checkout':
         if ($avail > 0) {
-            $retval .= COM_createLink('CheckOut',
-                $_CONF_LIB['admin_url'] . '/index.php?checkoutform=x&id=' .
-                $A['id']);
+            $retval .= COM_createLink(
+                _('Check Out'),
+                $_CONF_LIB['admin_url'] . '/index.php?checkoutform=x&id=' . $A['id']
+            );
         }
         break;
 
     case 'checkin':
         if ($total > $avail) {
-            $retval .= COM_createLink('CheckIn',
-                $_CONF_LIB['admin_url'] . '/index.php?checkinform=x&id=' .
-                $A['id']);
+            $retval .= COM_createLink(
+                _('Check In'),
+                $_CONF_LIB['admin_url'] . '/index.php?checkinform=x&id=' . $A['id']
+            );
         }
         break;
 
@@ -686,7 +688,7 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
  */
 function LIBRARY_adminMenu($mode='')
 {
-    global $_CONF, $_CONF_LIB, $LANG_ADMIN, $LANG_LIB;
+    global $_CONF, $_CONF_LIB;
 
     $menu_arr = array(
         array(
@@ -720,8 +722,7 @@ function LIBRARY_adminMenu($mode='')
     $T->set_file('title', 'library_title.thtml');
     $T->set_var('title', _('Library Administration'));
     $retval = $T->parse('', 'title');
-    $retval .= ADMIN_createMenu($menu_arr, $LANG_LIB[$admin_hdr],
-            plugin_geticon_library());
+    $retval .= ADMIN_createMenu($menu_arr, '', plugin_geticon_library());
     return $retval;
 }
 
@@ -731,7 +732,7 @@ function LIBRARY_adminMenu($mode='')
  */
 function LIBRARY_adminlist_Category()
 {
-    global $_CONF, $_CONF_LIB, $_TABLES, $LANG_LIB, $_USER, $LANG_ADMIN;
+    global $_CONF, $_CONF_LIB, $_TABLES, $_USER;
 
     $display = '';
     $sql = "SELECT cat.cat_id, cat.cat_name, cat.dscp, cat.enabled
@@ -820,7 +821,7 @@ function LIBRARY_adminlist_Category()
  */
 function LIBRARY_getAdminField_Category($fieldname, $fieldvalue, $A, $icon_arr)
 {
-    global $_CONF, $_CONF_LIB, $LANG_LIB, $LANG_ADMIN;
+    global $_CONF, $_CONF_LIB;
 
     $retval = '';
 
@@ -875,7 +876,7 @@ function LIBRARY_getAdminField_Category($fieldname, $fieldvalue, $A, $icon_arr)
  */
 function LIBRARY_adminlist_MediaType()
 {
-    global $_CONF, $_CONF_LIB, $_TABLES, $LANG_LIB, $_USER, $LANG_ADMIN;
+    global $_CONF, $_CONF_LIB, $_TABLES, $_USER;
 
     $display = '';
     $sql = "SELECT  *
@@ -946,7 +947,7 @@ function LIBRARY_adminlist_MediaType()
  */
 function LIBRARY_getAdminField_MediaType($fieldname, $fieldvalue, $A, $icon_arr)
 {
-    global $_CONF, $_CONF_LIB, $LANG_LIB, $LANG_ADMIN;
+    global $_CONF, $_CONF_LIB;
 
     switch($fieldname) {
     case 'edit':
@@ -996,7 +997,7 @@ function LIBRARY_getAdminField_MediaType($fieldname, $fieldvalue, $A, $icon_arr)
  */
 function LIBRARY_history($item_id)
 {
-    global $_CONF, $_CONF_LIB, $_TABLES, $LANG_LIB, $_USER;
+    global $_CONF, $_CONF_LIB, $_TABLES, $_USER;
 
     $display = '';
     $item_id = COM_sanitizeId($item_id, false);
@@ -1016,19 +1017,19 @@ function LIBRARY_history($item_id)
     $base_url = $_CONF_LIB['admin_url'];
 
     $header_arr = array(
-        array(  'text'  => $LANG_LIB['datetime'],
+        array(  'text'  => _('Date/Time'),
                 'field' => 'dt',
                 'sort'  => true,
             ),
-        array(  'text'  => $LANG_LIB['action_hdr'],
+        array(  'text'  => _('Action'),
                 'field' => 'trans_type',
                 'sort' => true,
             ),
-        array(  'text'  => $LANG_LIB['by'],
+        array(  'text'  => _('By'),
                 'field' => 'doneby',
                 'sort'  => true,
             ),
-        array(  'text'  => $LANG_LIB['username'],
+        array(  'text'  => _('User Name'),
                 'field' => 'uid',
                 'sort' => true,
             ),
@@ -1040,7 +1041,7 @@ function LIBRARY_history($item_id)
     );
 
     $display .= COM_startBlock(
-        "{$LANG_LIB['trans_hist_title']} $item_name ($item_id)",
+        _('Transaction History for') . ": $item_name ($item_id)",
         '',
         COM_getBlockTemplate('_admin_block', 'header'));
 
@@ -1077,7 +1078,7 @@ function LIBRARY_history($item_id)
  */
 function LIBRARY_getTransHistoryField($fieldname, $fieldvalue, $A, $icon_arr)
 {
-    global $_CONF, $_CONF_LIB, $LANG_LIB;
+    global $_CONF, $_CONF_LIB;
 
     $retval = '';
 
@@ -1174,8 +1175,6 @@ function LIBRARY_admin_getSQL($cat_id, $status = 0)
  */
 function LIBRARY_itemStatusForm($status, $item_id = '')
 {
-    global $LANG_LIB;
-
     for ($i = 0; $i < 5; $i++) {
         ${'sel_' . $i} = $i == $status ? 'selected="selected"' : '';
     }
@@ -1183,11 +1182,11 @@ function LIBRARY_itemStatusForm($status, $item_id = '')
         'top'    =>
                 '<input type="hidden" name="item_id" value="' . $item_id . '" />' .
                 '<select name="status" onchange="this.form.submit();">' .
-                "<option value=\"0\" $sel_0>{$LANG_LIB['all']}</option>" .
-                "<option value=\"1\" $sel_1>{$LANG_LIB['available']}</option>" .
-                "<option value=\"2\" $sel_2>{$LANG_LIB['checkedout']}</option>" .
-                "<option value=\"3\" $sel_3>{$LANG_LIB['pending']}</option>" .
-                "<option value=\"4\" $sel_4>{$LANG_LIB['overdue']}</option>" .
+                "<option value=\"0\" $sel_0>" . _('All') . "</option>" .
+                "<option value=\"1\" $sel_1>" . _('Available') . "</option>" .
+                "<option value=\"2\" $sel_2>" . _('Checked Out') . "</option>" .
+                "<option value=\"3\" $sel_3>" . _('Pending') . "</option>" .
+                "<option value=\"4\" $sel_4>" . _('Overdue') . "</option>" .
                 '</select>' . LB,
     );
     return $form_arr;

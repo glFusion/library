@@ -72,7 +72,7 @@ case 'addwait':
         }
         echo COM_refresh($_CONF_LIB['url']);
     } else {
-        $content .= COM_showMessageText($LANG_LIB['access_denied']);
+        $content .= COM_showMessageText(\Library\_('Access Denied'));
         $view = 'itemlist';
     }
     break;
@@ -82,7 +82,7 @@ case 'rmvwait':
         Library\Waitlist::Remove($id);
         echo COM_refresh($_CONF_LIB['url']);
     } else {
-        $content .= COM_showMessageText($LANG_LIB['access_denied']);
+        $content .= COM_showMessageText(\Library\_('Access Denied'));
         $view = 'itemlist';
     }
     break;
@@ -95,7 +95,7 @@ default:
 switch ($page) {
 case 'history':
     $content .= LIBRARY_history();
-    $menu_opt = $LANG_LIB['purchase_history'];
+    $menu_opt = \Library\_('Purchase History');
     break;
 
 case 'detail':
@@ -108,22 +108,22 @@ case 'detail':
         $P->SetListUrl($_CONF_LIB['url'] . '/index.php?' . implode('&', $params));
     }
     $content .= $P->Detail();
-    $menu_opt = $LANG_LIB['item_list'];
+    $menu_opt = \Library\_('Item List');
     break;
 
 case 'itemlist':
 default:
     $cat = isset($_GET['category']) ? $_GET['category'] : 0;
     $content .= LIBRARY_ItemList($cat);
-    $menu_opt = $LANG_LIB['item_list'];
+    $menu_opt = \Library\_('Item List');
     break;
 }
 
 // Create the user menu
 $menu = array();
-$menu[$LANG_LIB['item_list']] = $_CONF_LIB['url'] . '/index.php';
+$menu[\Library\_('Item List')] = $_CONF_LIB['url'] . '/index.php';
 if (SEC_hasRights('library.admin')) {
-    $menu[$LANG_LIB['mnu_admin']] = $_CONF_LIB['admin_url'] . '/index.php';
+    $menu[\Library\_('Admin Home')] = $_CONF_LIB['admin_url'] . '/index.php';
 }
 
 $display = LIBRARY_siteHeader();

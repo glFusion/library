@@ -14,6 +14,8 @@
 /** Include required glFusion common functions */
 require_once '../../../lib-common.php';
 
+use \Library\_;
+
 // This is for administrators only.  It's called by Javascript,
 // so don't try to display a message
 if (!SEC_hasRights('library.admin')) {
@@ -49,9 +51,9 @@ case 'toggle':
     }
     if ($newval !== NULL) {
         if ($newval != $_POST['oldval']) {
-            $message = $LANG_LIB['item_updated'];
+            $message = _('Item Updated');
         } else {
-            $message = $LANG_LIB['item_nochange'];
+            $message = _('Item Unchanged');
         }
         $retval = array(
             'id'    => $_POST['id'],

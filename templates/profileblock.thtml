@@ -1,10 +1,10 @@
 {# begin {templatelocation} #}
 <div class="profile-header">
-  {$LANG_LIB['main_title']}
+  {lang_main_title}
 </div>
 <ul>
 <!-- BEGIN profile_row -->
- <li>{name}:&nbsp;&nbsp;{$LANG_LIB['dt_due']}:&nbsp;&nbsp;{due_date}</li>
+ <li>{name}:&nbsp;&nbsp;{lang_dt_due}:&nbsp;&nbsp;{due_date}</li>
 <!-- END profile_row -->
 </ul>
 {# end {templatelocation} #}

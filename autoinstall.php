@@ -26,7 +26,6 @@ if (!is_file($_CONF['path'].'plugins/library/language/' . $language . '.php')) {
     $language = 'english';
 }
 require_once $_CONF['path'].'plugins/library/language/' . $language . '.php';
-global $LANG_LIB;
 
 //  Plugin installation options
 $INSTALL_plugin['library'] = array(

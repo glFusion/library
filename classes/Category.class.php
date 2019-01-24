@@ -290,12 +290,12 @@ class Category
      */
     public function showForm()
     {
-        global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB;
+        global $_TABLES, $_CONF, $_CONF_LIB;
 
         if ($this->cat_id > 0) {
-            $retval = COM_startBlock($LANG_LIB['edit'] . ': ' . $this->cat_name);
+            $retval = COM_startBlock(_('Edit') . ': ' . $this->cat_name);
         } else {
-            $retval = COM_startBlock($LANG_LIB['create_category']);
+            $retval = COM_startBlock(_('Create Category'));
         }
 
         $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
@@ -312,6 +312,14 @@ class Category
             'candelete'     => !self::isUsed($this->cat_id),
             'group_dropdown' => SEC_getGroupDropdown($this->group_id, 3),
             'doc_url'       => LIBRARY_getDocURL('cat_form.html', $_CONF['language']),
+            'lang_cat_name' => _('Category Name'),
+            'lang_parent_cat' => _('Parent Category'),
+            'lang_dscp'     => _('Description'),
+            'lang_enabled'  => _('Enabled?'),
+            'lang_group'    => _('Group'),
+            'lang_savecat'  => _('Save Category'),
+            'lang_cancel'   => _('Cancel'),
+            'lang_delcat'   => _('Delete Category'),
         ) );
         $T->parse('tooltipster', 'tips');
         $retval .= $T->parse('output', 'category');

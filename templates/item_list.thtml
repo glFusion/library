@@ -8,12 +8,12 @@
     <option value="ASC" {sortdir_asc_sel}>{lang_ascending]}</option>
     <option value="DESC" {sortdir_desc_sel}>{lang_descending}</option>
   </select> &nbsp;&nbsp;
-  {$LANG_LIB['type']}:&nbsp;
+  {lang_type}:&nbsp;
   <select name="type" onchange="this.form.submit();">
     <option value="0">-- {lang_all} --</option>
     {type_select}
   </select>&nbsp&nbsp;
-  {$LANG_LIB['category']}:&nbsp;
+  {lang_category}:&nbsp;
   <select name="cat_id" onchange="this.form.submit();">
     <option value="0">-- {lang_all} --</option>
     {cat_select}

@@ -4,7 +4,7 @@
   <input type="hidden" name="cat_id" value="{cat_id}" />
   <div class="uk-form-row">
     <label class="uk-form-label">
-      {$LANG_LIB['cat_name']}:
+      {lang_cat_name}:
         <span id="hlp_cat_name" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls">
@@ -14,7 +14,7 @@
 {#
   <div class="uk-form-row">
     <label class="uk-form-label">
-      {$LANG_LIB['parent_cat']}:
+      {lang_parent_cat}:
         <span id="hlp_parent_cat" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls">
@@ -26,7 +26,7 @@
 #}
   <div class="uk-form-row">
     <label class="uk-form-label">
-      {$LANG_LIB['dscp']}:
+      {lang_dscp}:
         <span id="hlp_dscp" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls">
@@ -36,7 +36,7 @@
 
   <div class="uk-form-row">
     <label class="uk-form-label">
-      {$LANG_LIB['enabled']}?
+      {lang_enabled}
         <span id="hlp_enabled" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls">
@@ -45,7 +45,7 @@
   </div>
 
   <div class="uk-form-row">
-    <label class="uk-form-label">{$LANG_ACCESS['group']}:
+    <label class="uk-form-label">{lang_group}:
         <span id="hlp_group_id" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls"> 
@@ -55,10 +55,10 @@
 
   <div class="uk-form-row">
     <div class="uk-form-controls">
-      <button type="submit" name="savecat" class="uk-button uk-button-success">{$LANG_LIB['savecat']}</button>
-      <button type="reset" name="catlist" class="uk-button" onclick="javascript: document.location.href='{site_admin_url}/plugins/library/index.php?catlist'">{$LANG_ADMIN['cancel']}</button>
+      <button type="submit" name="savecat" class="uk-button uk-button-success">{lang_savecat}</button>
+      <button type="reset" name="catlist" class="uk-button" onclick="javascript: document.location.href='{site_admin_url}/plugins/library/index.php?catlist'">{lang_cancel}</button>
 {!if candelete}
-      <button type="submit" name="delcat" class="uk-button uk-button-danger">{$LANG_LIB['deletecat']}</button>
+      <button type="submit" name="delcat" class="uk-button uk-button-danger">{lang_deletecat}</button>
 {!endif}
    </td>
   </tr>

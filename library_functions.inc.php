@@ -36,6 +36,8 @@ function LIBRARY_ItemList()
         'pi_url'        => $_CONF_LIB['url'],
         'type_select'   => Library\MediaType::buildSelection($med_type, true),
         'cat_select'    => Library\Category::buildSelection($cat_id),
+        'lang_type'     => _('Media Type'),
+        'lang_category' => _('Category'),
         'lang_search'   => _('Search'),
         'lang_all'      => _('All'),
         'lang_ascending' => _('Ascending'),
@@ -422,7 +424,7 @@ function LIBRARY_loadLanguage($requested='')
  */
 function LIBRARY_userSelect($item_id='')
 {
-    global $_TABLES, $LANG_LIB;
+    global $_TABLES;
 
     $retval = '';
     $wl_users = array();

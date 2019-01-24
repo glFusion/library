@@ -48,33 +48,19 @@ if (file_exists(__DIR__ . '/config.php')) {
 
 // Language file Include
 $langpath = __DIR__ . '/language';
+/*
 $langfile = "{$_CONF['language']}.php";
 if (!file_exists("$langpath/$langfile")) {
     $langfile = 'english.php';
 }
-/** Include the proper language file */
 require_once "$langpath/$langfile";
 if (file_exists("$langpath/custom/$langfile")) {
-    /** Include the custom language file, if any */
     include_once "$langpath/custom/$langfile";
 }
-/*
-$LANG_LOCALE='de_DE';
-$domain = $_CONF_LIB['pi_name'];
-$results = setlocale(LC_MESSAGES, $LANG_LOCALE);
-if ($results) {
-    bind_textdomain_codeset($domain, 'UTF-8');
-    bindtextdomain($domain, __DIR__ . "/locale");
- //   textdomain($domain);
-
- //   COM_errorLog(_("Good Morning"));
-} else {
-var_dump($results);
-}
 */
-//$LANG_LOCALE='fr_FR';
 include_once __DIR__ . '/gettext.php';
 use Library\_;
+require_once $langpath . '/lang_config.php';
 
 /** Import plugin-specific functions */
 function USES_library_functions()
@@ -133,7 +119,7 @@ function plugin_upgrade_library()
  */
 function plugin_getmenuitems_library()
 {
-    global $_CONF_LIB, $LANG_LIB;
+    global $_CONF_LIB;
 
     $menuitems = array();
     if ($_CONF_LIB['menuitem'] && SEC_hasRights('library.view,library.admin', 'OR')) {
@@ -216,7 +202,7 @@ function plugin_savecomment_library($title,$comment,$id,$pid,$postmode)
  */
 function plugin_displaycomment_library($id, $cid, $title, $order, $format, $page, $view)
 {
-    global $_TABLES, $LANG_ACCESS;
+    global $_TABLES;
 
     $retval = '';
 
@@ -252,10 +238,12 @@ function plugin_displaycomment_library($id, $cid, $title, $order, $format, $page
                                      $cid, $page, $view, $delete_option,
                                      plugin_commentsupport_library());
     } else {
-        $retval .= COM_startBlock($LANG_ACCESS['accessdenied'], '',
-                        COM_getBlockTemplate ('_msg_block', 'header'))
-                . $LANG_ACCESS['storydenialmsg']
-                . COM_endBlock(COM_getBlockTemplate ('_msg_block', 'footer'));
+        $retval .= COM_startBlock(
+            _('Access Denied'),
+            COM_getBlockTemplate ('_msg_block', 'header')
+        )
+        . _('Access Denied')
+        . COM_endBlock(COM_getBlockTemplate ('_msg_block', 'footer'));
     }
 
     return $retval;
@@ -436,7 +424,7 @@ function plugin_autotags_library ($op, $content = '', $autotag = '') {
  */
 function library_access_check($rights = 'library.user,library.admin')
 {
-    global $_USER, $_SERVER, $LANG_LIB;
+    global $_USER, $_SERVER;
 
     // Confirm that the user has sufficient rights to access this page
     if (!SEC_hasRights($rights, 'OR')) {
@@ -518,7 +506,7 @@ function library_filterVars($vars, &$arr) {
  */
 function plugin_searchtypes_library()
 {
-    global $_CONF_LIB, $LANG_LIB;
+    global $_CONF_LIB;
     return array(
         $_CONF_LIB['pi_name'] => _('Library'),
     );
@@ -541,7 +529,7 @@ function plugin_dopluginsearch_library(
 )
 {
 return;
-    global $_CONF, $_TABLES, $_CONF_LIB, $LANG_LIB;
+    global $_CONF, $_TABLES, $_CONF_LIB;
 
     if (!SEC_hasRights('library.user,library.admin', 'OR'))
         return;
@@ -863,8 +851,6 @@ function plugin_getiteminfo_library($id, $what, $uid=0, $options=array())
  */
 function LIBRARY_errorMessage($msg = '', $type = '', $header = '')
 {
-    global $LANG_LIB;
-
     // Require a valid message
     if ($msg == '')
         return '';
@@ -1009,11 +995,11 @@ function plugin_configmanager_select_def_group_id_library()
  */
 function LIBRARY_siteHeader($subject='', $meta='')
 {
-    global $_CONF_LIB, $LANG_LIB;
+    global $_CONF_LIB;
 
     $retval = '';
 
-    $title = $LANG_LIB['main_title'];
+    $title = _('Library Items');
     if ($subject != '')
         $title = $subject . ' : ' . $title;
 

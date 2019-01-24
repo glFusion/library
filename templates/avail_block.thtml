@@ -8,42 +8,41 @@
 {!endif}
 {!if can_reserve}
     <a href="{pi_url}/index.php?addwait=x&id={id}">
-    <button class="uk-button uk-button-success">{$LANG_LIB['add_waitlist']}</button>
+    <button class="uk-button uk-button-success">{lang_add_waitlist}</button>
     </a>
-{#        onclick="javascript:LIBR_ajaxReserve('{id}', 'addwait');">{$LANG_LIB['add_waitlist']}</button>#}
+{#        onclick="javascript:LIBR_ajaxReserve('{id}', 'addwait');">{lang_add_waitlist}</button>#}
 {!endif}
 {!if is_reserved}
   {waitlist_txt}<br />
     <a href="{pi_url}/index.php?rmvwait=x&id={id}">
-    <button class="uk-button uk-button-danger">{$LANG_LIB['click_to_remove']}</button>
+    <button class="uk-button uk-button-danger">{lang_click_to_remove}</button>
     </a>
-{#        onclick="javascript:LIBR_ajaxReserve('{id}', 'rmvwait');">{$LANG_LIB['click_to_remove']}</button>#}
+{#        onclick="javascript:LIBR_ajaxReserve('{id}', 'rmvwait');">{lang_click_to_remove}</button>#}
 {!endif}
 {!if is_librarian}
-  <br />
-    <span style="float:left;">{num_avail}</span>
-  <div style="float:right;">
+  <div style="margin-left:5px;margin-right:5px;text-align:center">
+    <div style="float:left;width:16px;">
 {!if can_checkin}
     <i data-uk-tooltip class="{iconset}-sign-in lib-icon-info"
-        title="{$LANG_LIB['checkin']}"
+        title="{lang_checkin}"
         onclick="javascript:showCheckInOutForm('{id}', 'checkin');"></i>
-{!else}
-    <i class="{iconset}-sign-in"></i>
 {!endif}
+    </div>
+    <div style="float:right;width:16px;">
 {!if can_checkout}
     <i data-uk-tooltip class="{iconset}-sign-out lib-icon-info"
-        title="{$LANG_LIB['checkout']}"
+        title="{lang_checkout}"
         onclick="javascript:showCheckInOutForm('{id}', 'checkout');"></i>
-{!else}
-    <i class="{iconset}-sign-out"></i>
 {!endif}
+    </div>
+    <div style="display:inline;">{num_avail}</div>
   </div>
 {!endif}
 </div>
 
 {!if due_dt}
   <div style="clear:both;">
-    <small>Due: {due_dt}</small>
+    <small>{lang_due}: {due_dt}</small>
   </div>
 {!endif}
 {# end {templatelocation} #}

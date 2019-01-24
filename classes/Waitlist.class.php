@@ -146,7 +146,7 @@ class Waitlist
      */
     public static function notifyNext($item_id)
     {
-        global $_TABLES,  $_CONF, $_CONF_LIB, $_LANG_LIB;
+        global $_TABLES,  $_CONF, $_CONF_LIB;
 
         // retrieve the first waitlisted user info.
         $sql = "SELECT w.id, w.uid, w.item_id, u.email, u.language,

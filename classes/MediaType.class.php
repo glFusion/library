@@ -262,7 +262,7 @@ class MediaType
      */
     public function showForm()
     {
-        global $_TABLES, $_CONF, $_CONF_LIB, $LANG_LIB;
+        global $_TABLES, $_CONF, $_CONF_LIB;
 
         $T = LIBRARY_getTemplate('mediatype_form', 'type');
 
@@ -270,10 +270,10 @@ class MediaType
         // Otherwise, we're creating a new item.  Also set the $not and $items
         // values to be used in the parent media type selection accordingly.
         if ($this->id > 0) {
-            $retval = COM_startBlock($LANG_LIB['edit'] . ': ' . $this->name);
+            $retval = COM_startBlock(_('Edit') . ': ' . $this->name);
             $T->set_var('id', $this->id);
         } else {
-            $retval = COM_startBlock($LANG_LIB['new_mediatype']);
+            $retval = COM_startBlock(_('New Media Type'));
             $T->set_var('id', '');
         }
 
@@ -281,6 +281,11 @@ class MediaType
             'action_url'    => $_CONF_LIB['admin_url'],
             'name'          => $this->name,
             'candelete'     => !$this->isNew && !self::isUsed($this->id),
+            'lang_type'     => _('Media Type'),
+            'lang_hlp_mt_type' => _('Enter a name for this media type. This should be unique.'),
+            'lang_save'     => _('Save'),
+            'lang_cancel'   => _('Cancel'),
+            'lang_delete'   => _('Delete'),
         ) );
         $retval .= $T->parse('output', 'type');
         $retval .= COM_endBlock();
