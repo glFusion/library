@@ -682,6 +682,8 @@ function plugin_autouninstall_library()
                 'library.categories',
                 'library.waitlist',
                 'library.types',
+                'library.instances',
+                'library.log',
         ),
         // Give the full name of the group, as in the db
         'groups' => array('library Admin'),
