@@ -102,12 +102,7 @@ $_SQL['library.types'] = "CREATE TABLE `{$_TABLES['library.types']}` (
 $_DEFDATA['library.types'] = "INSERT INTO {$_TABLES['library.types']} VALUES
     (1,'Book'),(2,'CD'),(3,'DVD')";
 
-$_DEFDATA['library.categories'] = "INSERT INTO {$_TABLES['library.categories']} (
-        cat_id, cat_name, dscp,
-        group_id, owner_id, perm_owner, perm_group, perm_members, perm_anon
-    ) VALUES (
-        1, 'Miscellaneous', 'Miscellaneous Items',
-        1, 2, 3, 3, 2, 2
-    )";
+$_DEFDATA['library.categories'] = "INSERT INTO {$_TABLES['library.categories']}
+        (cat_id, cat_name, dscp) VALUES (1, 'Miscellaneous', 'Miscellaneous Items')";
 
 ?>
