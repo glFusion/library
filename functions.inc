@@ -45,17 +45,18 @@ if (file_exists(__DIR__ . '/config.php')) {
 }
 
 // Language file Include
+/*
 $langpath = __DIR__ . '/language';
 $langfile = "{$_CONF['language']}.php";
 if (!file_exists("$langpath/$langfile")) {
     $langfile = 'english.php';
 }
-/** Include the proper language file */
 require_once "$langpath/$langfile";
 if (file_exists("$langpath/custom/$langfile")) {
-    /** Include the custom language file, if any */
     include_once "$langpath/custom/$langfile";
 }
+ */
+include_once __DIR__ . '/language.php';
 
 //  Set user ID = 1 for anonymous users.
 if (empty($_USER['uid'])) {

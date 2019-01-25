@@ -1,0 +1,760 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-01-24 16:00-0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: language.php:20 language.php:23 language.php:26 language.php:199
+msgid "Library"
+msgstr "Bibliothek"
+
+#: language.php:21
+msgid "Library Items"
+msgstr "Bibliothekselemente"
+
+#: language.php:22
+msgid "Library Administration"
+msgstr "Bibliotheksverwaltung"
+
+#: language.php:24
+msgid "Category"
+msgstr "Kategorie"
+
+#: language.php:25
+msgid "Categories"
+msgstr ""
+
+#: language.php:27
+msgid "Admin"
+msgstr ""
+
+#: language.php:28
+msgid "Item ID or SKU"
+msgstr ""
+
+#: language.php:29
+msgid "Name or Title"
+msgstr ""
+
+#: language.php:30
+msgid "Subtitle"
+msgstr ""
+
+#: language.php:31
+msgid "Qty"
+msgstr ""
+
+#: language.php:32
+msgid "Description"
+msgstr ""
+
+#: language.php:33
+msgid "Short Description"
+msgstr ""
+
+#: language.php:34
+msgid "Publisher"
+msgstr ""
+
+#: language.php:35
+msgid "Date Published"
+msgstr ""
+
+#: language.php:36
+msgid "Author"
+msgstr ""
+
+#: language.php:37
+msgid "Keywords"
+msgstr ""
+
+#: language.php:38
+msgid "Expiration Time (days)"
+msgstr ""
+
+#: language.php:39
+msgid "Max Checkout Days"
+msgstr ""
+
+#: language.php:40
+msgid "Txn ID"
+msgstr ""
+
+#: language.php:41
+msgid "Days to hold for waitlist"
+msgstr ""
+
+#: language.php:42
+msgid "Download"
+msgstr ""
+
+#: language.php:43
+msgid "Downloadable"
+msgstr ""
+
+#: language.php:44
+msgid "Price"
+msgstr ""
+
+#: language.php:45
+msgid "History"
+msgstr ""
+
+#: language.php:46
+msgid "View item history"
+msgstr ""
+
+#: language.php:47
+msgid "Media Type"
+msgstr ""
+
+#: language.php:48
+msgid "New Item"
+msgstr ""
+
+#: language.php:49
+msgid "New Category"
+msgstr ""
+
+#: language.php:50
+msgid "Item List"
+msgstr ""
+
+#: language.php:51
+msgid "Media Types"
+msgstr ""
+
+#: language.php:52
+msgid "New Media Type"
+msgstr ""
+
+#: language.php:53
+msgid "Category List"
+msgstr ""
+
+#: language.php:54
+msgid ""
+"Manage library items.  You can add, modify, and delete items.  You can also "
+"check items out or in from this screen, as well as disable items (make them "
+"invisible in the catalog)."
+msgstr ""
+
+#: language.php:55
+msgid ""
+"Manage and edit media types.  Media types can only be deleted if they're not "
+"referenced by any library items."
+msgstr ""
+
+#: language.php:56
+msgid "User Name"
+msgstr ""
+
+#: language.php:57
+msgid "Status"
+msgstr ""
+
+#: language.php:58
+msgid "Purchaser"
+msgstr ""
+
+#: language.php:59
+msgid "IP Address"
+msgstr ""
+
+#: language.php:60
+msgid "Date/Time"
+msgstr ""
+
+#: language.php:61
+msgid "Verified"
+msgstr ""
+
+#: language.php:62
+msgid "Full IPN Data"
+msgstr ""
+
+#: language.php:63
+msgid "View Cart"
+msgstr ""
+
+#: language.php:64
+msgid "Images"
+msgstr ""
+
+#: language.php:65
+msgid "Category Image"
+msgstr ""
+
+#: language.php:66
+msgid "Click to Enlarge Image"
+msgstr ""
+
+#: language.php:67
+msgid "Enabled"
+msgstr ""
+
+#: language.php:68
+msgid "Featured"
+msgstr ""
+
+#: language.php:69
+msgid "Taxable"
+msgstr ""
+
+#: language.php:70
+msgid "Save Type"
+msgstr ""
+
+#: language.php:71
+msgid "Delete Type"
+msgstr ""
+
+#: language.php:72
+msgid "Thank you for your order!"
+msgstr ""
+
+#: language.php:73 language.php:253
+msgid "Yes"
+msgstr ""
+
+#: language.php:74 language.php:254
+msgid "No"
+msgstr ""
+
+#: language.php:75
+msgid "Closed"
+msgstr ""
+
+#: language.php:76 language.php:245 language.php:249
+msgid "True"
+msgstr ""
+
+#: language.php:77 language.php:246 language.php:250
+msgid "False"
+msgstr ""
+
+#: language.php:78
+msgid "Information"
+msgstr ""
+
+#: language.php:79
+msgid "Warning"
+msgstr ""
+
+#: language.php:80
+msgid "Error"
+msgstr ""
+
+#: language.php:81
+msgid "Alert"
+msgstr ""
+
+#: language.php:82
+msgid "Please log in to view options."
+msgstr ""
+
+#: language.php:83
+msgid "An invalid item ID was requested"
+msgstr ""
+
+#: language.php:84
+msgid ""
+"You do not have access to this page. <p />If you believe you have reached "
+"this message in error, please contact your site administrator.<p />All "
+"attempts to access this page are logged."
+msgstr ""
+
+#: language.php:88
+msgid "Access Denied"
+msgstr ""
+
+#: language.php:89
+msgid "Select File"
+msgstr ""
+
+#: language.php:90
+msgid "Or, upload a new file"
+msgstr ""
+
+#: language.php:91
+msgid "The submitted form has missing or invalid fields"
+msgstr ""
+
+#: language.php:92
+msgid "Item Type"
+msgstr ""
+
+#: language.php:93
+msgid "Edit"
+msgstr ""
+
+#: language.php:94
+msgid "Create a New Category"
+msgstr ""
+
+#: language.php:95
+msgid "Category Name"
+msgstr ""
+
+#: language.php:96
+msgid "Parent Category"
+msgstr ""
+
+#: language.php:97
+msgid "-- Top --"
+msgstr ""
+
+#: language.php:98
+msgid "Save Item"
+msgstr ""
+
+#: language.php:99
+msgid "Delete Item"
+msgstr ""
+
+#: language.php:100
+msgid "Cannot delete categories that are in use."
+msgstr ""
+
+#: language.php:101
+msgid "Unable to delete this media type"
+msgstr ""
+
+#: language.php:102
+msgid "Save Category"
+msgstr ""
+
+#: language.php:103
+msgid "Delete Category"
+msgstr ""
+
+#: language.php:104
+msgid "Product ID"
+msgstr ""
+
+#: language.php:105
+msgid "Other Functions"
+msgstr ""
+
+#: language.php:106
+msgid "Reset Form"
+msgstr ""
+
+#: language.php:107
+msgid "Indicates a required field"
+msgstr ""
+
+#: language.php:108
+msgid "Item Information"
+msgstr ""
+
+#: language.php:109
+msgid "Delete Image"
+msgstr ""
+
+#: language.php:110
+msgid "Sort"
+msgstr ""
+
+#: language.php:111
+msgid "Search"
+msgstr "Suche"
+
+#: language.php:112
+msgid "Date Added"
+msgstr ""
+
+#: language.php:113
+msgid "Ascending"
+msgstr ""
+
+#: language.php:114
+msgid "Descending"
+msgstr ""
+
+#: language.php:115
+msgid "Sort Direction"
+msgstr ""
+
+#: language.php:116
+msgid "Comments"
+msgstr ""
+
+#: language.php:117
+msgid "Are you sure you want to reserve this item?"
+msgstr ""
+
+#: language.php:118
+msgid "Are you sure you want to cancel your reservation?"
+msgstr ""
+
+#: language.php:119
+msgid "Are you sure you want to delete this item?"
+msgstr ""
+
+#: language.php:120
+msgid "Place your reservation"
+msgstr ""
+
+#: language.php:121
+#, php-format
+msgid "You're #%d on the waiting list"
+msgstr ""
+
+#: language.php:122
+msgid "Remove"
+msgstr ""
+
+#: language.php:123
+msgid "Cancel Reservation"
+msgstr ""
+
+#: language.php:124
+msgid "Available"
+msgstr ""
+
+#: language.php:125
+#, php-format
+msgid "%s available"
+msgstr ""
+
+#: language.php:126
+#, php-format
+msgid "Pending reservations: %d"
+msgstr ""
+
+#: language.php:127
+msgid "Pending"
+msgstr ""
+
+#: language.php:128
+msgid "Pending Actions"
+msgstr ""
+
+#: language.php:129
+msgid "Overdue"
+msgstr ""
+
+#: language.php:130
+msgid "Waitlisted"
+msgstr ""
+
+#: language.php:131
+msgid "Check out to user"
+msgstr ""
+
+#: language.php:132
+msgid ""
+"Select the user who is checking out this item.  If there is a waiting list, "
+"the next user is automatically selected."
+msgstr ""
+
+#: language.php:133
+msgid "Submit"
+msgstr ""
+
+#: language.php:134
+msgid "Cancel"
+msgstr ""
+
+#: language.php:135
+msgid "Action"
+msgstr ""
+
+#: language.php:136
+msgid "Check Out"
+msgstr ""
+
+#: language.php:137
+msgid "Check In"
+msgstr ""
+
+#: language.php:138
+msgid "Checked Out"
+msgstr ""
+
+#: language.php:139
+msgid "You have checked out this item."
+msgstr ""
+
+#: language.php:140
+msgid "Back to Listing"
+msgstr ""
+
+#: language.php:141
+msgid "All"
+msgstr ""
+
+#: language.php:142
+msgid "Due Date"
+msgstr ""
+
+#: language.php:143
+msgid "Transaction History for: "
+msgstr ""
+
+#: language.php:144
+msgid "By"
+msgstr ""
+
+#: language.php:145
+msgid "Next on waiting list"
+msgstr ""
+
+#: language.php:146
+msgid "Your requested library item is available"
+msgstr ""
+
+#: language.php:147
+msgid "In Use"
+msgstr ""
+
+#: language.php:148
+msgid "Item has been updated."
+msgstr ""
+
+#: language.php:149
+msgid "Item has not been changed."
+msgstr ""
+
+#: language.php:150
+msgid "Search online for the ISBN."
+msgstr ""
+
+#: language.php:151
+msgid "You can reserve up to <br />"
+msgstr ""
+
+#: language.php:152
+msgid "Add Instances"
+msgstr ""
+
+#: language.php:153
+msgid "Instance"
+msgstr ""
+
+#: language.php:154
+msgid "View instances of this item"
+msgstr ""
+
+#: language.php:155
+msgid "View this item&apos;s detail"
+msgstr ""
+
+#: language.php:156
+#, php-format
+msgid "%d instances currently in the database"
+msgstr ""
+
+#: language.php:175
+msgid "You can reserve up to "
+msgstr ""
+
+#: language.php:176
+msgid "Enter or select the due date for the item."
+msgstr ""
+
+#: language.php:177
+msgid ""
+"Select the user to check out this item. The user at the top of the waiting "
+"list is shown first."
+msgstr ""
+
+#: language.php:178
+msgid "Enter a short name for this category"
+msgstr ""
+
+#: language.php:179
+msgid ""
+"Select the category owner. There is no submission option so this should "
+"normally be an administrator."
+msgstr ""
+
+#: language.php:180
+msgid ""
+"Select the category group. This can be used to limit read access to a "
+"specific group."
+msgstr ""
+
+#: language.php:181
+msgid "Select the permissions for this category. Only Read permission is used."
+msgstr ""
+
+#: language.php:182
+msgid ""
+"Select whether this category is enabled. Disabling a category prevents any "
+"of its items from being displayed."
+msgstr ""
+
+#: language.php:183
+msgid "Enter the number of instances to add for this item."
+msgstr ""
+
+#: language.php:184
+msgid "Select the specific item instance to check in."
+msgstr ""
+
+#: language.php:188
+msgid "The library plugin is already up to date."
+msgstr ""
+
+#: language.php:189
+msgid "Error retrieving current version number"
+msgstr ""
+
+#: language.php:190
+msgid "Error performing the plugin upgrade"
+msgstr ""
+
+#: language.php:191
+msgid "Error upgrading the plugin version number"
+msgstr ""
+
+#: language.php:192
+msgid "Plugin is already up to date"
+msgstr ""
+
+#: language.php:200
+msgid "Library Configuration"
+msgstr ""
+
+#: language.php:205
+msgid "Days to keep items on hold for waitlisted users"
+msgstr ""
+
+#: language.php:206
+msgid "Default sort order for item display"
+msgstr ""
+
+#: language.php:207
+msgid "Items to show per page"
+msgstr ""
+
+#: language.php:208
+msgid "CSS Menus? DEPRECATED"
+msgstr ""
+
+#: language.php:209
+msgid "Max number of item images"
+msgstr ""
+
+#: language.php:210
+msgid "Max Thumbnail Dimension (px)"
+msgstr ""
+
+#: language.php:211
+msgid "Max Image Width (px)"
+msgstr ""
+
+#: language.php:212
+msgid "Max Image Height (px)"
+msgstr ""
+
+#: language.php:213
+msgid "Max. Product Image Size"
+msgstr ""
+
+#: language.php:214
+msgid "Enable Comments?"
+msgstr ""
+
+#: language.php:215
+msgid "Enable Ratings?"
+msgstr ""
+
+#: language.php:216
+msgid "Enable Left Blocks?"
+msgstr ""
+
+#: language.php:217
+msgid "Enable Right Blocks"
+msgstr ""
+
+#: language.php:218
+msgid "Maximum number of days an item may be checked out"
+msgstr ""
+
+#: language.php:219
+msgid "Display glFusion Blocks"
+msgstr ""
+
+#: language.php:220
+msgid "Show on user menu?"
+msgstr ""
+
+#: language.php:221
+msgid "Librarian Group"
+msgstr ""
+
+#: language.php:222
+msgid "Default Access Group"
+msgstr ""
+
+#: language.php:223
+msgid "Notify Librarians on item reservation?"
+msgstr ""
+
+#: language.php:224
+msgid "ISBN Lookup Method"
+msgstr ""
+
+#: language.php:229
+msgid "Main Settings"
+msgstr ""
+
+#: language.php:234
+msgid "General Settings"
+msgstr ""
+
+#: language.php:235
+msgid "Images and Paths"
+msgstr ""
+
+#: language.php:236
+msgid "Notifications"
+msgstr ""
+
+#: language.php:257
+msgid "Never"
+msgstr ""
+
+#: language.php:258
+msgid "Always"
+msgstr ""
+
+#: language.php:259
+msgid "Logged-in Users"
+msgstr ""
+
+#: language.php:262
+msgid "None"
+msgstr ""
+
+#: language.php:263
+msgid "Left"
+msgstr ""
+
+#: language.php:264
+msgid "Right"
+msgstr ""
+
+#: language.php:265
+msgid "Both"
+msgstr ""
+
+#: language.php:270
+msgid "Astore Plugin"
+msgstr ""
