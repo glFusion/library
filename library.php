@@ -21,12 +21,18 @@ if (!defined ('GVERSION')) {
 global $_DB_table_prefix, $_TABLES;
 global $_CONF_LIB;
 
-$_CONF_LIB['pi_name']            = 'library';
+Library\Config::getInstance()
+    ->set('pi_name', 'library')
+    ->set('pi_display_name', 'Library')
+    ->set('pi_version', '0.0.1')
+    ->set('gl_version', '1.7.0')
+    ->set('pi_url', 'http://www.glfusion.org');
+/*$_CONF_LIB['pi_name']            = 'library';
 $_CONF_LIB['pi_display_name']    = 'Library';
 $_CONF_LIB['pi_version']         = '0.0.1';
 $_CONF_LIB['gl_version']         = '1.7.0';
 $_CONF_LIB['pi_url']             = 'http://www.glfusion.org';
-
+ */
 $_LIB_table_prefix = $_DB_table_prefix . 'library_';
 
 $_TABLES['library.items']       = $_LIB_table_prefix . 'items';

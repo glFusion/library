@@ -239,7 +239,7 @@ default:
     case 1:         // Available items
     case 3:         // Pending Actions
         $cat_id = isset($_GET['cat_id']) ? (int)$_GET['cat_id'] : 0;
-        $content .= LIBRARY_adminlist_Items($cat_id, $status);
+        $content .= Library\Item::adminList($cat_id, $status);
         break;
     case 2:         // Checked-out Instances
     case 4:         // Overdue Instances
@@ -252,7 +252,8 @@ default:
 }
 
 $display = COM_siteHeader();
-$display .= LIBRARY_adminMenu($view);
+//$display .= LIBRARY_adminMenu($view);
+$display .= Library\Menu::Admin($view);
 if (!empty($_REQUEST['msg'])) {
     $display .= COM_startBlock('Message');
     $display .= $_REQUEST['msg'];
@@ -371,7 +372,7 @@ function LIBRARY_adminlist_Instances($item_id=0, $status=0)
  * @param   integer $cat_id     Optional category to limit view
  * @param   integer $status     Optional status, to limit view
  */
-function LIBRARY_adminlist_Items($cat_id = 0, $status = 0)
+function XXLIBRARY_adminlist_Items($cat_id = 0, $status = 0)
 {
     global $_CONF, $_CONF_LIB, $_TABLES, $_USER;
 
@@ -515,7 +516,7 @@ function LIBRARY_getAdminField_Instance($fieldname, $fieldvalue, $A, $icon_arr)
     case 'delete':
         if ($A['uid'] == 0) {
             $retval .= COM_createLink(
-                '<i class="uk-icon uk-icon-trash-o uk-text-danger"></i>',
+                Icon::getHTML('delete'),
                 $_CONF_LIB['admin_url']. '/index.php?deleteinstance=x&amp;id=' . $A['instance_id'],
                 array(
                     'onclick'=>'return confirm(\''.
@@ -547,7 +548,7 @@ function LIBRARY_getAdminField_Instance($fieldname, $fieldvalue, $A, $icon_arr)
  * @param   array   $icon_arr   System icon array (not used)
  * @return  string              HTML for field display in the table
  */
-function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
+function XXLIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
 {
     global $_CONF, $_CONF_LIB, $_TABLES;
 
@@ -584,7 +585,7 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
     case 'delete':
         if (!Library\Item::isUsed($A['id'])) {
             $retval .= COM_createLink(
-                    '<i class="uk-icon uk-icon-trash-o uk-text-danger"></i>',
+                Icon::getHTML('delete'),
                 $_CONF_LIB['admin_url']. '/index.php?deleteitem=x&amp;id=' . $A['id'],
                 array(
                     'onclick'=>'return confirm(\'' .
@@ -677,53 +678,6 @@ function LIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
         break;
     }
 
-    return $retval;
-}
-
-
-/**
- * Create the administrator menu
- *
- * @param   string  $mode   Current view mode
- * @return  string      Administrator menu
- */
-function LIBRARY_adminMenu($mode='')
-{
-    global $_CONF, $_CONF_LIB;
-
-    $menu_arr = array(
-        array(
-            'url'   => $_CONF_LIB['admin_url'] . '/index.php',
-            'text'  => _('Item List'),
-            'active' => $mode == 'itemlist' ? true : false,
-        ),
-        array(
-            'url'  => $_CONF_LIB['admin_url'] . '/index.php?mode=catlist',
-            'text' => _('Categories'),
-            'active' => $mode == 'catlist' ? true : false,
-        ),
-        array(
-            'url'   => $_CONF_LIB['admin_url'] . '/index.php?medialist=x',
-            'text'  => _('Media Types'),
-            'active' => $mode == 'medialist' ? true : false,
-        ),
-        array(
-            'url'   => $_CONF_LIB['admin_url'] . '/index.php?status=4',
-            'text'  => _('Overdue'),
-            'active' => $mode == 'overdue' ? true : false,
-        ),
-        array(
-            'url'   => $_CONF['site_admin_url'],
-            'text'  => _('Admin Home'),
-        ),
-    );
-
-    $admin_hdr = 'admin_item_hdr';
-    $T = new Template($_CONF_LIB['pi_path'] . '/templates');
-    $T->set_file('title', 'library_title.thtml');
-    $T->set_var('title', _('Library Administration'));
-    $retval = $T->parse('', 'title');
-    $retval .= ADMIN_createMenu($menu_arr, '', plugin_geticon_library());
     return $retval;
 }
 
@@ -849,7 +803,7 @@ function LIBRARY_getAdminField_Category($fieldname, $fieldvalue, $A, $icon_arr)
     case 'delete':
         if (!Library\Category::isUsed($A['cat_id'])) {
             $retval .= COM_createLink(
-                '<i class="uk-icon uk-icon-trash uk-text-danger"></i>',
+                Icon::getHTML('delete'),
                 $_CONF_LIB['admin_url']. '/index.php?deletecat&id=' . $A['cat_id'],
                 array(
                     'onclick' => 'return confirm(\'' .
@@ -859,7 +813,7 @@ function LIBRARY_getAdminField_Category($fieldname, $fieldvalue, $A, $icon_arr)
                     'class' => 'tooltip',
                 ));
         } else {
-            $retval .= '<i class="tooltip ' . LIBRARY_getIcon('trash', 'unknown') .
+            $retval .= '<i class="tooltip uk-icon uk-icon-remove uk-text-danger' .
                     '" title="' . _('Cannot delete categories that are in use.') . '"></i>';
         }
         break;
@@ -964,7 +918,7 @@ function LIBRARY_getAdminField_MediaType($fieldname, $fieldvalue, $A, $icon_arr)
     case 'delete':
         if (!Library\MediaType::isUsed($A['id'])) {
             $retval = COM_createLink(
-                '<i class="' . LIBRARY_getIcon('trash', 'danger') . '"></i>',
+                Library\Icon::getHTML('delete'),
                 $_CONF_LIB['admin_url']. '/index.php?deletemedia=x&id=' . $A['id'],
                 array(
                     'onclick'=>'return confirm(\''.
@@ -975,8 +929,7 @@ function LIBRARY_getAdminField_MediaType($fieldname, $fieldvalue, $A, $icon_arr)
                 )
             );
         } else {
-            $retval = '<i class="' . LIBRARY_getIcon('trash', 'disabled') . ' tooltip"' .
-                'title="' . _('In Use') . '"></i>';
+            $retval = Library\Icon::getHTML('delete-grey', 'tooltip', array('title'=>_('In Use')));
         }
         break;
 

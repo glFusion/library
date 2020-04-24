@@ -27,6 +27,8 @@ if (!is_file($_CONF['path'].'plugins/library/language/' . $language . '.php')) {
 }
 require_once $_CONF['path'].'plugins/library/language/' . $language . '.php';
 
+$Cfg = Library\Config::getInstance();
+
 //  Plugin installation options
 $INSTALL_plugin['library'] = array(
     'installer' => array(
@@ -35,12 +37,12 @@ $INSTALL_plugin['library'] = array(
             'mode' => 'install'
         ),
     'plugin' => array(
-            'type' => 'plugin',
-            'name' => $_CONF_LIB['pi_name'],
-            'ver' => $_CONF_LIB['pi_version'],
-            'gl_ver' => $_CONF_LIB['gl_version'],
-            'url' => $_CONF_LIB['pi_url'],
-            'display' => $_CONF_LIB['pi_display_name']
+            'type'  => 'plugin',
+            'name'  => $Cfg->get('pi_name'),
+            'ver'   => $Cfg->get('pi_version'),
+            'gl_ver' => $Cfg->get('gl_version'),
+            'url'   => $Cfg->get('pi_url'),
+            'display' => $Cfg->get'pi_display_name')
         ),
     array(  'type' => 'table',
             'table' => $_TABLES['library.items'],
@@ -136,11 +138,11 @@ $INSTALL_plugin['library'] = array(
 */
 function plugin_install_library()
 {
-    global $INSTALL_plugin, $_CONF_LIB;
+    global $INSTALL_plugin;
 
-    COM_errorLog("Attempting to install the {$_CONF_LIB['pi_display_name']} plugin", 1);
+    COM_errorLog("Attempting to install the " . Library\Config::getInstance()->get('pi_display_name') . " plugin", 1);
 
-    $ret = INSTALLER_install($INSTALL_plugin[$_CONF_LIB['pi_name']]);
+    $ret = INSTALLER_install($INSTALL_plugin[Library\Config::getInstance()->get('pi_name')]);
     if ($ret > 0) {
         return false;
     }
@@ -155,11 +157,13 @@ function plugin_install_library()
 */
 function plugin_load_configuration_library()
 {
-    global $_CONF, $_CONF_LIB, $_TABLES;
+    global $_CONF, $_TABLES;
 
     // Get the group ID that was saved previously.
-    $group_id = (int)DB_getItem($_TABLES['groups'], 'grp_id',
-            "grp_name='{$_CONF_LIB['pi_name']} Admin'");
+    $group_id = (int)DB_getItem(
+        $_TABLES['groups'],
+        'grp_id',
+        "grp_name='" . DB_escapeString(Library\Config::getInstance()->get('pi_name')) . " Admin'");
 
     return plugin_initconfig_library($group_id);
 }

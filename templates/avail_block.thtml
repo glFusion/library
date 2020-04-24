@@ -23,14 +23,14 @@
   <div style="margin-left:5px;margin-right:5px;text-align:center">
     <div style="float:left;width:16px;">
 {!if can_checkin}
-    <i data-uk-tooltip class="uk-icon uk-icon-sign-in lib-icon-info"
+    <i data-uk-tooltip class="uk-icon uk-icon-sign-in uk-text-danger"
         title="{lang_checkin}"
         onclick="javascript:showCheckInOutForm('{id}', 'checkin');"></i>
 {!endif}
     </div>
     <div style="float:right;width:16px;">
 {!if can_checkout}
-    <i data-uk-tooltip class="uk-icon uk-icon-sign-out lib-icon-info"
+    <i data-uk-tooltip class="uk-icon uk-icon-sign-out uk-text-success"
         title="{lang_checkout}"
         onclick="javascript:showCheckInOutForm('{id}', 'checkout');"></i>
 {!endif}

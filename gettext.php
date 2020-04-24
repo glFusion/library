@@ -10,13 +10,19 @@ if ($results) {
     $dom = bindtextdomain($domain, __DIR__ . "/locale");
 }
 
-function _($txt)
-{
-    return \dgettext('library', $txt);
-}
 function _n($single, $plural, $number)
 {
     return \dngettext('library', $single, $plural, $number);
+}
+
+
+function _T($txt)
+{
+    return \dgettext('library', $txt);
+}
+function _($txt)
+{
+    return \dgettext('library', $txt);
 }
 
 ?>

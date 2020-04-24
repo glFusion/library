@@ -16,13 +16,35 @@ if (!defined ('GVERSION')) {
     die ('This file can not be used on its own.');
 }
 
-//  Check and see if we need to load the plugin configuration
-if (isset($config) && !isset($_CONF_LIB['maxcheckout'])) {
-    /** Include the system configuration class */
-    require_once $_CONF['path_system'] . 'classes/config.class.php';
-    $lib_config = config::get_instance();
-    $_CONF_LIB= $lib_config->get_config('library');
-}
+spl_autoload_register(function ($class)
+{
+    // project-specific namespace prefix
+    $prefix = 'Library\\';
+
+    // does the class use the namespace prefix?
+    $len = strlen($prefix);
+    if (strncmp($prefix, $class, $len) !== 0) {
+        // no, move to the next registered autoloader
+        return;
+    }
+
+    // base directory for the namespace prefix
+    $base_dir = __DIR__ . '/classes/';
+
+    // get the relative class name
+    $relative_class = substr($class, $len);
+
+    // replace the namespace prefix with the base directory, replace namespace
+    // separators with directory separators in the relative class name, append
+    // with .php
+    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.class.php';
+
+    // if the file exists, require it
+    if (file_exists($file)) {
+        require $file;
+    }
+});
+
 
 /** Include library config file  */
 require_once 'library.php';
@@ -33,10 +55,11 @@ define ('LIB_STATUS_AVAIL', 1);
 define ('LIB_STATUS_OUT', 2);
 
 // Store the private image path in a conf var so it's available
-$_CONF_LIB['pi_path']= __DIR__;
-$_CONF_LIB['url'] = "{$_CONF['site_url']}/{$_CONF_LIB['pi_name']}";
-$_CONF_LIB['admin_url'] = "{$_CONF['site_admin_url']}/plugins/{$_CONF_LIB['pi_name']}";
-$_CONF_LIB['image_dir'] = $_CONF['path'] . 'data/library/images/items';
+Library\Config::getInstance()
+    ->set('pi_path', __DIR__)
+    ->set('url', $_CONF['site_url'] . '/library')
+    ->set('admin_url', $_CONF['site_admin_url'] . '/plugins/library')
+    ->set('image_dir', $_CONF['path'] . 'data/library/images/items');
 
 //  Additional config items and table definitions are added here
 if (file_exists(__DIR__ . '/config.php')) {
@@ -68,35 +91,6 @@ function USES_library_functions()
 function USES_library_upgrade()
 {   require_once __DIR__ . '/upgrade.inc.php';   }
 
-spl_autoload_register(function ($class)
-{
-    // project-specific namespace prefix
-    $prefix = 'Library\\';
-
-    // does the class use the namespace prefix?
-    $len = strlen($prefix);
-    if (strncmp($prefix, $class, $len) !== 0) {
-        // no, move to the next registered autoloader
-        return;
-    }
-
-    // base directory for the namespace prefix
-    $base_dir = __DIR__ . '/classes/';
-
-    // get the relative class name
-    $relative_class = substr($class, $len);
-
-    // replace the namespace prefix with the base directory, replace namespace
-    // separators with directory separators in the relative class name, append
-    // with .php
-    $file = $base_dir . str_replace('\\', '/', $relative_class) . '.class.php';
-
-    // if the file exists, require it
-    if (file_exists($file)) {
-        require $file;
-    }
-});
-
 
 /**
  * Upgrade the plugin to the currently-installed version.
@@ -117,12 +111,13 @@ function plugin_upgrade_library()
  */
 function plugin_getmenuitems_library()
 {
-    global $_CONF_LIB;
-
     $menuitems = array();
-    if ($_CONF_LIB['menuitem'] && SEC_hasRights('library.view,library.admin', 'OR')) {
+    if (
+        Library\Config::getInstance()->get('menuitem') &&
+        SEC_hasRights('library.view,library.admin', 'OR')
+    ) {
         $txt = _('Library');
-        $menuitems[$txt] = $_CONF_LIB['url'] . '/index.php';
+        $menuitems[$txt] = Library\Config::getInstance()->get('url') . '/index.php';
     }
     return $menuitems;
 }
@@ -135,8 +130,7 @@ function plugin_getmenuitems_library()
  */
 function plugin_commentsupport_library()
 {
-    global $_CONF_LIB;
-    return $_CONF_LIB['ena_comments'] == 0 ? false : true;
+    return Library\Config::getInstance()->get('ena_comments') == 0 ? false : true;
 }
 
 
@@ -180,8 +174,12 @@ function plugin_savecomment_library($title,$comment,$id,$pid,$postmode)
         DB_change($_TABLES['library.items'], 'comments',  $comments,
                 'id', $id);
 
-        return (COM_refresh (COM_buildUrl($_CONF_LIB['url'] .
-                    "/index.php?mode=detail&id=$id")) );
+        return COM_refresh(
+            COM_buildUrl(
+                Library\Config::getInstance()->get('url') .
+                "/index.php?mode=detail&id=$id"
+            )
+        );
     }
 }
 
@@ -273,8 +271,10 @@ function plugin_deletecomment_library($cid, $id)
                     SET comments=$count
                     WHERE id='$id'");
             // Redirect back to the product detail page
-            return (COM_refresh($_CONF_LIB['url'] .
-                    '/index.php?mode=detail&id=' . $id));
+            return COM_refresh(
+                Library\Config::getInstance()->get('url') .
+                '/index.php?mode=detail&id=' . $id
+            );
         }
     }
 
@@ -293,8 +293,11 @@ function plugin_deletecomment_library($cid, $id)
  */
 function plugin_editcomment_library($cid, $id)
 {
-    echo COM_refresh(COM_buildUrl(
-            $_CONF_LIB['url'] . '/index.php?mode=detail&id=' . $id));
+    echo COM_refresh(
+        COM_buildUrl(
+            Library\Config::getInstance()->get('url') . '/index.php?mode=detail&id=' . $id
+        )
+    );
     exit;
 }
 
@@ -306,8 +309,8 @@ function plugin_editcomment_library($cid, $id)
  */
 function plugin_geticon_library()
 {
-    global $_CONF_LIB;
-    return $_CONF_LIB['url'] . '/images/' . $_CONF_LIB['pi_name'] . '.png';
+    return Library\Config::getInstance()->get('url') . '/images/' .
+        Library\Config::getInstance()->get('pi_name') . '.png';
 }
 
 
@@ -319,12 +322,12 @@ function plugin_geticon_library()
  */
 function plugin_cclabel_library()
 {
-    global $_CONF_LIB;
-
     if (SEC_hasRights('library.admin')) {
-        return array($_CONF_LIB['pi_display_name'],
-                    $_CONF_LIB['admin_url'] . '/index.php',
-                    plugin_geticon_library());
+        return array(
+            Library\Config::getInstance()->get('pi_display_name'),
+            Library\Config::getInstance()->get('admin_url'),
+            plugin_geticon_library()
+        );
     }
 }
 
@@ -336,12 +339,14 @@ function plugin_cclabel_library()
  */
 function plugin_getadminoption_library()
 {
-    global $_TABLES, $_CONF_LIB;
+    global $_TABLES;
 
     if (SEC_hasRights('library.admin')) {
-        return array($_CONF_LIB['pi_display_name'],
-                    $_CONF_LIB['admin_url'] . '/index.php',
-                    DB_count($_TABLES['library.items']));
+        return array(
+            Library\Config::getInstance()->get('pi_display_name'),
+            Library\Config::getInstance()->get('admin_url'),
+            DB_count($_TABLES['library.items'])
+        );
     }
 }
 
@@ -353,9 +358,7 @@ function plugin_getadminoption_library()
  */
 function plugin_chkVersion_library()
 {
-    global $_CONF_LIB;
-
-    return $_CONF_LIB['pi_version'];
+    return Library\Config::getInstance()->get('pi_version');
 }
 
 
@@ -393,7 +396,7 @@ function plugin_autotags_library ($op, $content = '', $autotag = '') {
         return 'library';
     } else if ($op == 'parse') {
         $id = COM_applyFilter($autotag['parm1']);
-        $url = $_CONF_LIB['url'] . "/index.php?mode=detail&product=$id";
+        $url = Library\Config::getInstance()->get('url') . "/index.php?mode=detail&product=$id";
 
         // Allow the author to use different text for the link.  Default
         // is the stored product name.
@@ -507,9 +510,8 @@ function library_filterVars($vars, &$arr) {
  */
 function plugin_searchtypes_library()
 {
-    global $_CONF_LIB;
     return array(
-        $_CONF_LIB['pi_name'] => _('Library'),
+        'library' => _('Library'),
     );
 }
 
@@ -530,7 +532,7 @@ function plugin_dopluginsearch_library(
 )
 {
 return;
-    global $_CONF, $_TABLES, $_CONF_LIB;
+    global $_CONF, $_TABLES;
 
     if (!SEC_hasRights('library.user,library.admin', 'OR'))
         return;
@@ -543,33 +545,18 @@ return;
     $htmlquery = urlencode($query);
 
     $query = trim(DB_escapeString(htmlspecialchars($query)));
-
-    $sql_X = "SELECT
-                p.id, p.name as title, p.dscp as description,
-                dt_add as date,  views as hits,
-                CONCAT('/{$_CONF_LIB['pi_name']}/index.php?mode=detail&id=',p.id,'&query=$htmlquery') as url
-            FROM
-                {$_TABLES['library.items']} p
-            LEFT JOIN
-                {$_TABLES['library.categories']} c
-                ON p.cat_id=c.cat_id
-            WHERE
-                p.enabled = 1
-            AND
-                (c.enabled=1 OR c.enabled IS NULL)
-            ";
-
+    $pi_name = Library\Config::getInstance()->get('pi_name');
     $sql = "SELECT
                 p.id, p.name as title, p.dscp as description,
                 dt_add as date,  views as hits,
-                CONCAT('/{$_CONF_LIB['pi_name']}/index.php?detail=x&id=',p.id,'&query=$htmlquery') as url
+                CONCAT('/{$pi_name}/index.php?detail=x&id=',p.id,'&query=$htmlquery') as url
             FROM
                 {$_TABLES['library.items']} p
             WHERE
                 p.enabled = 1
             ";
 
-    $search = new SearchCriteria($_CONF_LIB['pi_name'], _('Library'));
+    $search = new SearchCriteria($pi_name, _('Library'));
     $columns = array('p.name', 'p.dscp',
                     'p.keywords', 'c.cat_name', 'c.dscp');
     list($sql, $ftsql) = $search->buildSearchSQL($keyType, $query, $columns, $sql);
@@ -651,8 +638,6 @@ function plugin_getconfigelementhelp_library($option, $doclang='english')
  */
 function LIBRARY_getDocURL($file='', $doclang='english')
 {
-    global $_CONF_LIB;
-
     $doc_path = __DIR__ . "/docs/$doclang/";
     $doc_url = '';
 
@@ -660,12 +645,12 @@ function LIBRARY_getDocURL($file='', $doclang='english')
         if (!file_exists($doc_path . $file)) {
             $doclang = 'english';
         }
-        $doc_url = $_CONF_LIB['url'] . "/docs/$doclang/$file";
+        $doc_url = Library\Config::getInstance()->get('url') . "/docs/$doclang/$file";
     } else {
         if (!is_dir($doc_path)) {
             $doclang = 'english';
         }
-        $doc_url = $_CONF_LIB['url'] . "/docs/$doclang/";
+        $doc_url = Library\Config::getInstance()->get('url') . "/docs/$doclang/";
     }
     return $doc_url;
 }
@@ -919,10 +904,7 @@ function plugin_itemrated_library($id, $rating, $votes)
  */
 function plugin_canuserrate_library($item_id, $uid)
 {
-    global $_CONF_LIB;
-
-    $_CONF_LIB['anon_can_rate'] = 0;    // TODO Make a config var
-    if ($_CONF_LIB['anon_can_rate'] == 0 && COM_isAnonUser()) {
+    if (Library\Config::getInstance()->get('anon_can_rate') == 0 && COM_isAnonUser()) {
         return false;
     } else {
         return true;
@@ -998,15 +980,13 @@ function plugin_configmanager_select_def_group_id_library()
  */
 function LIBRARY_siteHeader($subject='', $meta='')
 {
-    global $_CONF_LIB;
-
     $retval = '';
 
     $title = _('Library Items');
     if ($subject != '')
         $title = $subject . ' : ' . $title;
 
-    switch ($_CONF_LIB['displayblocks']) {
+    switch (Library\Config::getInstance()->get('displayblocks')) {
     case 2:     // right only
     case 0:     // none
         $retval .= COM_siteHeader('none', $title, $meta);
@@ -1031,11 +1011,9 @@ function LIBRARY_siteHeader($subject='', $meta='')
  */
 function LIBRARY_siteFooter()
 {
-    global $_CONF_LIB;
-
     $retval = '';
 
-    switch($_CONF_LIB['displayblocks']) {
+    switch (Library\Config::getInstance()->get('displayblocks')) {
     case 2 : // right only
     case 3 : // left and right
         $retval .= COM_siteFooter(true);
@@ -1087,8 +1065,9 @@ function LIBRARY_today()
  */
 function LIBRARY_dueDate($days = 0)
 {
-    global $_CONF_LIB;
-    if ($days == 0) $days = $_CONF_LIB['maxcheckout'];
+    if ($days == 0) {
+        $days = Library\Config::getInstance()->get('maxcheckout');
+    }
     return LIBRARY_now()->add(new \DateInterval("P{$days}D"));
 }
 

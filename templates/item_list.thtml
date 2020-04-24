@@ -1,77 +1,76 @@
 {# begin {templatelocation} #}
-<div>
-  <form action="{pi_url}/index.php" method="get">
-  {lang_search}:&nbsp;
-  <input type="text" name="query" value="{query}"><br />
-  {lang_sort}:&nbsp;
-  <select name="sortdir" onchange="this.form.submit();">
-    <option value="ASC" {sortdir_asc_sel}>{lang_ascending]}</option>
-    <option value="DESC" {sortdir_desc_sel}>{lang_descending}</option>
-  </select> &nbsp;&nbsp;
-  {lang_type}:&nbsp;
-  <select name="type" onchange="this.form.submit();">
-    <option value="0">-- {lang_all} --</option>
-    {type_select}
-  </select>&nbsp&nbsp;
-  {lang_category}:&nbsp;
-  <select name="cat_id" onchange="this.form.submit();">
-    <option value="0">-- {lang_all} --</option>
-    {cat_select}
-  </select>
-
-  </form>
+<div style="margin-bottom:30px;">
+    <form action="{pi_url}/index.php" method="get">
+        <ul class="uk-grid">
+            <li class="uk-width-1-1">
+                {lang_search}:&nbsp;
+                <input type="text" name="query" value="{query}" onchange="this.form.submit();">
+                &nbsp;&nbsp;
+                <button class="uk-button uk-button-success" type="submit" name="dosearch">{lang_submit}</button>
+            </li>
+        </ul>
+        <ul class="uk-grid uk-grid-width-1-3" style="margin-top:8px;">
+            <li>
+                {lang_sort}:&nbsp;
+                <select name="sortdir" onchange="this.form.submit();">
+                    <option value="ASC" {sortdir_asc_sel}>{lang_ascending}</option>
+                    <option value="DESC" {sortdir_desc_sel}>{lang_descending}</option>
+                </select>
+            </li>
+            <li>
+                {lang_type}:&nbsp;
+                <select name="type" onchange="this.form.submit();">
+                    <option value="0">-- {lang_all} --</option>
+                    {type_select}
+                </select>
+            </li>
+            <li>
+                {lang_category}:&nbsp;
+                <select name="cat_id" onchange="this.form.submit();">
+                    <option value="0">-- {lang_all} --</option>
+                    {cat_select}
+                </select>
+            </li>
+        </ul>
+    </form>
+</div>
 
 <!-- BEGIN ItemRow -->
-<div style="clear:both;">
-  <hr width="85%" />
-</div>
-
-<div style="text-align:left;">
-  <div class="libListItem">
-    <div class="libListItemImage">
+    <ul class="uk-grid">
+        <li class="uk-width-1-5 uk-hidden-small">
 {!if small_pic}
-      <a href="{pi_url}/index.php?detail=x&id={id}{url_opts}">
-        <img src="{small_pic}" alt="{title}" style="border: none" />
-      </a>
-{!else}
-      &nbsp;
+            <a href="{pi_url}/index.php?detail=x&id={id}{url_opts}">
+                <img src="{small_pic}" alt="{title}" style="border: none" />
+            </a>
 {!endif}
-    </div>
+        </li>
 
-    <div style="float:left;width:80%;">
-      {avail_blk}
-      <a class="lib_itemlist" href="{pi_url}/index.php?detail=x&id={id}{url_opts}">
-        <b><large>{hi_name}</large></b>
-      </a>
+        <li class="uk-width-3-5">
+            <a class="lib_itemlist" href="{pi_url}/index.php?detail=x&id={id}{url_opts}">
+                <b><large>{hi_name}</large></b>
+            </a>
 {!if can_edit}
-      <a href="{site_admin_url}/plugins/library/index.php?edititem=x&id={id}">
-        <i class="uk-icon uk-icon-edit" data-uk-tooltip title="{lang_edit}"></i>
-      </a>
+            <a href="{site_admin_url}/plugins/library/index.php?edititem=x&id={id}">
+                <i class="uk-icon uk-icon-edit" data-uk-tooltip title="{lang_edit}"></i>
+            </a>
 {!endif}
-      <br />
-      {#<small>{id}</small><br />#}
+            <br />
+            {#<small>{id}</small><br />#}
 {!if publisher}
-        {publisher}<br />
+            {publisher}<br />
 {!endif}
 {!if author}
-        {author}
+            {author}
 {!endif}
 {!if rating_bar}
-        <div>{rating_bar}</div>
+            <div>{rating_bar}</div>
 {!endif}
-    </div>
-  </div>
-
-</div>
+        </li>
+        <li class="uk-width-1-5">
+            {avail_blk}
+        </li>
+    </ul>
 <!-- END ItemRow -->
-
-<div style="clear:both;">
-  <hr width="85%" />
-</div>
-
-<p>
-  <div style="align: center">{pagination}</div>
-</p>
-</div>
+<div style="align: center">{pagination}</div>
 {checkinout_js}
 {# end {templatelocation} #}

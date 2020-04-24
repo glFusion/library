@@ -19,7 +19,7 @@
  */
 function LIBRARY_do_upgrade($dvlp = false)
 {
-    global $_TABLES, $_CONF, $_CONF_LIB;
+    global $_TABLES, $_CONF;
 
     $error = 0;
 
@@ -43,7 +43,7 @@ function LIBRARY_do_upgrade($dvlp = false)
  */
 function LIBRARY_do_upgrade_sql($version='', $dvlp=false)
 {
-    global $_TABLES, $_CONF_LIB, $_DB_dbms;
+    global $_TABLES, $_DB_dbms;
 
     /** Include the table creation strings */
     require_once __DIR__ . "/sql/{$_DB_dbms}_install.php";

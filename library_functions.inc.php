@@ -10,7 +10,6 @@
  *              GNU Public License v2 or later
  * @filesource
  */
-use Library\_;
 
 /**
  * Diaplay the product catalog items.
@@ -19,9 +18,9 @@ use Library\_;
  */
 function LIBRARY_ItemList()
 {
-    global $_TABLES, $_CONF, $_CONF_LIB, $_USER, $_GROUPS;
+    global $_TABLES, $_CONF, $_USER, $_GROUPS;
 
-    $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
+    $T = new \Template(__DIR__ . '/templates');
     $T->set_file(array(
         'item'      => 'item_list.thtml',
         'formjs'    => 'checkinout_js.thtml',
@@ -33,19 +32,21 @@ function LIBRARY_ItemList()
     $cat_id = isset($_GET['cat_id']) ? (int)$_GET['cat_id'] : 0;
     $url_opts .= '&type=' . $med_type;
 
+    $Config = Library\Config::getInstance();
     $T->set_var(array(
-        'pi_url'        => $_CONF_LIB['url'],
+        'pi_url'        => $Config->get('url'),
         'type_select'   => Library\MediaType::buildSelection($med_type, true),
         'cat_select'    => Library\Category::buildSelection($cat_id),
-        'lang_type'     => _('Media Type'),
-        'lang_category' => _('Category'),
-        'lang_search'   => _('Search'),
-        'lang_all'      => _('All'),
-        'lang_ascending' => _('Ascending'),
-        'lang_descending' => _('Descending'),
-        'lang_category' => _('Category'),
-        'lang_edit' => _('Edit'),
-        'lang_sort' => _('Sort'),
+        'lang_type'     => dgettext('library', 'Media Type'),
+        'lang_category' => dgettext('library', 'Category'),
+        'lang_search'   => dgettext('library', 'Search'),
+        'lang_all'      => dgettext('library', 'All'),
+        'lang_ascending' => dgettext('library', 'Ascending'),
+        'lang_descending' => dgettext('library', 'Descending'),
+        'lang_category' => dgettext('library', 'Category'),
+        'lang_edit' => dgettext('library', 'Edit'),
+        'lang_sort' => dgettext('library', 'Sort'),
+        'lang_submit' => dgettext('library', 'Submit'),
         //'is_librarian'  => plugin_ismoderatorator_library(),
     ) );
     $user_groups = implode(', ', $_GROUPS);
@@ -73,7 +74,7 @@ function LIBRARY_ItemList()
 
     if (!empty($_GET['query'])) {
         $query = DB_escapeString($_GET['query']);
-        $sql .= " AND (p.name like '%$query%'
+        $sql .= " AND (p.title like '%$query%'
                 OR p.dscp like '%$query%')";
         $T->set_var('query', htmlspecialchars($_GET['query']));
         $pagenav_args .= '&query=' . urlencode($_GET['query']);
@@ -83,7 +84,8 @@ function LIBRARY_ItemList()
     $sql .= " ORDER BY $sortby $sortdir";
 
     // If applicable, handle pagination of query
-    if (isset($_CONF_LIB['items_per_page']) && $_CONF_LIB['items_per_page'] > 0) {
+    $items_per_page = (int)$Config->get('items_per_page');
+    if ($items_per_page > 0) {
         // Count items from database
         $count_sql = 'SELECT COUNT(*) as cnt ' . $sql;
         $key = md5($count_sql);
@@ -100,13 +102,13 @@ function LIBRARY_ItemList()
 
         // Make sure page requested is reasonable, if not, fix it
         $page = isset($_GET['page']) && $_GET['page'] > 0 ? (int)$_GET['page'] : 1;
-        $start_limit = ($page - 1) * $_CONF_LIB['items_per_page'];
+        $start_limit = ($page - 1) * $items_per_page;
         if ($start_limit > $count) {
-            $page = ceil($count / $_CONF_LIB['items_per_page']);
+            $page = ceil($count / $items_per_page);
         }
         // Add limit for pagination (if applicable)
-        if ($count > $_CONF_LIB['items_per_page']) {
-            $sql .= " LIMIT $start_limit, {$_CONF_LIB['items_per_page']}";
+        if ($count > $items_per_page) {
+            $sql .= " LIMIT $start_limit, {$items_per_page}";
         }
     }
 
@@ -130,7 +132,7 @@ function LIBRARY_ItemList()
         'sortdir'   => $sortdir,
     ) );
 
-    if ($_CONF_LIB['ena_ratings'] == 1) {
+    if ($Config->get('ena_ratings') == 1) {
         $ratedIds = RATING_getRatedIds('library');
     } else {
         $ratedIds = array();
@@ -141,7 +143,7 @@ function LIBRARY_ItemList()
     foreach ($Items as $A) {
         $P = \Library\Item::getInstance($A);
 
-        if ($_CONF_LIB['ena_ratings'] == 1) {
+        if ($Config->get('ena_ratings') == 1) {
             if (in_array($P->id, $ratedIds)) {
                 $static = true;
                 $voted = 1;
@@ -181,7 +183,7 @@ function LIBRARY_ItemList()
             'hi_name'   => $hi_name,
             'dscp'      => PLG_replacetags($l_desc),
             'subtitle'  => $subtitle,
-            'img_cell_width' => ($_CONF_LIB['max_thumb_size'] + 20),
+            'img_cell_width' => ($Config->get('max_thumb_size') + 20),
             'avail_blk' => $P->AvailBlock(),
             'author'    => $P->author,
             'publisher' => $P->publisher,
@@ -193,7 +195,7 @@ function LIBRARY_ItemList()
                 "item_id = '{$A['id']}'");
         if ($pic_filename) {
             $T->set_var('small_pic',
-                LGLIB_ImageUrl($_CONF_LIB['image_dir'] . '/' . $pic_filename));
+                LGLIB_ImageUrl($Config->get('image_dir') . '/' . $pic_filename));
         } else {
             $T->set_var('small_pic', '');
         }
@@ -205,13 +207,17 @@ function LIBRARY_ItemList()
     }
 
     // Display pagination
-    if (isset($_CONF_LIB['items_per_page']) &&
-            $_CONF_LIB['items_per_page'] > 0 &&
-            $count > $_CONF_LIB['items_per_page'] ) {
+    if (
+        $items_per_page > 0 &&
+        $count > $items_per_page
+    ) {
         $T->set_var('pagination',
-            COM_printPageNavigation($_CONF_LIB['url'] . '/index.php' . $pagenav_args,
-                        $page,
-                        ceil($count / $_CONF_LIB['items_per_page'])));
+            COM_printPageNavigation(
+                $Config->get('url') . '/index.php' . $pagenav_args,
+                $page,
+                ceil($count / $items_per_page)
+            )
+        );
     } else {
         $T->set_var('pagination', '');
     }
@@ -258,7 +264,7 @@ function LIBRARY_errMsg($msg)
  */
 function LIBRARY_notifyWaitlist($id = '')
 {
-    global $_TABLES,  $_CONF, $_CONF_LIB;
+    global $_TABLES,  $_CONF;
 
     // require a valid item ID
     $id = COM_sanitizeID($id);
@@ -297,7 +303,7 @@ function LIBRARY_notifyWaitlist($id = '')
     $T->set_file('message', 'item_avail.thtml');
     $T->set_var(array(
         'username'      => $username,
-        'pi_url'        => $_CONF_LIB['url'],
+        'pi_url'        => $Config->get('url'),
         'item_id'       => $A['item_id'],
         'item_descrip'  => $A['title'],
         'daysonhold'    => $daysonhold,
@@ -323,7 +329,7 @@ function LIBRARY_notifyWaitlist($id = '')
  */
 function LIBRARY_notifyLibrarian($item_id, $uid)
 {
-    global $_TABLES,  $_CONF, $_CONF_LIB;
+    global $_TABLES,  $_CONF;
 
     USES_lib_user();
 
@@ -333,7 +339,7 @@ function LIBRARY_notifyLibrarian($item_id, $uid)
         return;
     }
     $user = COM_getDisplayName($uid);
-    $grp_id = (int)$_CONF_LIB['grp_librarians'];
+    $grp_id = (int)Library\Config::getInstance()->get('grp_librarians');
     $groupList = implode(',', USER_getChildGroups($grp_id, true));
 
     // Get the users in the Librarians group
@@ -447,7 +453,8 @@ function LIBRARY_userSelect($item_id='')
             } else {
                 $sel = '';
             }
-            $userdisplay = "{$A['fullname']} ({$A['username']}) &lt;== " . _('Next on Waiting List');
+            $userdisplay = "{$A['fullname']} ({$A['username']}) &lt;== " .
+                dgettext('library', 'Next on Waiting List');
             $retval .= "<option value='{$A['uid']}' $sel>$userdisplay</option>\n";
         }
     }

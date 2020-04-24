@@ -51,10 +51,8 @@ class Item
      */
     public function __construct($id = '')
     {
-        global $_CONF_LIB;
-
         $this->properties = array();
-        $this->user_ckout_limit = $_CONF_LIB['def_checkout_limit'];
+        $this->user_ckout_limit = Config::getInstance()->get('def_checkout_limit');
         if ($id == '') {
             $this->isNew = true;
             $this->id = COM_makeSid();
@@ -66,9 +64,9 @@ class Item
             $this->publisher = '';
             $this->pub_date = '';
             $this->author = '';
-            $this->daysonhold = $_CONF_LIB['daysonhold'];
+            $this->daysonhold = Config::getInstance()->get('daysonhold');
             $this->type = 0;
-            $this->maxcheckout = $_CONF_LIB['maxcheckout'];
+            $this->maxcheckout = Config::getInstance()->get('maxcheckout');
             $this->enabled = 1;
             $this->dt_add = time();
             $this->views = 0;
@@ -91,7 +89,7 @@ class Item
                 $this->Category = Category::getInstance($this->cat_id);
             }
         }
-        $this->ListingUrl = $_CONF_LIB['url'] . '/index.php';
+        $this->ListingUrl = Config::getInstance()->get('url') . '/index.php';
         $this->isAdmin = SEC_hasRights('library.admin') ? 1 : 0;
     }
 
@@ -286,7 +284,7 @@ class Item
      */
     public function Save($A = '')
     {
-        global $_TABLES, $_CONF_LIB;
+        global $_TABLES;
 
         if (is_array($A)) {
             $this->setVars($A);
@@ -339,7 +337,7 @@ class Item
         if (empty($this->Error)) {
             self::makeClone($this->id, $add_instances);
             Cache::clear('items');
-            PLG_itemSaved($this->id, $_CONF_LIB['pi_name']);
+            PLG_itemSaved($this->id, Config::getInstance()->get('pi_name'));
             return true;
         } else {
             return false;
@@ -352,7 +350,7 @@ class Item
      */
     public function Delete()
     {
-        global $_TABLES, $_CONF_LIB;
+        global $_TABLES;
 
         if ($this->id == '')
             return false;
@@ -368,7 +366,7 @@ class Item
             $this->DeleteImage($prow['img_id']);
         }
 
-        PLG_itemDeleted($this->id, $_CONF_LIB['pi_name']);
+        PLG_itemDeleted($this->id, Config::getInstance()->get('pi_name'));
         DB_delete($_TABLES['library.items'], 'id', $this->id);
         $this->id = 0;
         return true;
@@ -382,19 +380,24 @@ class Item
      */
     public function DeleteImage($img_id)
     {
-        global $_TABLES, $_CONF_LIB;
+        global $_TABLES;
 
         $img_id = (int)$img_id;
         if ($img_id < 1) return;
 
-        $filename = DB_getItem($_TABLES['library.images'], 'filename',
-                "img_id=$img_id");
+        $filename = DB_getItem(
+            $_TABLES['library.images'],
+            'filename',
+            "img_id=$img_id");
 
-        if (file_exists("{$_CONF_LIB['image_dir']}/{$filename}"))
-                unlink( "{$_CONF_LIB['image_dir']}/{$filename}" );
+        $img_dir = Config::getInstance()->get('image_dir');
+        if (file_exists("$img_dir/{$filename}")) {
+            unlink( "$img_dir/{$filename}" );
+        }
 
-        if (file_exists("{$_CONF_LIB['image_dir']}/thumbs/{$filename}"))
-                unlink("{$_CONF_LIB['image_dir']}/thumbs/{$filename}");
+        if (file_exists("$img_dir/thumbs/{$filename}")) {
+            unlink("$img_dir/thumbs/{$filename}");
+        }
 
         DB_delete($_TABLES['library.images'], 'img_id', $img_id);
     }
@@ -424,7 +427,7 @@ class Item
      */
     public function showForm($id = 0)
     {
-        global $_TABLES, $_CONF, $_CONF_LIB;
+        global $_TABLES, $_CONF;
 
         if ($id != '') {
             // If an id is passed in, then read that record
@@ -434,12 +437,12 @@ class Item
         }
         $id = $this->id;
 
-        $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
+        $T = new \Template(Config::getInstance()->get('pi_path') . '/templates');
         $T->set_file(array(
             'product'   => 'item_form.thtml',
             'tips'      => 'tooltipster.thtml',
         ) );
-        $action_url = $_CONF_LIB['admin_url'] . '/index.php';
+        $action_url = Config::getInstance()->get('admin_url') . '/index.php';
         if ($this->oldid != '') {
             $retval = COM_startBlock(_('Edit') . ': ' . $this->title);
         } else {
@@ -479,13 +482,13 @@ class Item
             'author'        => $this->author,
             'daysonhold'    => $this->daysonhold,
             'maxcheckout'   => $this->maxcheckout,
-            'pi_admin_url'  => $_CONF_LIB['admin_url'],
+            'pi_admin_url'  => Config::getInstance()->get('admin_url'),
             'keywords'      => htmlspecialchars($this->keywords),
             'cat_select'    => Category::buildSelection($this->cat_id),
-            'pi_url'        => $_CONF_LIB['url'],
+            'pi_url'        => Config::getInstance()->get('url'),
             'doc_url'       => LIBRARY_getDocURL('item_form.html',
                                             $_CONF['language']),
-            'lookup_method' => $_CONF_LIB['lookup_method'],
+            'lookup_method' => Config::getInstance()->get('lookup_method'),
             'add_instances' => $this->isNew ? 1 : 0,
             //            'total_instances' => sprintf($LANG_LIB['total_instances'], $total_instances),
             'total_instances' => sprintf(
@@ -560,14 +563,17 @@ class Item
         if ($photocount > 0) {
             while ($prow = DB_fetchArray($photo)) {
                 $i++;
-                $filepath = $_CONF_LIB['image_dir'] . '/' . $prow['filename'];
+                $filepath = Config::getInstance()->get('image_dir') . '/' . $prow['filename'];
                 $T->set_var(array(
                     'img_url'   => LGLIB_ImageUrl($filepath, 800, 600), // todo
-                    'thumb_url' => LGLIB_ImageUrl($filepath,
-                            $_CONF_LIB['max_thumb_size'], $_CONF_LIB['max_thumb_size']),
+                    'thumb_url' => LGLIB_ImageUrl(
+                        $filepath,
+                        Config::getInstance()->get('max_thumb_size'),
+                        $_CONF_LIB['max_thumb_size']
+                    ),
                     'seq_no'    => $i,
                     'id'        => $this->id,
-                    'del_img_url' => $_CONF_LIB['admin_url'] . '/index.php' .
+                    'del_img_url' => Config::getInstance()->get('admin_url') . '/index.php' .
                         '?mode=delete_img' .
                         "&img_id={$prow['img_id']}".
                         "&id={$this->id}",
@@ -580,7 +586,7 @@ class Item
 
         // add upload fields for unused images
         $T->set_block('product', 'UploadFld', 'UFLD');
-        for ($j = $i; $j < $_CONF_LIB['max_images']; $j++) {
+        for ($j = $i; $j < Config::getInstance()->get('max_images'); $j++) {
             $T->parse('UFLD', 'UploadFld', true);
         }
         $T->parse('tooltipster', 'tips');
@@ -667,7 +673,7 @@ class Item
      */
     public function Detail()
     {
-        global $_CONF, $_CONF_LIB, $_TABLES, $_USER;
+        global $_CONF, $_TABLES, $_USER;
 
         USES_lib_comments();
 
@@ -676,7 +682,7 @@ class Item
         }
 
         $retval = COM_startBlock();
-        $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
+        $T = new \Template(Config::getInstance()->get('pi_path') . '/templates');
         $T->set_file(array(
             'item' => 'item_detail.thtml',
             'formjs' => 'checkinout_js.thtml',
@@ -698,8 +704,8 @@ class Item
             'title'             => $title,
             'subtitle'          => $subtitle,
             'dscp'              => $l_desc,
-            'img_cell_width'    => ($_CONF_LIB['max_thumb_size'] + 20),
-            'pi_url'            => $_CONF_LIB['url'],
+            'img_cell_width'    => Config::getInstance()->get('max_thumb_size') + 20,
+            'pi_url'            => Config::getInstance()->get('url'),
             'avail_blk'         => $this->AvailBlock(),
             'publisher'         => $this->publisher,
             'pub_date'          => $this->pub_date,
@@ -723,14 +729,16 @@ class Item
         $photo_detail = '';
         $T->set_var('have_photo', '');     // assume no photo available
         for ($i = 0; $prow = DB_fetchArray($img_res, false); $i++) {
-            $img_file = "{$_CONF_LIB['image_dir']}/{$prow['filename']}";
-            $tn_url = LGLIB_ImageUrl($img_file, $_CONF_LIB['max_thumb_size'],
-                    $_CONF_LIB['max_thumb_size']);
+            $img_file = Config::getInstance()->get('image_dir') . '/' . $prow['filename'];
+            $tn_url = LGLIB_ImageUrl(
+                $img_file,
+                Config::getInstance()->get('max_thumb_size'),
+                Config::getInstance()->get('max_thumb_size')
+            );
             $img_url = LGLIB_ImageUrl($img_file, 800, 600);
             if ($tn_url !== '') {
                 if ($i == 0) {
                     $T->set_var('main_img_url', LGLIB_ImageUrl($img_file,
-                        //$_CONF_LIB['max_img_width'], $_CONF_LIB['max_img_height']));
                         800, 600));
                 }
                 $T->set_block('item', 'Thumbnail', 'PBlock');
@@ -753,7 +761,7 @@ class Item
                     '', 0, 1, false, false, $mode));
         }
 
-        if ($_CONF_LIB['ena_ratings'] == 1) {
+        if (Config::getInstance()->get('ena_ratings') == 1) {
             $ratedIds = RATING_getRatedIds('library');
             if (in_array($this->id, $ratedIds)) {
                 $static = true;
@@ -866,9 +874,9 @@ class Item
      */
     public function AvailBlock()
     {
-        global $_TABLES, $_USER, $_CONF_LIB;
+        global $_TABLES, $_USER;
 
-        $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
+        $T = new \Template(Config::getInstance()->get('pi_path') . '/templates');
         $T->set_file('avail', 'avail_block.thtml');
         $avail = Instance::getAll($this->id, LIB_STATUS_AVAIL);
         $waitlisters = Waitlist::countByItem($this->id);
@@ -891,12 +899,13 @@ class Item
                 $is_reserved = true;
                 $waitlist_txt = sprintf(_('You\'re #%d on the waiting list'), $waitlist_pos);
             } else {
-                $can_reserve = $user_wait_items < $_CONF_LIB['max_wait_items'] ? true : false;
+                $can_reserve = $user_wait_items < Config::getInstance()->get('max_wait_items') ? true : false;
                 $is_reserved = false;
             }
         }
 
         // Check if the current user already has the item checked out
+        $max_wait_items = Config::getInstance()->get('max_wait_items');
         $item_checked_out = Instance::UserHasItem($this->id, $_USER['uid']);
         $all_checked_out= Instance::countByUser($_USER['uid']);
         if ($item_checked_out) {
@@ -907,10 +916,10 @@ class Item
             $reserve_txt = '';
         } else {
             if ($num_avail > 0) {
-                if (($user_wait_items + $all_checked_out) < $_CONF_LIB['max_wait_items']) {
+                if (($user_wait_items + $all_checked_out) < $max_wait_items) {
                     $avail_txt = sprintf(_('%d available'), $num_avail);
                 } elseif (!$is_reserved) {
-                    $avail_txt = sprintf(_('You can reserve up to <br />%d items at a time.'), $_CONF_LIB['max_wait_items']);
+                    $avail_txt = sprintf(_('You can reserve up to <br />%d items at a time.'), $max_wait_items);
                     $can_reserve = false;
                 } else {
                     $avail_txt = '';
@@ -929,20 +938,20 @@ class Item
         $T->set_var(array(
             'can_reserve'   => $can_reserve,
             'is_reserved'   => $is_reserved,
-            'wait_limit_reached' => $user_wait_items >= $_CONF_LIB['max_wait_items'],
+            'wait_limit_reached' => $user_wait_items >= $max_wait_items,
             'avail_txt'     => $avail_txt,
             'waitlist_txt'  => $waitlist_txt,
             'due_dt'        => '',
             'reserve_txt' => $reserve_txt,
             'id'            => $this->id,
-            'pi_url'        => $_CONF_LIB['url'],
-            'pi_admin_url'  => $_CONF_LIB['admin_url'],
+            'pi_url'        => Config::getInstance()->get('url'),
+            'pi_admin_url'  => Config::getInstance()->get('admin_url'),
             'is_librarian'  => plugin_ismoderator_library(),
             'can_checkout'  => count($avail),
             'can_checkin'   => $can_checkin,
             'num_avail'     => sprintf(_('%s available'), count($avail) . '/' . $total_instances),
-            'lang_add_waitlist' => _('Place your reservation'),
-            'lang_click_to_remove' => _('Cancel Reservation'),
+            'lang_add_waitlist' => _('Reserve'),
+            'lang_click_to_remove' => _('Cancel'),
             'lang_checkin'  => _('Check In'),
             'lang_checkout' => _('Check Out'),
             'lang_due'      => _('Due'),
@@ -1060,7 +1069,7 @@ class Item
      */
     public static function checkinForm($id, $ajax=false)
     {
-        global $_CONF, $_CONF_LIB;
+        global $_CONF;
 
         $I = self::getInstance($id);
         if ($I->isNew || $I->id == '') {
@@ -1078,12 +1087,12 @@ class Item
                 $username . ' - ' . _('Due Date') . ': ' . $due .
                 '</option>';
         }
-        $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
+        $T = new \Template(Config::getInstance()->get('pi_path') . '/templates');
         $T->set_file('form', 'checkin_form.thtml');
         $T->set_var(array(
             'title'         => _('Library Administration'),
-            'action_url'    => $_CONF_LIB['admin_url'] . '/index.php',
-            'pi_url'        => $_CONF_LIB['url'],
+            'action_url'    => Config::getInstance()->get('admin_url') . '/index.php',
+            'pi_url'        => Config::getInstance()->get('url'),
             'item_id'       => $I->id,
             'title'         => $I->title,
             'subtitle'      => $I->subtitle,
@@ -1111,7 +1120,7 @@ class Item
      */
     public static function checkoutForm($id, $ajax=false)
     {
-        global $_CONF, $_CONF_LIB;
+        global $_CONF;
 
         $I = self::getInstance($id);
         if ($I->isNew || $I->id == '') {
@@ -1123,7 +1132,7 @@ class Item
         // the calendar popup, so make sure a corresponding language file
         // exists.  Default to English if not found.
         $iso_lang = $_CONF['iso_lang'];
-        if (!is_file($_CONF['path_html'] . $_CONF_LIB['pi_name'] .
+        if (!is_file($_CONF['path_html'] . Config::getInstance()->get('pi_name') .
             '/js/calendar/lang/calendar-' . $iso_lang . '.js')) {
             $iso_lang = 'en';
         }
@@ -1131,15 +1140,15 @@ class Item
         // Default to the plugin config for maxcheckout if not set for
         // this item.
         if ($I->maxcheckout < 1) {
-            $I->maxcheckout = (int)$_CONF_LIB['maxcheckout'];
+            $I->maxcheckout = (int)Config::getInstance()->get('maxcheckout');
         }
 
-        $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
+        $T = new \Template(Config::getInstance()->get('pi_path') . '/templates');
         $T->set_file('form', 'checkout_form.thtml');
         $T->set_var(array(
             'title'         => _('Library Administration'),
-            'action_url'    => $_CONF_LIB['admin_url'] . '/index.php',
-            'pi_url'        => $_CONF_LIB['url'],
+            'action_url'    => Config::getInstance()->get('admin_url') . '/index.php',
+            'pi_url'        => Config::getInstance()->get('url'),
             'item_id'       => $I->id,
             'title'         => $I->title,
             'subtitle'      => $I->subtitle,
@@ -1161,6 +1170,263 @@ class Item
         return $T->finish($T->get_var('output'));
     }
 
-}   // class Item
+
+    /**
+     * Product Admin List View.
+     *
+     * @param   integer $cat_id     Optional category to limit view
+     * @param   integer $status     Optional status, to limit view
+     */
+    public static function adminList($cat_id = 0, $status = 0)
+    {
+        global $_CONF, $_CONF_LIB, $_TABLES, $_USER;
+
+        $sql = LIBRARY_admin_getSQL($cat_id, $status);
+
+        $display = '';
+        $header_arr = array(
+            array(  'text'  => _('Edit'),
+                'field' => 'edit',
+                'sort'  => false,
+                'align' => 'center',
+            ),
+            array(  'text'  => _('Copy'),
+                'field' => 'copy',
+                'sort'  => false,
+                'align' => 'center',
+            ),
+            array(  'text'  => _('ID'),
+                'field' => 'id',
+                'sort'  => true,
+            ),
+            array(  'text'  => _('Enabled'),
+                'field' => 'enabled',
+                'sort'  => false,
+                'align' => 'center',
+            ),
+            array(  'text'  => _('Item Name'),
+                'field' => 'title',
+                'sort'  => true,
+            ),
+            array(  'text'  => _('Media Type'),
+                'field' => 'typename',
+                'sort'  => true,
+            ),
+            array(  'text'  => _('Category'),
+                'field' => 'cat_name',
+                'sort'  => true,
+            ),
+            array(  'text'  => _('Available'),
+                'field' => 'status',
+                'sort'  => false,
+                'align' => 'center',
+            ),
+            array(  'text'  => _('History'),
+                'field' => 'history',
+                'sort'  => false,
+            ),
+            array(  'text'  => _('Check Out'),
+                'field' => 'checkout',
+                'sort'  => false,
+            ),
+            array(  'text'  => _('Check In'),
+                'field' => 'checkin',
+                'sort'  => false,
+            ),
+            array(  'text'  => _('Delete'),
+                'field' => 'delete',
+                'sort'  => false,
+                'align' => 'center',
+            ),
+        );
+
+        $defsort_arr = array(
+            'field' => 'id',
+            'direction' => 'asc',
+        );
+
+        $display .= COM_startBlock(
+            '', '',
+            COM_getBlockTemplate('_admin_block', 'header')
+        );
+
+        $query_arr = array(
+            'table' => 'library.items',
+            'sql' => $sql,
+            'query_fields' => array('p.name', 'p.dscp'),
+            'default_filter' => '',
+        );
+        $text_arr = array(
+            //'has_extras' => true,
+            'form_url' => $_CONF_LIB['admin_url'] . '/index.php?status=' . $status,
+        );
+        $form_arr = LIBRARY_itemStatusForm($status);
+        $filter = '';
+        $extras = array(
+            'status'    => $status,
+        );
+        if (!isset($_REQUEST['query_limit'])) {
+            $_GET['query_limit'] = 20;
+        }
+
+        $display .= '<div class="floatright">' . COM_createLink(_('New Item'),
+            $_CONF_LIB['admin_url'] . '/index.php?edititem=0',
+            array('class' => 'uk-button uk-button-success')
+        ) . '</div>';
+        $display .= ADMIN_list(
+            'library_adminlist_item',
+            array(__CLASS__, 'adminListField'),
+            $header_arr, $text_arr, $query_arr, $defsort_arr,
+            $filter, $extras, '', $form_arr
+        );
+        $display .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
+        return $display;
+    }
+
+
+    /**
+     * Get an individual field for the Item Admin screen.
+     *
+     * @param   string  $fieldname  Name of field (from the array, not the db)
+     * @param   mixed   $fieldvalue Value of the field
+     * @param   array   $A          Array of all fields from the database
+     * @param   array   $icon_arr   System icon array (not used)
+     * @return  string              HTML for field display in the table
+     */
+    public static function adminListField($fieldname, $fieldvalue, $A, $icon_arr)
+    {
+        global $_CONF, $_CONF_LIB, $_TABLES;
+
+        $retval = '';
+
+        $avail = count(Instance::getAll($A['id'], LIB_STATUS_AVAIL));
+        $out = count(Instance::getAll($A['id'], LIB_STATUS_OUT));
+        $total = $avail + $out;
+
+        switch($fieldname) {
+        case 'id':
+            $retval = COM_createLink(
+                $fieldvalue,
+                $_CONF_LIB['admin_url'] . '/index.php?instances=x&item_id=' . $fieldvalue,
+                array(
+                    'title' => _('View Instances'),
+                    'class' => 'tooltip',
+                ) );
+            break;
+
+        case 'edit':
+            $retval .= COM_createLink(
+                '<i class="uk-icon uk-icon-edit"></i>',
+                $_CONF_LIB['admin_url'] . "/index.php?edititem=x&amp;id={$A['id']}"
+            );
+            break;
+
+        case 'copy':
+            $retval .= COM_createLink(
+                '<i class="uk-icon uk-icon-copy"></i>',
+                $_CONF_LIB['admin_url'] . "/index.php?copyitem=x&amp;id={$A['id']}"
+            );
+            break;
+
+        case 'delete':
+            if (!self::isUsed($A['id'])) {
+                $retval .= COM_createLink(
+                    Icon::getHTML('delete'),
+                    $_CONF_LIB['admin_url']. '/index.php?deleteitem=x&amp;id=' . $A['id'],
+                    array(
+                        'onclick'=>'return confirm(\'' .
+                        _('Are you sure you want to delete this item?') .
+                        '\');',
+                        'title' => _('Delete Item'),
+                        'class' => 'tooltip',
+                    )
+                );
+            }
+            break;
+
+        case 'enabled':
+            $chk = $fieldvalue == 1 ? ' checked="checked"' : '';
+            $retval .= "<input type=\"checkbox\" $chk value=\"1\" name=\"ena_check\"
+                id=\"togenabled{$A['id']}\"
+                onclick='LIBR_toggle(this,\"{$A['id']}\",\"enabled\",\"item\");'>".LB;
+            break;
+
+        case 'title':
+            $retval = COM_createLink(
+                $fieldvalue,
+                $_CONF_LIB['url'] . '/index.php?detail=x&id=' . $A['id'],
+                array(
+                    'title' => _('View Item'),
+                    'class' => 'tooltip',
+                ) );
+            break;
+
+        case 'type':
+            $retval = LGLIB_getVar(_('Media Types'), $A['type'], 'string', 'Unknown');
+            break;
+
+        case 'status':
+            $retval = $avail . ' / ' . $total;
+            break;
+            if ($fieldvalue == LIB_STATUS_OUT) {
+                if ($A['due'] < LIBRARY_now()) {
+                    $cls = 'danger';
+                    $msg = _('Overdue');
+                } else {
+                    $cls = 'unknown';
+                    $msg = _('Checked Out');
+                }
+            } elseif (isset($A['wait_count']) && $A['wait_count'] > 0) {
+                $cls = 'warning';
+                $msg = _('Waitlisted');
+            } elseif ($fieldvalue == LIB_STATUS_AVAIL) {
+                $cls = 'ok';
+                $msg = _('Available');
+            } else {
+                $cls = 'unknown';
+                $msg = '';
+            }
+            $retval .= '<i class="uk-icon uk-icon-circle uk-icon-' . $cls .
+                '" title="' . $msg . '" class="tooltip"></i>';
+            break;
+
+        case 'checkout':
+            if ($avail > 0) {
+                $retval .= COM_createLink(
+                    _('Check Out'),
+                    $_CONF_LIB['admin_url'] . '/index.php?checkoutform=x&id=' . $A['id']
+                );
+            }
+            break;
+
+        case 'checkin':
+            if ($total > $avail) {
+                $retval .= COM_createLink(
+                    _('Check In'),
+                    $_CONF_LIB['admin_url'] . '/index.php?checkinform=x&id=' . $A['id']
+                );
+            }
+            break;
+
+        case 'history':
+            if (DB_count($_TABLES['library.log'], 'item_id', $A['id']) > 0) {
+                $retval .= COM_createLink('<i class="uk-icon uk-icon-file-text-o"></i>',
+                    $_CONF_LIB['admin_url'] . '/index.php?history=x&id=' . $A['id'],
+                    array(
+                        'title' => _('View History'),
+                        'class' => 'tooltip',
+                    ) );
+            }
+            break;
+
+        default:
+            $retval = htmlspecialchars($fieldvalue);
+            break;
+        }
+
+        return $retval;
+    }
+
+}
 
 ?>
