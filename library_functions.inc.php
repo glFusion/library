@@ -11,6 +11,8 @@
  * @filesource
  */
 
+use Library\_;
+
 /**
  * Diaplay the product catalog items.
  *
@@ -37,16 +39,18 @@ function LIBRARY_ItemList()
         'pi_url'        => $Config->get('url'),
         'type_select'   => Library\MediaType::buildSelection($med_type, true),
         'cat_select'    => Library\Category::buildSelection($cat_id),
-        'lang_type'     => dgettext('library', 'Media Type'),
-        'lang_category' => dgettext('library', 'Category'),
-        'lang_search'   => dgettext('library', 'Search'),
-        'lang_all'      => dgettext('library', 'All'),
-        'lang_ascending' => dgettext('library', 'Ascending'),
-        'lang_descending' => dgettext('library', 'Descending'),
-        'lang_category' => dgettext('library', 'Category'),
-        'lang_edit' => dgettext('library', 'Edit'),
-        'lang_sort' => dgettext('library', 'Sort'),
-        'lang_submit' => dgettext('library', 'Submit'),
+        'lang_type'     => _('Media Type'),
+        'lang_category' => _('Category'),
+        'lang_search'   => _('Search'),
+        'lang_all'      => _('All'),
+        'lang_ascending' => _('Ascending'),
+        'lang_descending' => _('Descending'),
+        'lang_category' => _('Category'),
+        'lang_edit' => _('Edit'),
+        'lang_sort' => _('Sort'),
+        'lang_submit' => _('Submit'),
+        'is_admin' => plugin_ismoderator_library(),
+        'lang_admin' => _('Admin'),
         //'is_librarian'  => plugin_ismoderatorator_library(),
     ) );
     $user_groups = implode(', ', $_GROUPS);
@@ -141,10 +145,11 @@ function LIBRARY_ItemList()
     // Display each product
     $T->set_block('item', 'ItemRow', 'IRow');
     foreach ($Items as $A) {
+        //var_dump($A);die;
         $P = \Library\Item::getInstance($A);
 
         if ($Config->get('ena_ratings') == 1) {
-            if (in_array($P->id, $ratedIds)) {
+            if (in_array($P->getID(), $ratedIds)) {
                 $static = true;
                 $voted = 1;
             } elseif (plugin_canuserrate_library($A['id'], $_USER['uid'])) {
@@ -154,9 +159,11 @@ function LIBRARY_ItemList()
                 $static = 1;
                 $voted = 0;
             }
-            $rating_box = RATING_ratingBar('library', $P->id,
-                    $P->votes, $P->rating,
-                    $voted, 5, $static, 'sm');
+            $rating_box = RATING_ratingBar(
+                'library', $P->getID(),
+                $P->getVotes(), $P->getRating(),
+                $voted, 5, $static, 'sm'
+            );
             $T->set_var('rating_bar', $rating_box);
         } else {
             $T->set_var('rating_bar', '');
@@ -165,28 +172,28 @@ function LIBRARY_ItemList()
         // Highlight the query terms if coming from a search
         if (!empty($query)) {
             $url_opts .= '&query=' . urlencode($query);
-            $hi_name = COM_highlightQuery(htmlspecialchars($P->title),
+            $hi_name = COM_highlightQuery(htmlspecialchars($P->getTitle()),
                         $query);
-            $l_desc = COM_highlightQuery(htmlspecialchars($P->dscp),
+            $l_desc = COM_highlightQuery(htmlspecialchars($P->getDscp()),
                         $query);
-            $subtitle = COM_highlightQuery(htmlspecialchars($P->subtitle),
+            $subtitle = COM_highlightQuery(htmlspecialchars($P->getSubtitle()),
                         $query);
         } else {
-            $hi_name = htmlspecialchars($P->title);
-            $l_desc = htmlspecialchars($P->dscp);
-            $subtitle = htmlspecialchars($P->subtitle);
+            $hi_name = htmlspecialchars($P->getTitle());
+            $l_desc = htmlspecialchars($P->getDscp());
+            $subtitle = htmlspecialchars($P->getSubtitle());
         }
 
         $T->set_var(array(
             'id'        => $A['id'],
-            'title'     => $P->title,
+            'title'     => $P->getTitle(),
             'hi_name'   => $hi_name,
             'dscp'      => PLG_replacetags($l_desc),
             'subtitle'  => $subtitle,
             'img_cell_width' => ($Config->get('max_thumb_size') + 20),
             'avail_blk' => $P->AvailBlock(),
-            'author'    => $P->author,
-            'publisher' => $P->publisher,
+            'author'    => $P->getAuthor(),
+            'publisher' => $P->getPublisher(),
             'url_opts'  => $url_opts,
             'can_edit'  => plugin_ismoderator_library(),
         ) );
@@ -272,7 +279,7 @@ function LIBRARY_notifyWaitlist($id = '')
         return;
 
     // retrieve the first waitlisted user info.
-    $sql = "SELECT w.id, w.uid, w.item_id, i.name, i.daysonhold,
+    $sql = "SELECT w.id, w.uid, w.item_id, i.title, i.daysonhold,
                 u.email, u.language
             FROM {$_TABLES['library.waitlist']} w
             LEFT JOIN {$_TABLES['library.items']} i
@@ -353,10 +360,10 @@ function LIBRARY_notifyLibrarian($item_id, $uid)
     $res = DB_query($sql, 1);
     if (DB_numRows($res) == 0) return;
     $Item = new Library\Item($item_id);
-    if ($Item->isNew) return;   // invalid item id
+    if ($Item->isNew()) return;   // invalid item id
 
     $msg = '<p>Someone has requested a library item.</p>' . LB .
-        '<p>Item Name: ' . $Item->title . '</p>' . LB .
+        '<p>Item Name: ' . $Item->getTitle() . '</p>' . LB .
         '<p>Requested By: ' . $user . '</p>' . LB;
 
     while ($A = DB_fetchArray($res, false)) {
@@ -454,7 +461,7 @@ function LIBRARY_userSelect($item_id='')
                 $sel = '';
             }
             $userdisplay = "{$A['fullname']} ({$A['username']}) &lt;== " .
-                dgettext('library', 'Next on Waiting List');
+                _('Next on Waiting List');
             $retval .= "<option value='{$A['uid']}' $sel>$userdisplay</option>\n";
         }
     }
