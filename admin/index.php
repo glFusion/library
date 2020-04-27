@@ -43,7 +43,7 @@ $expected = array(
     'savemedia', 'saveitem', 'savecat',
     'edititem', 'editcat', 'editmedia',
     // views:
-    'catlist', 'medialist', 'itemlist', 'pending',
+    'catlist', 'medialist', 'itemlist', 'pending', 'overdue',
     'checkoutform', 'checkinform', 'history', 'instances',
 );
 $action = 'itemlist';       // Default action
@@ -65,13 +65,13 @@ switch ($action) {
 case 'checkout':
     $I = \Library\Item::getInstance($_POST['id']);
     $I->checkOut($_POST['uid']);
-    COM_refresh($_CONF_LIB['admin_url'] . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
+    COM_refresh(Config::getInstance()->get('admin_url') . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
     break;
 
 case 'checkin':
     $I = \Library\Item::getInstance($_POST['id']);
     $I->checkIn($_POST['instance_id']);
-    COM_refresh($_CONF_LIB['admin_url'] . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
+    COM_refresh(Config::getInstance()->get('admin_url') . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
     break;
 
 case 'deleteitem':
@@ -79,7 +79,7 @@ case 'deleteitem':
     $P = \Library\Item::getInstance($_REQUEST['id']);
     if (!$P->isUsed()) {
         $P->Delete();
-        COM_refresh($_CONF_LIB['admin_url'] . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
+        COM_refresh(Config::getInstance()->get('admin_url') . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
     } else {
         $content .= "Product has purchase records, can't delete.";
     }
@@ -89,7 +89,7 @@ case 'deleteinstance':
     // Instance ID only comes from $_GET
     $I = \Library\Instance::getInstance($_GET['id']);
     $I->Delete();
-    COM_refresh($_CONF_LIB['admin_url'] . '/index.php?instances=x&item_id=' . $_GET['item_id']);;
+    COM_refresh(Config::getInstance()->get('admin_url') . '/index.php?instances=x&item_id=' . $_GET['item_id']);;
     break;
 
 case 'deletecatimage':
@@ -128,7 +128,7 @@ case 'savemedia':
 
 case 'deletemedia':
     \Library\MediaType::getInstance(LGLIB_getVar($_GET, 'id', 'integer'))->Delete();
-    COM_refresh($_CONF_LIB['admin_url'] . '/index.php?medialist=x');
+    COM_refresh(Config::getInstance()->get('admin_url') . '/index.php?medialist=x');
     break;
 
 case 'saveitem':
@@ -147,7 +147,7 @@ case 'savecat':
         $content .= LIBRARY_popupMsg(_('The submitted form has missing or invalid fields'));
         $view = 'editcat';
     } else {
-        COM_refresh($_CONF_LIB['admin_url'] . '/index.php?catlist');
+        COM_refresh(Config::getInstance()->get('admin_url') . '/index.php?catlist');
     }
     break;
 
@@ -189,7 +189,7 @@ case 'copyitem':
     if (!empty($id)) {
         \Library\Item::makeClone($id);
     }
-    echo COM_refresh($_CONF_LIB['admin_url']);
+    COM_refresh(Config::getInstance()->get('admin_url'));
     break;
 
 case 'editcat':
@@ -213,23 +213,24 @@ case 'editmedia':
     break;
 
 case 'catlist':
-    $content .= LIBRARY_adminlist_Category();
+    $content .= Library\Category::adminList();
     break;
 
 case 'medialist':
-    $content .= LIBRARY_adminlist_MediaType();
+    $content .= Library\MediaType::adminList();
     break;
 
 case 'pending':
-    $content .= LIBRARY_adminlist_Items(0, true);
+    $content .= Library\Item::adminList(0, true);
     break;
 
 case 'instances':
     $status = isset($_REQUEST['status']) ? (int)$_REQUEST['status'] : 0;
     $item_id = isset($_REQUEST['item_id']) ? $_REQUEST['item_id'] : '';
-    $content .= LIBRARY_adminlist_Instances($item_id, $status);
+    $content .= Library\Instance::adminList($item_id, $status);
     break;
 
+case 'overdue':
 case 'itemlist':
 default:
     $status = isset($_REQUEST['status']) ? (int)$_REQUEST['status'] : 0;
@@ -245,7 +246,7 @@ default:
     case 4:         // Overdue Instances
         // checked-out or overdue instances
         $item_id = isset($_REQUEST['item_id']) ? $_REQUEST['item_id'] : '';
-        $content .= LIBRARY_adminlist_Instances($item_id, $status);
+        $content .= Library\Instance::adminList($item_id, $status);
         break;
     }
     break;
@@ -265,682 +266,6 @@ $display .= COM_siteFooter();
 echo $display;
 exit;
 
-
-/**
- * Get the admin list of item instances.
- *
- * @param   string  $item_id    Item ID
- * @param   integer $status     Optional item status, to limit view
- * @return  string      HTML for admin list
- */
-function LIBRARY_adminlist_Instances($item_id=0, $status=0)
-{
-    global $_CONF, $_CONF_LIB, $_TABLES, $_USER;
-
-    $display = '';
-
-    $sql = "SELECT inst.*, item.title FROM {$_TABLES['library.instances']} inst
-            LEFT JOIN {$_TABLES['library.items']} item
-                ON item.id = inst.item_id ";
-    $stat_join = '';
-    switch ($status) {
-    case 0:     // All
-        $stat_sql = ' WHERE 1=1 ';
-        break;
-    case 1:     // Available
-        $stat_sql = ' WHERE inst.uid = 0 ';
-        break;
-    case 2:     // Checked Out
-        $stat_sql = ' WHERE inst.uid > 0 ';
-        break;
-    case 3:     // Pending Actions, include available only
-        $stat_sql = ' GROUP BY w.item_id HAVING count(w.id) > 0 ';
-        $stat_join = "LEFT JOIN {$_TABLES['library.waitlist']} w
-                ON item.id = w.item_id";
-        break;
-    case 4:     // Overdue
-        $stat_sql = ' WHERE inst.due > 0 AND inst.due < UNIX_TIMESTAMP() ';
-        break;
-    }
-    $sql .= $stat_join;
-    $sql .= $stat_sql;
-    if (!empty($item_id)) {
-        $sql .= " AND inst.item_id = '" . DB_escapeString($item_id) . "'";
-    }
-
-    $header_arr = array(
-        array(  'text'  => 'ID',
-                'field' => 'instance_id',
-                'sort'  => true,
-            ),
-        array(  'text'  => _('Item ID'),
-                'field' => 'item_id',
-                'sort'  => true,
-            ),
-        array(  'text'  => _('Check out to user'),
-                'field' => 'uid',
-                'sort'  => true,
-            ),
-        array(  'text'  => _('Checked Out'),
-                'field' => 'checkout',
-                'sort'  => true,
-            ),
-        array(  'text'  => _('Due Date'),
-                'field' => 'due',
-                'sort'  => true,
-            ),
-        array(  'text'  => _('Check In'),
-                'field' => 'checkin',
-                'sort'  => false,
-            ),
-        array(  'text'  => _('Delete'),
-                'field' => 'delete',
-                'sort'  => true,
-            ),
-    );
-
-    $defsort_arr = array('field' => 'inst.due',
-            'direction' => 'desc');
-
-    $display .= COM_startBlock('', '',
-                    COM_getBlockTemplate('_admin_block', 'header'));
-
-    $query_arr = array(
-        'table' => 'library.instances',
-        'sql' => $sql,
-        'query_fields' => array(),
-        'default_filter' => '',
-    );
-    $filter = '';
-    $text_arr = array(
-        //'has_extras' => true,
-        'form_url' => $_CONF_LIB['admin_url'] . '/index.php?status=' . $status,
-    );
-    $form_arr = LIBRARY_itemStatusForm($status, $item_id);
-    $extras = array();
-    $display .= ADMIN_list('library', 'LIBRARY_getAdminField_Instance',
-            $header_arr, $text_arr, $query_arr, $defsort_arr,
-            $filter, $extras, '', $form_arr);
-    $display .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
-    return $display;
-}
-
-
-/**
- * Product Admin List View.
- *
- * @param   integer $cat_id     Optional category to limit view
- * @param   integer $status     Optional status, to limit view
- */
-function XXLIBRARY_adminlist_Items($cat_id = 0, $status = 0)
-{
-    global $_CONF, $_CONF_LIB, $_TABLES, $_USER;
-
-    $sql = LIBRARY_admin_getSQL($cat_id, $status);
-
-    $display = '';
-    $header_arr = array(
-        array(  'text'  => _('Edit'),
-                'field' => 'edit',
-                'sort'  => false,
-                'align' => 'center',
-            ),
-        array(  'text'  => _('Copy'),
-                'field' => 'copy',
-                'sort'  => false,
-                'align' => 'center',
-            ),
-        array(  'text'  => _('ID'),
-                'field' => 'id',
-                'sort'  => true,
-            ),
-        array(  'text'  => _('Enabled'),
-                'field' => 'enabled',
-                'sort'  => false,
-                'align' => 'center',
-            ),
-        array(  'text'  => _('Item Name'),
-                'field' => 'title',
-                'sort'  => true,
-            ),
-        array(  'text'  => _('Media Type'),
-                'field' => 'typename',
-                'sort'  => true,
-            ),
-        array(  'text'  => _('Category'),
-                'field' => 'cat_name',
-                'sort'  => true,
-            ),
-        array(  'text'  => _('Available'),
-                'field' => 'status',
-                'sort'  => false,
-                'align' => 'center',
-            ),
-        array(  'text'  => _('History'),
-                'field' => 'history',
-                'sort'  => false,
-            ),
-        array(  'text'  => _('Check Out'),
-                'field' => 'checkout',
-                'sort'  => false,
-            ),
-        array(  'text'  => _('Check In'),
-                'field' => 'checkin',
-                'sort'  => false,
-            ),
-        array(  'text'  => _('Delete'),
-                'field' => 'delete',
-                'sort'  => false,
-                'align' => 'center',
-            ),
-    );
-
-    $defsort_arr = array('field' => 'id',
-            'direction' => 'asc');
-
-    $display .= COM_startBlock('', '',
-                    COM_getBlockTemplate('_admin_block', 'header'));
-
-    $query_arr = array(
-        'table' => 'library.items',
-        'sql' => $sql,
-        'query_fields' => array('p.name',
-                            'p.dscp'),
-        'default_filter' => '',
-    );
-    $text_arr = array(
-        //'has_extras' => true,
-        'form_url' => $_CONF_LIB['admin_url'] . '/index.php?status=' . $status,
-    );
-    $form_arr = LIBRARY_itemStatusForm($status);
-    $filter = '';
-    $extras = array(
-        'status'    => $status,
-    );
-    if (!isset($_REQUEST['query_limit'])) {
-        $_GET['query_limit'] = 20;
-    }
-
-    $display .= '<div class="floatright">' . COM_createLink(_('New Item'),
-        $_CONF_LIB['admin_url'] . '/index.php?edititem=0',
-        array('class' => 'uk-button uk-button-success')
-    ) . '</div>';
-    $display .= ADMIN_list('library', 'LIBRARY_getAdminField_Item',
-            $header_arr, $text_arr, $query_arr, $defsort_arr,
-            $filter, $extras, '', $form_arr);
-
-    $display .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
-    return $display;
-}
-
-
-/**
- * Get an individual field for the Instance Admin screen.
- *
- * @param   string  $fieldname  Name of field (from the array, not the db)
- * @param   mixed   $fieldvalue Value of the field
- * @param   array   $A          Array of all fields from the database
- * @param   array   $icon_arr   System icon array (not used)
- * @return  string              HTML for field display in the table
- */
-function LIBRARY_getAdminField_Instance($fieldname, $fieldvalue, $A, $icon_arr)
-{
-    global $_CONF, $_CONF_LIB, $_TABLES;
-
-    $retval = '';
-    static $usernames = array();
-    switch($fieldname) {
-    case 'uid':
-        if ($fieldvalue > 0) {
-            if (!isset($usernames[$fieldvalue])) {
-                $usernames[$fieldvalue] = COM_getDisplayName($fieldvalue);
-            }
-            $retval .= $usernames[$fieldvalue];
-        }
-        break;
-    case 'checkout':
-    case 'due':
-        if ($fieldvalue > 0) {
-            $dt = new Date($fieldvalue, $_CONF['timezone']);
-            $retval .= $dt->format('Y-m-d', true);
-        }
-        break;
-    case 'checkin':
-        if ($A['uid'] > 0) {
-            $retval .= COM_createLink(
-                _('Check In'),
-                $_CONF_LIB['admin_url'] . '/index.php?checkinform=x&id=' . $A['item_id']
-            );
-        }
-        break;
-    case 'delete':
-        if ($A['uid'] == 0) {
-            $retval .= COM_createLink(
-                Icon::getHTML('delete'),
-                $_CONF_LIB['admin_url']. '/index.php?deleteinstance=x&amp;id=' . $A['instance_id'],
-                array(
-                    'onclick'=>'return confirm(\''.
-                    _('Are you sure you want to delete this item?').
-                    '\');',
-                    'title' => _('Delete Item'),
-                    'class' => 'tooltip',
-                )
-            );
-        }
-        break;
-    case 'item_id':
-        $retval .= '<span title="' . htmlspecialchars($A['name']) . '" class="tooltip">' . $fieldvalue . '</span>';
-        break;
-    default:
-        $retval .= $fieldvalue;
-        break;
-    }
-    return $retval;
-}
-
-
-/**
- * Get an individual field for the Item Admin screen.
- *
- * @param   string  $fieldname  Name of field (from the array, not the db)
- * @param   mixed   $fieldvalue Value of the field
- * @param   array   $A          Array of all fields from the database
- * @param   array   $icon_arr   System icon array (not used)
- * @return  string              HTML for field display in the table
- */
-function XXLIBRARY_getAdminField_Item($fieldname, $fieldvalue, $A, $icon_arr)
-{
-    global $_CONF, $_CONF_LIB, $_TABLES;
-
-    $retval = '';
-
-    $avail = count(\Library\Instance::getAll($A['id'], LIB_STATUS_AVAIL));
-    $out = count(\Library\Instance::getAll($A['id'], LIB_STATUS_OUT));
-    $total = $avail + $out;
-
-    switch($fieldname) {
-    case 'id':
-        $retval = COM_createLink($fieldvalue,
-            $_CONF_LIB['admin_url'] . '/index.php?instances=x&item_id=' . $fieldvalue,
-            array(
-                'title' => _('View Instances'),
-                'class' => 'tooltip',
-            ) );
-        break;
-
-    case 'edit':
-        $retval .= COM_createLink(
-                '<i class="uk-icon uk-icon-edit"></i>',
-                $_CONF_LIB['admin_url'] . "/index.php?edititem=x&amp;id={$A['id']}"
-            );
-        break;
-
-    case 'copy':
-        $retval .= COM_createLink(
-                '<i class="uk-icon uk-icon-copy"></i>',
-                $_CONF_LIB['admin_url'] . "/index.php?copyitem=x&amp;id={$A['id']}"
-            );
-        break;
-
-    case 'delete':
-        if (!Library\Item::isUsed($A['id'])) {
-            $retval .= COM_createLink(
-                Icon::getHTML('delete'),
-                $_CONF_LIB['admin_url']. '/index.php?deleteitem=x&amp;id=' . $A['id'],
-                array(
-                    'onclick'=>'return confirm(\'' .
-                    _('Are you sure you want to delete this item?') .
-                    '\');',
-                    'title' => _('Delete Item'),
-                    'class' => 'tooltip',
-                )
-            );
-        }
-        break;
-
-    case 'enabled':
-        $chk = $fieldvalue == 1 ? ' checked="checked"' : '';
-        $retval .= "<input type=\"checkbox\" $chk value=\"1\" name=\"ena_check\"
-                id=\"togenabled{$A['id']}\"
-                onclick='LIBR_toggle(this,\"{$A['id']}\",\"enabled\",\"item\");'>".LB;
-        break;
-
-    case 'title':
-        $retval = COM_createLink(
-            $fieldvalue,
-            $_CONF_LIB['url'] . '/index.php?detail=x&id=' . $A['id'],
-            array(
-                'title' => _('View Item'),
-                'class' => 'tooltip',
-            ) );
-        break;
-
-    case 'type':
-        $retval = LGLIB_getVar(_('Media Types'), $A['type'], 'string', 'Unknown');
-        break;
-
-    case 'status':
-        $retval = $avail . ' / ' . $total;
-        break;
-        if ($fieldvalue == LIB_STATUS_OUT) {
-            if ($A['due'] < LIBRARY_now()) {
-                $cls = 'danger';
-                $msg = _('Overdue');
-            } else {
-                $cls = 'unknown';
-                $msg = _('Checked Out');
-            }
-        } elseif (isset($A['wait_count']) && $A['wait_count'] > 0) {
-            $cls = 'warning';
-            $msg = _('Waitlisted');
-        } elseif ($fieldvalue == LIB_STATUS_AVAIL) {
-            $cls = 'ok';
-            $msg = _('Available');
-        } else {
-            $cls = 'unknown';
-            $msg = '';
-        }
-        $retval .= '<i class="uk-icon uk-icon-circle uk-icon-' . $cls .
-            '" title="' . $msg . '" class="tooltip"></i>';
-        break;
-
-    case 'checkout':
-        if ($avail > 0) {
-            $retval .= COM_createLink(
-                _('Check Out'),
-                $_CONF_LIB['admin_url'] . '/index.php?checkoutform=x&id=' . $A['id']
-            );
-        }
-        break;
-
-    case 'checkin':
-        if ($total > $avail) {
-            $retval .= COM_createLink(
-                _('Check In'),
-                $_CONF_LIB['admin_url'] . '/index.php?checkinform=x&id=' . $A['id']
-            );
-        }
-        break;
-
-    case 'history':
-        if (DB_count($_TABLES['library.log'], 'item_id', $A['id']) > 0) {
-            $retval .= COM_createLink('<i class="uk-icon uk-icon-file-text-o"></i>',
-                $_CONF_LIB['admin_url'] . '/index.php?history=x&id=' . $A['id'],
-                array(
-                    'title' => _('View History'),
-                    'class' => 'tooltip',
-                ) );
-        }
-        break;
-
-    default:
-        $retval = htmlspecialchars($fieldvalue);
-        break;
-    }
-
-    return $retval;
-}
-
-
-/**
- * Category Admin List View.
- */
-function LIBRARY_adminlist_Category()
-{
-    global $_CONF, $_CONF_LIB, $_TABLES, $_USER;
-
-    $display = '';
-    $sql = "SELECT cat.cat_id, cat.cat_name, cat.dscp, cat.enabled
-            FROM {$_TABLES['library.categories']} cat";
-
-    $header_arr = array(
-        array(
-            'text' => _('Edit'),
-            'field' => 'edit',
-            'sort' => false,
-            'align' => 'center',
-        ),
-        array(
-            'text' => _('ID'),
-            'field' => 'cat_id',
-            'sort' => true,
-        ),
-        array(
-            'text' => _('Enabled'),
-            'field' => 'enabled',
-            'sort' => false,
-            'align' => 'center',
-        ),
-        array(
-            'text' => _('Category'),
-            'field' => 'cat_name',
-            'sort' => true,
-        ),
-        array(
-            'text' => _('Description'),
-            'field' => 'dscp',
-            'sort' => true,
-        ),
-        array(
-            'text' => _('Delete'),
-            'field' => 'delete',
-            'sort' => false,
-            'align' => 'center',
-        ),
-    );
-    $display .= COM_startBlock('', '', COM_getBlockTemplate('_admin_block', 'header'));
-
-    $defsort_arr = array('field' => 'cat_id',
-            'direction' => 'asc');
-    $query_arr = array('table' => 'library.categories',
-        'sql' => $sql,
-        'query_fields' => array('cat.name', 'cat.dscp'),
-        'default_filter' => 'WHERE 1=1',
-    );
-    $text_arr = array(
-        //'has_extras' => true,
-        'form_url' => $_CONF_LIB['admin_url'] . '/index.php',
-    );
-    $form_arr = array();
-    $filter = '';
-    if (!isset($_REQUEST['query_limit'])) {
-        $_GET['query_limit'] = 20;
-    }
-
-    $display .= '<div class="floatright">';
-    $display .= COM_createLink(
-        _('New Category'),
-        $_CONF_LIB['admin_url'] . '/index.php?editcat=0',
-        array(
-            'class' => 'uk-button uk-button-success',
-        )
-    ) . '</div>';
-
-    $display .= ADMIN_list('library', 'LIBRARY_getAdminField_Category',
-            $header_arr, $text_arr, $query_arr, $defsort_arr,
-            $filter, '', '', $form_arr);
-
-    $display .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
-    return $display;
-}
-
-
-/**
- * Get an individual field for the category admin list.
- *
- * @param   string  $fieldname  Name of field (from the array, not the db)
- * @param   mixed   $fieldvalue Value of the field
- * @param   array   $A          Array of all fields from the database
- * @param   array   $icon_arr   System icon array (not used)
- * @return  string              HTML for field display in the table
- */
-function LIBRARY_getAdminField_Category($fieldname, $fieldvalue, $A, $icon_arr)
-{
-    global $_CONF, $_CONF_LIB;
-
-    $retval = '';
-
-    switch($fieldname) {
-    case 'edit':
-        $retval .= COM_createLink(
-            '<i class="uk-icon uk-icon-edit"></i>',
-            $_CONF_LIB['admin_url'] . "/index.php?mode=editcat&amp;id={$A['cat_id']}",
-            array(
-                'title' => _('Edit'),
-                'class' => 'tooltip',
-            )
-        );
-        break;
-
-    case 'enabled':
-        $chk = $fieldvalue == 1 ? 'checked="checked"' : '';
-        $retval .= "<input type=\"checkbox\" $chk value=\"1\" name=\"ena_check\"
-                id=\"togenabled{$A['cat_id']}\" class=\"tooltip\" title=\"Enable/Disable\"
-                onclick='LIBR_toggle(this,\"{$A['cat_id']}\",\"{$fieldname}\",".
-                "\"category\");' />" . LB;
-        break;
-
-    case 'delete':
-        if (!Library\Category::isUsed($A['cat_id'])) {
-            $retval .= COM_createLink(
-                Icon::getHTML('delete'),
-                $_CONF_LIB['admin_url']. '/index.php?deletecat&id=' . $A['cat_id'],
-                array(
-                    'onclick' => 'return confirm(\'' .
-                    _('Are you sure you want to delete this item?'),
-                    '\');',
-                    'title' => _('Delete Item'),
-                    'class' => 'tooltip',
-                ));
-        } else {
-            $retval .= '<i class="tooltip uk-icon uk-icon-remove uk-text-danger' .
-                    '" title="' . _('Cannot delete categories that are in use.') . '"></i>';
-        }
-        break;
-
-    default:
-        $retval = htmlspecialchars($fieldvalue);
-        break;
-    }
-    return $retval;
-}
-
-
-/**
- *   Media Type Admin List View.
- */
-function LIBRARY_adminlist_MediaType()
-{
-    global $_CONF, $_CONF_LIB, $_TABLES, $_USER;
-
-    $display = '';
-    $sql = "SELECT  *
-            FROM {$_TABLES['library.types']} ";
-
-    $header_arr = array(
-        array(  'text'  => _('Edit'),
-                'field' => 'edit',
-                'sort'  => false,
-                'align' => 'center',
-            ),
-        array(  'text'  => _('Media Type'),
-                'field' => 'name',
-                'sort'  => true,
-            ),
-        array(  'text'  => _('Delete'),
-                'field' => 'delete',
-                'sort'  => false,
-                'align' => 'center',
-            ),
-    );
-
-    $defsort_arr = array('field' => 'id',
-            'direction' => 'asc');
-
-    $display .= COM_startBlock('', '', COM_getBlockTemplate('_admin_block', 'header'));
-
-    $query_arr = array('table' => 'library.types',
-        'sql' => $sql,
-        'query_fields' => array('name'),
-        'default_filter' => 'WHERE 1=1',
-    );
-    $text_arr = array(
-        'has_extras' => true,
-        'form_url' => $_CONF_LIB['admin_url'] . '/index.php',
-    );
-    $form_arr = array();
-    $filter = '';
-    if (!isset($_REQUEST['query_limit'])) {
-        $_GET['query_limit'] = 20;
-    }
-
-    $display .= '<div class="floatright">' .
-        COM_createLink(
-            _('New Media Type'),
-            $_CONF_LIB['admin_url'] . '/index.php?editmedia=0',
-            array(
-                'class' => 'uk-button uk-button-success',
-            )
-        ) . '</div>';
-
-    $display .= ADMIN_list('library', 'LIBRARY_getAdminField_MediaType',
-            $header_arr, $text_arr, $query_arr, $defsort_arr,
-            $filter, '', '', $form_arr);
-
-    $display .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
-    return $display;
-}
-
-/**
- * Get an individual field for the media type admin list.
- *
- * @param   string  $fieldname  Name of field (from the array, not the db)
- * @param   mixed   $fieldvalue Value of the field
- * @param   array   $A          Array of all fields from the database
- * @param   array   $icon_arr   System icon array (not used)
- * @return  string              HTML for field display in the table
- */
-function LIBRARY_getAdminField_MediaType($fieldname, $fieldvalue, $A, $icon_arr)
-{
-    global $_CONF, $_CONF_LIB;
-
-    switch($fieldname) {
-    case 'edit':
-        $retval = COM_createLink(
-                '<i class="uk-icon uk-icon-edit"></i>',
-                $_CONF_LIB['admin_url'] . "/index.php?editmedia=x&amp;id={$A['id']}",
-                array(
-                    'class' => 'tooltip',
-                    'title' => _('Edit'),
-                ) );
-        break;
-
-    case 'delete':
-        if (!Library\MediaType::isUsed($A['id'])) {
-            $retval = COM_createLink(
-                Library\Icon::getHTML('delete'),
-                $_CONF_LIB['admin_url']. '/index.php?deletemedia=x&id=' . $A['id'],
-                array(
-                    'onclick'=>'return confirm(\''.
-                    _('Are you sure you want to delete this item?') .
-                    '\');',
-                    'title' => _('Delete'),
-                    'class' => 'tooltip',
-                )
-            );
-        } else {
-            $retval = Library\Icon::getHTML('delete-grey', 'tooltip', array('title'=>_('In Use')));
-        }
-        break;
-
-    default:
-        $retval = htmlspecialchars($fieldvalue);
-        break;
-    }
-    return $retval;
-}
-
-
 /**
  * Checkout History View.
  * Displays the purchase history for the current user.
@@ -951,7 +276,7 @@ function LIBRARY_getAdminField_MediaType($fieldname, $fieldvalue, $A, $icon_arr)
  */
 function LIBRARY_history($item_id)
 {
-    global $_CONF, $_CONF_LIB, $_TABLES, $_USER;
+    global $_CONF, $_TABLES, $_USER;
 
     $display = '';
     $item_id = COM_sanitizeId($item_id, false);
@@ -968,7 +293,7 @@ function LIBRARY_history($item_id)
 
     $item_name = DB_getItem($_TABLES['library.items'], 'title', "id='$item_id'");
 
-    $base_url = $_CONF_LIB['admin_url'];
+    $base_url = Library\Config::getInstance()->get('admin_url');
 
     $header_arr = array(
         array(  'text'  => _('Date/Time'),
@@ -1032,14 +357,14 @@ function LIBRARY_history($item_id)
  */
 function LIBRARY_getTransHistoryField($fieldname, $fieldvalue, $A, $icon_arr)
 {
-    global $_CONF, $_CONF_LIB;
+    global $_CONF;
 
     $retval = '';
 
     switch($fieldname) {
     case 'id':
         $retval = COM_createLink($fieldvalue,
-            $_CONF_LIB['url'] . '/index.php?detail=x&id=' . $fieldvalue);
+            Library\Config::getInstance()->get('url') . '/index.php?detail=x&id=' . $fieldvalue);
         break;
 
     case 'dt':
@@ -1067,55 +392,6 @@ function LIBRARY_getTransHistoryField($fieldname, $fieldvalue, $A, $icon_arr)
     }
 
     return $retval;
-}
-
-
-/**
- * Get the SQL query for the item list.
- *
- * @param   integer $cat_id     Category ID
- * @param   integer $status     Optional status, default = "all"
- * @return  string      SQL query to get the items
- */
-function LIBRARY_admin_getSQL($cat_id, $status = 0)
-{
-    global $_TABLES;
-
-    $sql = "SELECT p.*,
-                t.name AS typename,
-                c.cat_name as cat_name
-            FROM {$_TABLES['library.items']} p
-            LEFT JOIN {$_TABLES['library.types']} t
-                ON p.type = t.id
-            LEFT JOIN {$_TABLES['library.categories']} c
-                ON c.cat_id = p.cat_id ";
-    switch ($status) {
-    case 0:     // All
-        break;
-    case 1:     // Available
-        $sql .= "LEFT JOIN {$_TABLES['library.instances']} inst
-                    ON p.id = inst.item_id
-                WHERE inst.uid = 0 GROUP BY inst.item_id HAVING COUNT(inst.item_id) > 0";
-        break;
-    case 2:     // Checked Out
-        $sql .= "LEFT JOIN {$_TABLES['library.instances']} inst
-                    ON p.id = inst.item_id
-                WHERE inst.uid > 0 GROUP BY inst.item_id HAVING COUNT(inst.item_id) > 0";
-        break;
-    case 3:     // Pending Actions, include available only
-        $sql .= "LEFT JOIN {$_TABLES['library.waitlist']} w
-                    ON p.id = w.item_id
-                GROUP BY w.item_id HAVING count(w.id) > 0";
-        break;
-    case 4:     // Overdue
-        //$sql .= "LEFT JOIN {$_TABLES['library.instances']} inst
-        //            ON p.id = inst.item_id
-        $sql .= "        WHERE inst.uid > 0 AND inst.due < UNIX_TIMESTAMP() ";
-        $sql .= " GROUP BY  p.id ";
-        break;
-    }
-    //echo $sql;die;
-    return $sql;
 }
 
 

@@ -208,7 +208,7 @@ class MediaType
      */
     public function Save($A = array())
     {
-        global $_TABLES, $_CONF_LIB;
+        global $_TABLES;
 
         if (is_array($A)) {
             $this->SetVars($A);
@@ -241,7 +241,7 @@ class MediaType
      */
     public function Delete()
     {
-        global $_TABLES, $_CONF_LIB;
+        global $_TABLES;
 
         if ($this->id > 0) {
             DB_delete($_TABLES['library.types'], 'id', $this->id);
@@ -262,9 +262,9 @@ class MediaType
      */
     public function showForm()
     {
-        global $_TABLES, $_CONF, $_CONF_LIB;
+        global $_TABLES, $_CONF;
 
-        $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
+        $T = new \Template(__DIR__ . '/../templates');
         $T->set_file(array(
             'type'  =>'mediatype_form.thtml',
             'tips'  => 'tooltipster.thtml',
@@ -282,7 +282,7 @@ class MediaType
         }
 
         $T->set_var(array(
-            'action_url'    => $_CONF_LIB['admin_url'],
+            'action_url'    => Config::getInstance()->get('admin_url'),
             'name'          => $this->name,
             'candelete'     => !$this->isNew && !self::isUsed($this->id),
             'lang_type'     => _('Media Type'),
@@ -392,6 +392,130 @@ class MediaType
         return ($id > 1) && !self::isUsed($id);
     }
 
+
+    /**
+     *   Media Type Admin List View.
+     */
+    public static function adminlist()
+    {
+        global $_CONF, $_TABLES, $_USER;
+
+        $display = '';
+        $sql = "SELECT  *
+            FROM {$_TABLES['library.types']} ";
+
+        $header_arr = array(
+            array(
+                'text'  => _('Edit'),
+                'field' => 'edit',
+                'sort'  => false,
+                'align' => 'center',
+            ),
+            array(
+                'text'  => _('Media Type'),
+                'field' => 'name',
+                'sort'  => true,
+            ),
+            array(
+                'text'  => _('Delete'),
+                'field' => 'delete',
+                'sort'  => false,
+                'align' => 'center',
+            ),
+        );
+        $defsort_arr = array(
+            'field' => 'id',
+            'direction' => 'asc',
+        );
+        $display .= COM_startBlock(
+            '', '',
+            COM_getBlockTemplate('_admin_block', 'header')
+        );
+
+        $query_arr = array(
+            'table' => 'library.types',
+            'sql' => $sql,
+            'query_fields' => array('name'),
+            'default_filter' => 'WHERE 1=1',
+        );
+        $text_arr = array(
+            'has_extras' => true,
+            'form_url' => Config::getInstance()->get('admin_url') . '/index.php',
+        );
+        $form_arr = array();
+        $filter = '';
+        if (!isset($_REQUEST['query_limit'])) {
+            $_GET['query_limit'] = 20;
+        }
+
+        $display .= '<div class="floatright">' .
+            COM_createLink(
+                _('New Media Type'),
+                Config::getInstance()->get('admin_url') . '/index.php?editmedia=0',
+                array(
+                    'class' => 'uk-button uk-button-success',
+                )
+            ) . '</div>';
+
+        $display .= ADMIN_list(
+            'library',
+            array(__CLASS__, 'getAdminField'),
+            $header_arr, $text_arr, $query_arr, $defsort_arr,
+            $filter, '', '', $form_arr
+        );
+        $display .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
+        return $display;
+    }
+
+
+    /**
+     * Get an individual field for the media type admin list.
+     *
+     * @param   string  $fieldname  Name of field (from the array, not the db)
+     * @param   mixed   $fieldvalue Value of the field
+     * @param   array   $A          Array of all fields from the database
+     * @param   array   $icon_arr   System icon array (not used)
+     * @return  string              HTML for field display in the table
+     */
+    public static function getAdminField($fieldname, $fieldvalue, $A, $icon_arr)
+    {
+        global $_CONF;
+
+        switch($fieldname) {
+        case 'edit':
+            $retval = COM_createLink(
+                '<i class="uk-icon uk-icon-edit"></i>',
+                Config::getInstance()->get('admin_url') . "/index.php?editmedia=x&amp;id={$A['id']}",
+                array(
+                    'class' => 'tooltip',
+                    'title' => _('Edit'),
+            ) );
+            break;
+
+        case 'delete':
+            if (!self::isUsed($A['id'])) {
+                $retval = COM_createLink(
+                    Icon::getHTML('delete'),
+                    Config::getInstance()->get('admin_url') . '/index.php?deletemedia=x&id=' . $A['id'],
+                    array(
+                        'onclick'=>'return confirm(\''.
+                        _('Are you sure you want to delete this item?') .
+                        '\');',
+                        'title' => _('Delete'),
+                        'class' => 'tooltip',
+                    )
+                );
+            } else {
+                $retval = Icon::getHTML('delete-grey', 'tooltip', array('title'=>_('In Use')));
+            }
+            break;
+
+        default:
+            $retval = htmlspecialchars($fieldvalue);
+            break;
+        }
+        return $retval;
+    }
 
 }   // class MediaType
 

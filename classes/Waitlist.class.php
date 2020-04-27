@@ -49,21 +49,21 @@ class Waitlist
         // the current one.
         if (DB_count($_TABLES['library.waitlist'],
                 array('item_id', 'uid'),
-                array($Item->id, $uid)) > 0) {
+                array($Item->getID(), $uid)) > 0) {
             $exp_dt = 0;
         } else {
-            $exp_dt = self::_calcExp($Item->daysonhold);
+            $exp_dt = self::_calcExp($Item->getDaysOnHold());
         }
 
         $sql = "INSERT IGNORE INTO {$_TABLES['library.waitlist']} SET
             dt = UNIX_TIMESTAMP(),
             expire = '" . $exp_dt . "',
-            item_id = '{$Item->id}',
+            item_id = '{$Item->getID()}',
             uid = '$uid'";
         DB_query($sql,1);
         if (!DB_error()) {
             USES_library_functions();
-            LIBRARY_notifyLibrarian($Item->id, $uid);
+            LIBRARY_notifyLibrarian($Item->getID(), $uid);
             return DB_insertID();
         } else {
             return 0;
@@ -114,7 +114,7 @@ class Waitlist
      */
     public static function Expire()
     {
-        global $_TABLES, $_CONF_LIB, $_CONF;
+        global $_TABLES, $_CONF;
 
         // Delete expired waitlist entries.  This could be done as one
         // sql statement, but we want to log each deletion.
@@ -146,11 +146,11 @@ class Waitlist
      */
     public static function notifyNext($item_id)
     {
-        global $_TABLES,  $_CONF, $_CONF_LIB;
+        global $_TABLES,  $_CONF;
 
         // retrieve the first waitlisted user info.
         $sql = "SELECT w.id, w.uid, w.item_id, u.email, u.language,
-                    i.id as item_id, i.name, i.daysonhold
+                    i.id as item_id, i.title, i.daysonhold
             FROM {$_TABLES['library.waitlist']} w
             LEFT JOIN {$_TABLES['library.items']} i
                 ON i.id = w.item_id
@@ -176,10 +176,10 @@ class Waitlist
                 " WHERE id = {$A['id']}");
 
         // Select the template for the message
-        $template_dir = $_CONF_LIB['pi_path'] .
-                    '/templates/notify/' . $A['language'];
+        $template_dir = Config::getInstance()->get('pi_path') .
+            '/templates/notify/' . $A['language'];
         if (!file_exists($template_dir . '/item_avail.thtml')) {
-            $template_dir = $_CONF_LIB['pi_path'] . '/templates/notify/english';
+            $template_dir = Config::getInstance()->get('pi_path') . '/templates/notify/english';
         }
 
         // Load the recipient's language.
@@ -189,7 +189,7 @@ class Waitlist
         $T->set_file('message', 'item_avail.thtml');
         $T->set_var(array(
             'username'      => $username,
-            'pi_url'        => $_CONF_LIB['url'],
+            'pi_url'        => Config::getInstance()->get('url'),
             'item_id'       => $A['item_id'],
             'item_descrip'  => $A['name'],
             'daysonhold'    => $daysonhold,

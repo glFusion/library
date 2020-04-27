@@ -46,8 +46,6 @@ class Category
     */
     public function __construct($id=0, $data=NULL)
     {
-        global $_CONF_LIB;
-
         $this->properties = array();
         //$this->button_types = array('buy_now', 'add_cart'); // TODO
         $this->isNew = true;
@@ -57,7 +55,7 @@ class Category
             $this->cat_id = 0;
             $this->cat_name = '';
             $this->dscp = '';
-            $this->group_id = $_CONF_LIB['def_group_id'];
+            $this->group_id = Config::getInstance()->get('def_group_id');
             $this->enabled = 1;
         } else {
             $this->cat_id = $id;
@@ -209,7 +207,7 @@ class Category
      */
     public function Save($A = array())
     {
-        global $_TABLES, $_CONF_LIB;
+        global $_TABLES;
 
         if (is_array($A)) {
             $this->setVars($A, false);
@@ -290,7 +288,7 @@ class Category
      */
     public function showForm()
     {
-        global $_TABLES, $_CONF, $_CONF_LIB;
+        global $_TABLES, $_CONF;
 
         if ($this->cat_id > 0) {
             $retval = COM_startBlock(_('Edit') . ': ' . $this->cat_name);
@@ -298,14 +296,14 @@ class Category
             $retval = COM_startBlock(_('Create Category'));
         }
 
-        $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
+        $T = new \Template(__DIR__ . '/../templates');
         $T->set_file(array(
             'category'  => 'category_form.thtml',
             'tips'      => 'tooltipster.thtml',
         ));
         $T->set_var(array(
             'cat_id'        => $this->cat_id,
-            'action_url'    => $_CONF_LIB['admin_url'],
+            'action_url'    => Config::getInstance()->get('admin_url'),
             'cat_name'      => $this->cat_name,
             'dscp'          => $this->dscp,
             'ena_chk'       => $this->enabled == 1 ? 'checked="checked"' : '',
@@ -513,6 +511,159 @@ class Category
         } else {
             return false;
         }
+    }
+
+
+    /**
+     * Category Admin List View.
+     */
+    public static function adminlist()
+    {
+        global $_CONF, $_TABLES, $_USER;
+
+        $display = '';
+        $sql = "SELECT cat.cat_id, cat.cat_name, cat.dscp, cat.enabled
+            FROM {$_TABLES['library.categories']} cat";
+
+        $header_arr = array(
+            array(
+                'text' => _('Edit'),
+                'field' => 'edit',
+                'sort' => false,
+                'align' => 'center',
+            ),
+            array(
+                'text' => _('ID'),
+                'field' => 'cat_id',
+                'sort' => true,
+            ),
+            array(
+                'text' => _('Enabled'),
+                'field' => 'enabled',
+                'sort' => false,
+                'align' => 'center',
+            ),
+            array(
+                'text' => _('Category'),
+                'field' => 'cat_name',
+                'sort' => true,
+            ),
+            array(
+                'text' => _('Description'),
+                'field' => 'dscp',
+                'sort' => true,
+            ),
+            array(
+                'text' => _('Delete'),
+                'field' => 'delete',
+                'sort' => false,
+                'align' => 'center',
+            ),
+        );
+        $display .= COM_startBlock(
+            '', '',
+            COM_getBlockTemplate('_admin_block', 'header')
+        );
+
+        $defsort_arr = array(
+            'field' => 'cat_id',
+            'direction' => 'asc',
+        );
+        $query_arr = array(
+            'table' => 'library.categories',
+            'sql' => $sql,
+            'query_fields' => array('cat.name', 'cat.dscp'),
+            'default_filter' => 'WHERE 1=1',
+        );
+        $text_arr = array(
+            //'has_extras' => true,
+            'form_url' => Config::getInstance()->get('admin_url') . '/index.php',
+        );
+        $form_arr = array();
+        $filter = '';
+        if (!isset($_REQUEST['query_limit'])) {
+            $_GET['query_limit'] = 20;
+        }
+
+        $display .= '<div class="floatright">';
+        $display .= COM_createLink(
+            _('New Category'),
+            Config::getInstance()->get('admin_url') . '/index.php?editcat=0',
+            array(
+                'class' => 'uk-button uk-button-success',
+            )
+        ) . '</div>';
+
+        $display .= ADMIN_list(
+            'library',
+            array(__CLASS__, 'getAdminField'),
+            $header_arr, $text_arr, $query_arr, $defsort_arr,
+            $filter, '', '', $form_arr
+        );
+        $display .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
+        return $display;
+    }
+
+
+    /**
+     * Get an individual field for the category admin list.
+     *
+     * @param   string  $fieldname  Name of field (from the array, not the db)
+     * @param   mixed   $fieldvalue Value of the field
+     * @param   array   $A          Array of all fields from the database
+     * @param   array   $icon_arr   System icon array (not used)
+     * @return  string              HTML for field display in the table
+     */
+    public static function getAdminField($fieldname, $fieldvalue, $A, $icon_arr)
+    {
+        global $_CONF;
+
+        $retval = '';
+
+        switch($fieldname) {
+        case 'edit':
+            $retval .= COM_createLink(
+                '<i class="uk-icon uk-icon-edit"></i>',
+                Config::getInstance()->get('admin_url') . "/index.php?mode=editcat&amp;id={$A['cat_id']}",
+                array(
+                    'title' => _('Edit'),
+                    'class' => 'tooltip',
+                )
+            );
+            break;
+
+        case 'enabled':
+            $chk = $fieldvalue == 1 ? 'checked="checked"' : '';
+            $retval .= "<input type=\"checkbox\" $chk value=\"1\" name=\"ena_check\"
+                id=\"togenabled{$A['cat_id']}\" class=\"tooltip\" title=\"Enable/Disable\"
+                onclick='LIBR_toggle(this,\"{$A['cat_id']}\",\"{$fieldname}\",".
+                "\"category\");' />" . LB;
+            break;
+
+        case 'delete':
+            if (!self::isUsed($A['cat_id'])) {
+                $retval .= COM_createLink(
+                    Icon::getHTML('delete'),
+                    Config::getInstance()->get('admin_url') . '/index.php?deletecat&id=' . $A['cat_id'],
+                    array(
+                        'onclick' => 'return confirm(\'' .
+                        _('Are you sure you want to delete this item?'),
+                        '\');',
+                        'title' => _('Delete Item'),
+                        'class' => 'tooltip',
+                    )
+                );
+            } else {
+                $retval .= '<i class="tooltip uk-icon uk-icon-remove uk-text-danger' .
+                    '" title="' . _('Cannot delete categories that are in use.') . '"></i>';
+            }
+            break;
+
+        default:
+            $retval = htmlspecialchars($fieldvalue);
+            break;
+        }
+        return $retval;
     }
 
 }   // class Category

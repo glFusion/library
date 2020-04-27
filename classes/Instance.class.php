@@ -142,14 +142,17 @@ class Instance
      */
     public function Delete()
     {
-        global $_TABLES, $_CONF_LIB;
+        global $_TABLES;
 
         // Can't delete new or currently checked-out instances
         if ($this->instance_id <= 0 || $this->uid > 0)
             return false;
 
-        DB_delete($_TABLES['library.instances'],
-                'instance_id', $this->instance_id);
+        DB_delete(
+            $_TABLES['library.instances'],
+            'instance_id',
+            $this->instance_id
+        );
 
         $this->instance_id = 0;
         return true;
@@ -243,23 +246,26 @@ class Instance
             return;
         }
 
-        DB_query("UPDATE {$_TABLES['library.instances']} SET
+        $sql = "UPDATE {$_TABLES['library.instances']} SET
                     uid = 0,
                     checkout = 0,
                     due = 0
-                WHERE instance_id='{$this->instance_id}'");
+                    WHERE instance_id='{$this->instance_id}'";
+COM_errorLog($sql);
+        DB_query($sql);
         Cache::clear(array('instance', $this->item_id));
 
         // Insert the trasaction record, only if it's checked out.
         $me = isset($_USER['uid']) ? (int)$_USER['uid'] : 0;
         if ($me > 1) {
-            DB_query("INSERT INTO {$_TABLES['library.log']} SET
+            $sql = "INSERT INTO {$_TABLES['library.log']} SET
                     item_id = '{$this->item_id}',
                     instance_id = $this->instance_id,
                     dt = UNIX_TIMESTAMP(),
                     doneby = $me,
                     uid = {$this->uid},
-                    trans_type = 'checkin'");
+                    trans_type = 'checkin'";
+            DB_query($sql);
         }
     }
 
@@ -300,6 +306,121 @@ class Instance
 
 
     /**
+     * Get the admin list of item instances.
+     *
+     * @param   string  $item_id    Item ID
+     * @param   integer $status     Optional item status, to limit view
+     * @return  string      HTML for admin list
+     */
+    public static function adminlist($item_id=0, $status=0)
+    {
+        global $_CONF, $_TABLES, $_USER;
+
+        $display = '';
+
+        $sql = "SELECT inst.*, item.title
+            FROM {$_TABLES['library.instances']} inst
+            LEFT JOIN {$_TABLES['library.items']} item
+                ON item.id = inst.item_id ";
+        $stat_join = '';
+        switch ($status) {
+        case 0:     // All
+            $stat_sql = ' WHERE 1=1 ';
+            break;
+        case 1:     // Available
+            $stat_sql = ' WHERE inst.uid = 0 ';
+            break;
+        case 2:     // Checked Out
+            $stat_sql = ' WHERE inst.uid > 0 ';
+            break;
+        case 3:     // Pending Actions, include available only
+            $stat_sql = ' GROUP BY w.item_id HAVING count(w.id) > 0 ';
+            $stat_join = "LEFT JOIN {$_TABLES['library.waitlist']} w
+                ON item.id = w.item_id";
+            break;
+        case 4:     // Overdue
+            $stat_sql = ' WHERE inst.due > 0 AND inst.due < UNIX_TIMESTAMP() ';
+            break;
+        }
+        $sql .= $stat_join;
+        $sql .= $stat_sql;
+        if (!empty($item_id)) {
+            $sql .= " AND inst.item_id = '" . DB_escapeString($item_id) . "'";
+        }
+
+        $header_arr = array(
+            array(
+                'text'  => 'ID',
+                'field' => 'instance_id',
+                'sort'  => true,
+            ),
+            array(
+                'text'  => _('Item ID'),
+                'field' => 'item_id',
+                'sort'  => true,
+            ),
+            array(
+                'text'  => _('Check out to user'),
+                'field' => 'uid',
+                'sort'  => true,
+            ),
+            array(
+                'text'  => _('Checked Out'),
+                'field' => 'checkout',
+                'sort'  => true,
+            ),
+            array(
+                'text'  => _('Due Date'),
+                'field' => 'due',
+                'sort'  => true,
+            ),
+            array(
+                'text'  => _('Check In'),
+                'field' => 'checkin',
+                'sort'  => false,
+            ),
+            array(
+                'text'  => _('Delete'),
+                'field' => 'delete',
+                'sort'  => true,
+            ),
+        );
+
+        $defsort_arr = array(
+            'field' => 'inst.due',
+            'direction' => 'desc',
+        );
+
+        $display .= COM_startBlock(
+            '', '',
+            COM_getBlockTemplate('_admin_block', 'header')
+        );
+
+        $query_arr = array(
+            'table' => 'library.instances',
+            'sql' => $sql,
+            'query_fields' => array(),
+            'default_filter' => '',
+        );
+        $filter = '';
+        $text_arr = array(
+            //'has_extras' => true,
+            'form_url' => Config::getInstance()->get('admin_url') . '/index.php?status=' . $status,
+        );
+        $form_arr = LIBRARY_itemStatusForm($status, $item_id);
+        $extras = array();
+        $display .= ADMIN_list(
+            'library',
+            array(__CLASS__, 'getAdminField'),
+            $header_arr, $text_arr, $query_arr, $defsort_arr,
+            $filter, $extras, '', $form_arr
+        );
+        $display .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
+        return $display;
+    }
+
+
+    /**
      * Check if a given user has an item checked out.
      *
      * @uses    self::checkedoutByUser()
@@ -312,6 +433,71 @@ class Instance
         $items = self::checkedoutByUser($uid);
         $key = array_search($item_id, array_column($items, 'item_id'));
         return $key === false ? false : true;
+    }
+
+
+    /**
+     * Get an individual field for the Instance Admin screen.
+     *
+     * @param   string  $fieldname  Name of field (from the array, not the db)
+     * @param   mixed   $fieldvalue Value of the field
+     * @param   array   $A          Array of all fields from the database
+     * @param   array   $icon_arr   System icon array (not used)
+     * @return  string              HTML for field display in the table
+     */
+    public static function getAdminField($fieldname, $fieldvalue, $A, $icon_arr)
+    {
+        global $_CONF, $_TABLES;
+
+        $retval = '';
+        static $usernames = array();
+        switch($fieldname) {
+        case 'uid':
+            if ($fieldvalue > 0) {
+                if (!isset($usernames[$fieldvalue])) {
+                    $usernames[$fieldvalue] = COM_getDisplayName($fieldvalue);
+                }
+                $retval .= $usernames[$fieldvalue];
+            }
+            break;
+        case 'checkout':
+        case 'due':
+            if ($fieldvalue > 0) {
+                $dt = new \Date($fieldvalue, $_CONF['timezone']);
+                $retval .= $dt->format('Y-m-d', true);
+            }
+            break;
+        case 'checkin':
+            if ($A['uid'] > 0) {
+                $retval .= COM_createLink(
+                    _('Check In'),
+                    Config::getInstance()->get('admin_url') . '/index.php?checkinform=x&id=' . $A['item_id']
+                );
+            }
+            break;
+        case 'delete':
+            if ($A['uid'] == 0) {
+                $retval .= COM_createLink(
+                    Icon::getHTML('delete'),
+                    Config::getInstance()->get('admin_url') . '/index.php?deleteinstance=x&amp;id=' . $A['instance_id'],
+                    array(
+                        'onclick'=>'return confirm(\''.
+                        _('Are you sure you want to delete this item?').
+                        '\');',
+                        'title' => _('Delete Item'),
+                        'class' => 'tooltip',
+                    )
+                );
+            }
+            break;
+        case 'item_id':
+            $retval .= '<span title="' . htmlspecialchars($A['name']) . '" class="tooltip">' . $fieldvalue . '</span>';
+            break;
+        default:
+            $retval .= $fieldvalue;
+            break;
+        }
+        return $retval;
     }
 
 }   // class Instance

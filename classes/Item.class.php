@@ -20,7 +20,91 @@ class Item
 {
     /** Property fields.  Accessed via Set() and Get()
      * @var array */
-    private $properties;
+    //private $properties;
+    //
+    /** Item record ID, ISBN or similar.
+     * @var string */
+    private $id = '';
+
+    /** View counter.
+     * @var integer */
+    private $views = 0;
+
+    /** Date added (timestamp).
+     * @var integer */
+    private $dt_add = 0;
+
+    /** Max days to keep on hold for a waitlisted user.
+     * @var integer */
+    private $daysonhold = 5;
+
+    /** Max days the item can be checked out.
+     * @var integer */
+    private $maxcheckout = 14;
+
+    /** Votes given to the item.
+     * @var integer */
+    private $votes = 0;
+
+    /** Item media type.
+     * @var integer */
+    private $type = 0;
+
+    /** Category record ID.
+     * @var integer */
+    private $cat_id = 0;
+
+    /** Comments enabled?
+     * @var integer */
+    private $comments_enabled = 0;
+
+    /** Item status flag. DEPRECATED.
+     * @var integer */
+    private $status = 0;
+
+    /** Item due date. DEPRECATED.
+     * @var integer */
+    private $due = 0;
+
+    /** Checkout limit per user.
+     * @var integer */
+    private $user_ckout_limit = 0;
+
+    /** Overall item rating from votes.
+     * @var float */
+    private $rating = 0;
+
+    /** Item full description.
+     * @var string */
+    private $dscp = '';
+
+    /** Item title.
+     * @var string */
+    private $title = '';
+
+    /** Item subtitle.
+     * @var string */
+    private $subtitle = '';
+
+    /** Search keywords.
+     * @var string */
+    private $keywords = '';
+
+    /** Publisher name
+     * @var string */
+    private $publisher = '';
+
+    /** Publication date (free-form text).
+     * @var string */
+    private $pub_date = '';
+
+    /** Author/Artist name.
+     * @var string */
+    private $author = '';
+
+    /** Item enabled flag.
+     * @var boolean */
+    private $enabled = 1;
 
     /** Indicate whether the current user is an administrator
      * @var boolean */
@@ -100,7 +184,7 @@ class Item
      * @param   string  $var    Name of property to set.
      * @param   mixed   $value  New value for property.
      */
-    public function __set($var, $value='')
+    public function X__set($var, $value='')
     {
         switch ($var) {
         case 'id':
@@ -158,13 +242,76 @@ class Item
      * @param   string  $var    Name of property to retrieve.
      * @return  mixed           Value of property, NULL if undefined.
      */
-    public function __get($var)
+    public function X__get($var)
     {
         if (array_key_exists($var, $this->properties)) {
             return $this->properties[$var];
         } else {
             return NULL;
         }
+    }
+
+
+    public function getID()
+    {
+        return $this->id;
+    }
+
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+
+    public function getSubtitle()
+    {
+        return $this->subtitle;
+    }
+
+
+    public function getDscp()
+    {
+        return $this->dscp;
+    }
+
+
+    public function getVotes()
+    {
+        return (int)$this->votes;
+    }
+
+    public function getRating()
+    {
+        return (float)$this->rating;
+    }
+
+    public function getAuthor()
+    {
+        return $this->author;
+    }
+
+    public function getPublisher()
+    {
+        return $this->publisher;
+    }
+
+
+    public function isAvailable()
+    {
+        return $this->status == LIB_STATUS_AVAIL;
+    }
+
+
+    public function isNew()
+    {
+        return $this->isNew ? 1 : 0;
+    }
+
+
+    public function getDaysOnHold()
+    {
+        return (int)$this->daysonhold;
     }
 
 
@@ -222,23 +369,23 @@ class Item
         $this->publisher = $row['publisher'];
         $this->pub_date = $row['pub_date'];
         $this->author = $row['author'];
-        $this->enabled = isset($row['enabled']) ? 1 : 0;
+        $this->enabled = isset($row['enabled']) && $row['enabled'] ? 1 : 0;
         $this->title = $row['title'];
         $this->subtitle = $row['subtitle'];
-        $this->cat_id = $row['cat_id'];
-        $this->daysonhold = $row['daysonhold'];
-        $this->maxcheckout = $row['maxcheckout'];
-        $this->dt_add = $row['dt_add'];
-        $this->views = $row['views'];
+        $this->cat_id = (int)$row['cat_id'];
+        $this->daysonhold = (int)$row['daysonhold'];
+        $this->maxcheckout = (int)$row['maxcheckout'];
+        $this->dt_add = (int)$row['dt_add'];
+        $this->views = (int)$row['views'];
         $this->keywords = $row['keywords'];
-        $this->type = $row['type'];
-        $this->votes = $row['votes'];
-        $this->rating = $row['rating'];
-        $this->comments_enabled = $row['comments_enabled'];
+        $this->type = (int)$row['type'];
+        $this->votes = (int)$row['votes'];
+        $this->rating = (float)$row['rating'];
+        $this->comments_enabled = (int)$row['comments_enabled'];
 
         if ($fromDB) {
             $this->oldid = $row['id'];
-            $this->status = $row['status'];
+            $this->status = (int)$row['status'];
         } else {
             $this->oldid = $row['oldid'];
             $this->status = 0;
@@ -506,6 +653,7 @@ class Item
             'lang_item_id'  => _('Item ID'),
             'lang_item_info' => _('Item Information'),
             'lang_item_name' => _('Item Name'),
+            'lang_subtitle' => _('Subtitle'),
             'lang_category' => _('Category'),
             'lang_author' => _('Author'),
             'lang_publisher' => _('Publisher'),
@@ -569,7 +717,7 @@ class Item
                     'thumb_url' => LGLIB_ImageUrl(
                         $filepath,
                         Config::getInstance()->get('max_thumb_size'),
-                        $_CONF_LIB['max_thumb_size']
+                        Config::getInstance()->get('max_thumb_size')
                     ),
                     'seq_no'    => $i,
                     'id'        => $this->id,
@@ -823,12 +971,12 @@ class Item
     public function checkOut($to, $due='')
     {
         $to = (int)$to;
-        if ($to == 1)           // Can't check out to anonymous
-            return;
-        if ($to == 0 && empty($_POST['co_username'])) {
+        if (
+            $to == 1 ||         // Can't check out to anonymous
+            ($to == 0 && empty($_POST['co_username']))
+        ) {
             return;
         }
-
         if (empty($due)) {
             $due = LIBRARY_dueDate($this->maxcheckout)->toUnix();
         } else {
@@ -837,6 +985,7 @@ class Item
 
         $instances = Instance::getAll($this->id, LIB_STATUS_AVAIL);
         if (empty($instances)) {
+            COM_errorLog("Checkout:: no instances found for {$this->id}");
             return;
         }
         Instance::checkOut($instances[0], $to, $due);
@@ -860,6 +1009,7 @@ class Item
     public function checkIn($instance_id)
     {
         $I = new Instance($instance_id);
+        COM_errorLog("checking in $instance_id");
         $I->checkIn();
         // If there's a reservation for this item, notify the reserver.
         Waitlist::notifyNext($this->id);
@@ -1179,9 +1329,41 @@ class Item
      */
     public static function adminList($cat_id = 0, $status = 0)
     {
-        global $_CONF, $_CONF_LIB, $_TABLES, $_USER;
+        global $_CONF, $_TABLES, $_USER;
 
-        $sql = LIBRARY_admin_getSQL($cat_id, $status);
+        $sql = "SELECT p.*,
+                t.name AS typename,
+                c.cat_name as cat_name
+            FROM {$_TABLES['library.items']} p
+            LEFT JOIN {$_TABLES['library.types']} t
+                ON p.type = t.id
+            LEFT JOIN {$_TABLES['library.categories']} c
+                ON c.cat_id = p.cat_id ";
+        switch ($status) {
+        case 0:     // All
+            break;
+        case 1:     // Available
+            $sql .= "LEFT JOIN {$_TABLES['library.instances']} inst
+                    ON p.id = inst.item_id
+                WHERE inst.uid = 0 GROUP BY inst.item_id HAVING COUNT(inst.item_id) > 0";
+            break;
+        case 2:     // Checked Out
+            $sql .= "LEFT JOIN {$_TABLES['library.instances']} inst
+                    ON p.id = inst.item_id
+                WHERE inst.uid > 0 GROUP BY inst.item_id HAVING COUNT(inst.item_id) > 0";
+            break;
+        case 3:     // Pending Actions, include available only
+            $sql .= "LEFT JOIN {$_TABLES['library.waitlist']} w
+                    ON p.id = w.item_id
+                GROUP BY w.item_id HAVING count(w.id) > 0";
+            break;
+        case 4:     // Overdue
+            //$sql .= "LEFT JOIN {$_TABLES['library.instances']} inst
+            //            ON p.id = inst.item_id
+            $sql .= "        WHERE inst.uid > 0 AND inst.due < UNIX_TIMESTAMP() ";
+            $sql .= " GROUP BY  p.id ";
+            break;
+        }
 
         $display = '';
         $header_arr = array(
@@ -1258,7 +1440,7 @@ class Item
         );
         $text_arr = array(
             //'has_extras' => true,
-            'form_url' => $_CONF_LIB['admin_url'] . '/index.php?status=' . $status,
+            'form_url' => Config::getInstance()->get('admin_url') . '/index.php?status=' . $status,
         );
         $form_arr = LIBRARY_itemStatusForm($status);
         $filter = '';
@@ -1270,7 +1452,7 @@ class Item
         }
 
         $display .= '<div class="floatright">' . COM_createLink(_('New Item'),
-            $_CONF_LIB['admin_url'] . '/index.php?edititem=0',
+            Config::getInstance()->get('admin_url') . '/index.php?edititem=0',
             array('class' => 'uk-button uk-button-success')
         ) . '</div>';
         $display .= ADMIN_list(
@@ -1295,7 +1477,7 @@ class Item
      */
     public static function adminListField($fieldname, $fieldvalue, $A, $icon_arr)
     {
-        global $_CONF, $_CONF_LIB, $_TABLES;
+        global $_CONF, $_TABLES;
 
         $retval = '';
 
@@ -1307,7 +1489,7 @@ class Item
         case 'id':
             $retval = COM_createLink(
                 $fieldvalue,
-                $_CONF_LIB['admin_url'] . '/index.php?instances=x&item_id=' . $fieldvalue,
+                Config::getInstance()->get('admin_url') . '/index.php?instances=x&item_id=' . $fieldvalue,
                 array(
                     'title' => _('View Instances'),
                     'class' => 'tooltip',
@@ -1317,14 +1499,14 @@ class Item
         case 'edit':
             $retval .= COM_createLink(
                 '<i class="uk-icon uk-icon-edit"></i>',
-                $_CONF_LIB['admin_url'] . "/index.php?edititem=x&amp;id={$A['id']}"
+                Config::getInstance()->get('admin_url') . "/index.php?edititem=x&amp;id={$A['id']}"
             );
             break;
 
         case 'copy':
             $retval .= COM_createLink(
                 '<i class="uk-icon uk-icon-copy"></i>',
-                $_CONF_LIB['admin_url'] . "/index.php?copyitem=x&amp;id={$A['id']}"
+                Config::getInstance()->get('admin_url') . "/index.php?copyitem=x&amp;id={$A['id']}"
             );
             break;
 
@@ -1332,7 +1514,7 @@ class Item
             if (!self::isUsed($A['id'])) {
                 $retval .= COM_createLink(
                     Icon::getHTML('delete'),
-                    $_CONF_LIB['admin_url']. '/index.php?deleteitem=x&amp;id=' . $A['id'],
+                    Config::getInstance()->get('admin_url') . '/index.php?deleteitem=x&amp;id=' . $A['id'],
                     array(
                         'onclick'=>'return confirm(\'' .
                         _('Are you sure you want to delete this item?') .
@@ -1354,7 +1536,7 @@ class Item
         case 'title':
             $retval = COM_createLink(
                 $fieldvalue,
-                $_CONF_LIB['url'] . '/index.php?detail=x&id=' . $A['id'],
+                Config::getInstance()->get('url') . '/index.php?detail=x&id=' . $A['id'],
                 array(
                     'title' => _('View Item'),
                     'class' => 'tooltip',
@@ -1394,7 +1576,7 @@ class Item
             if ($avail > 0) {
                 $retval .= COM_createLink(
                     _('Check Out'),
-                    $_CONF_LIB['admin_url'] . '/index.php?checkoutform=x&id=' . $A['id']
+                    Config::getInstance()->get('admin_url') . '/index.php?checkoutform=x&id=' . $A['id']
                 );
             }
             break;
@@ -1403,7 +1585,7 @@ class Item
             if ($total > $avail) {
                 $retval .= COM_createLink(
                     _('Check In'),
-                    $_CONF_LIB['admin_url'] . '/index.php?checkinform=x&id=' . $A['id']
+                    Config::getInstance()->get('admin_url') . '/index.php?checkinform=x&id=' . $A['id']
                 );
             }
             break;
@@ -1411,7 +1593,7 @@ class Item
         case 'history':
             if (DB_count($_TABLES['library.log'], 'item_id', $A['id']) > 0) {
                 $retval .= COM_createLink('<i class="uk-icon uk-icon-file-text-o"></i>',
-                    $_CONF_LIB['admin_url'] . '/index.php?history=x&id=' . $A['id'],
+                    Config::getInstance()->get('admin_url') . '/index.php?history=x&id=' . $A['id'],
                     array(
                         'title' => _('View History'),
                         'class' => 'tooltip',
