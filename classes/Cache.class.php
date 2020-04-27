@@ -31,9 +31,9 @@ class Cache
      */
     public static function set($key, $data, $tag='')
     {
-        global $_CONF_LIB;
-
-        if (version_compare(GVERSION, self::MIN_GVERSION, '<')) return NULL;
+        if (version_compare(GVERSION, self::MIN_GVERSION, '<')) {
+            return true;    // pretend to succeed
+        }
 
         if ($tag == '')
             $tag = array(self::TAG);
@@ -56,7 +56,9 @@ class Cache
      */
     public static function clear($tag = '')
     {
-        if (version_compare(GVERSION, self::MIN_GVERSION, '<')) return NULL;
+        if (version_compare(GVERSION, self::MIN_GVERSION, '<')) {
+            return true;    // pretend to succeed
+        }
 
         $tags = array(self::TAG);
         if (!empty($tag)) {
@@ -91,7 +93,9 @@ class Cache
     {
         global $_EV_CONF;
 
-        if (version_compare(GVERSION, self::MIN_GVERSION, '<')) return NULL;
+        if (version_compare(GVERSION, self::MIN_GVERSION, '<')) {
+            return NULL;    // fail for early versions of glFusion
+        }
 
         $key = self::_makeKey($key, $tag);
         if (\glFusion\Cache\Cache::getInstance()->has($key)) {

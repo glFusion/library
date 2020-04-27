@@ -50,10 +50,10 @@ final class Config
 
         if (
             $this->properties === NULL
-            || $this->empty($_CONF_LIB)
+            || empty($_CONF_LIB)
         ) {
-            $cfg = \config::get_instance();
-            $this->properties = $cfg->get_config('library');
+            $this->properties = \config::get_instance()
+                ->get_config('library');
             $_CONF_LIB = $this->properties;
         }
     }
@@ -83,6 +83,7 @@ final class Config
      *
      * @param   string  $key    Configuration item name
      * @param   mixed   $val    Value to set
+     * @return  object  $this
      */
     public function set($key, $val)
     {
@@ -99,7 +100,7 @@ final class Config
      * the database. It only removes config vars in memory.
      *
      * @param   string  $key    Configuration item name
-     * @param   mixed   $val    Value to set
+     * @return  object  $this
      */
     public function del($key)
     {
