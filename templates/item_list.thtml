@@ -2,12 +2,19 @@
 <div style="margin-bottom:30px;">
     <form action="{pi_url}/index.php" method="get">
         <ul class="uk-grid">
-            <li class="uk-width-1-1">
+            <li class="uk-width-1-2">
                 {lang_search}:&nbsp;
                 <input type="text" name="query" value="{query}" onchange="this.form.submit();">
                 &nbsp;&nbsp;
                 <button class="uk-button uk-button-success" type="submit" name="dosearch">{lang_submit}</button>
             </li>
+{!if is_admin}
+            <li class="uk-width-1-2" style="text-align:right;">
+                <a href="{site_admin_url}/plugins/library/index.php"
+                    class="uk-button uk-button-danger uk-button-mini">{lang_admin}</a>
+            </li>
+{!endif}
+
         </ul>
         <ul class="uk-grid uk-grid-width-1-3" style="margin-top:8px;">
             <li>
