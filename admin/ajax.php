@@ -130,19 +130,20 @@ case 'docheckout':
         if ($due_dt == '') {
             $due_dt = LIBRARY_dueDate();
         }
-        $I = \Library\Item::getInstance($item_id);
+        $I = Library\Item::getInstance($item_id);
         $I->checkOut($uid);
         $retval['content'] = $I->AvailBlock();
         $retval['item_id'] = $item_id;  // needed to update the right avail blk
         $retval['status'] = 0;
     }
-    COM_errorLog(print_r($retval,true));
+    //COM_errorLog(print_r($retval,true));
     break;
 
 case 'docheckin':
     $item_id = isset($_POST['id']) ? $_POST['id'] : '';
     $instance_id = isset($_POST['instance_id']) ? $_POST['instance_id'] : '0';
-    $I = \Library\Item::getInstance($item_id);
+    //COM_errorLog("checking in $item_id, $instance_id");
+    $I = Library\Item::getInstance($item_id);
     $I->checkIn($instance_id);
     $retval['content'] = $I->AvailBlock();
     $retval['item_id'] = $item_id;  // needed to update the right avail blk
