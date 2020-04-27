@@ -1,5 +1,5 @@
 {# begin {templatelocation} #}
-<form action="{action_url}" method="post" class="uk-form uk-form-horizontal">
+<form action="{action_url}" method="post" class="uk-form uk-form-horizontal" id="libcheckinoutform">
   <input type="hidden" name="id" value="{item_id}">
   <input type="hidden" name="action" value="docheckout" />
   <div class="uk-form-row">

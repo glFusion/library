@@ -2,7 +2,7 @@
 <script type="text/javascript">
 var lib_actions_modal;
 
-function showCheckInOutForm(item_id, action)
+function LIBshowCheckInOutForm(item_id, action)
 {
     var dataS = {
         "action": "checkinoutform",
@@ -33,7 +33,7 @@ function showCheckInOutForm(item_id, action)
 
 function LIBR_doAction()
 {
-    data = $("form").serialize();
+    data = $("#libcheckinoutform").serialize();
     $.ajax({
         type: "POST",
         dataType: "json",
