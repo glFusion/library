@@ -62,17 +62,17 @@ if ($action == 'mode') $action = $actionval;
 $page = $action;    // Unless overridden by the action
 switch ($action) {
 case 'addwait':
-    $Item = \Library\Item::getInstance($id);
+    $Item = Library\Item::getInstance($id);
     if ($Item->canCheckout()) {
-        if (!$Item->isNew) {
+        if (!$Item->isNew()) {
             Library\Waitlist::Add($Item);
-            if ($Item->status == LIB_STATUS_AVAIL && $_CONF_LIB['notify_checkout'] == 1) {
+            if ($Item->isAvailable() && Library\Config::getInstance()->get('notify_checkout') == 1) {
                 LIBRARY_notifyLibrarian($id, $_USER['uid']);
             }
         }
-        echo COM_refresh($_CONF_LIB['url']);
+        COM_refresh(Library\Config::getInstance()->get('url'));
     } else {
-        $content .= COM_showMessageText(\Library\_('Access Denied'));
+        $content .= COM_showMessageText(Library\_('Access Denied'));
         $view = 'itemlist';
     }
     break;
@@ -80,9 +80,9 @@ case 'addwait':
 case 'rmvwait':
     if (SEC_hasRights('library.checkout')) {
         Library\Waitlist::Remove($id);
-        echo COM_refresh($_CONF_LIB['url']);
+        COM_refresh(Library\Config::getInstance()->get('url'));
     } else {
-        $content .= COM_showMessageText(\Library\_('Access Denied'));
+        $content .= COM_showMessageText(Library\_('Access Denied'));
         $view = 'itemlist';
     }
     break;
@@ -105,7 +105,7 @@ case 'detail':
     if (isset($_GET['sortdir'])) $params[] = 'sortdir=' . $_GET['sortdir'];
     if (isset($_GET['type'])) $params[] = 'type=' . $_GET['type'];
     if (!empty($params)) {
-        $P->SetListUrl($_CONF_LIB['url'] . '/index.php?' . implode('&', $params));
+        $P->SetListUrl(Library\Config::getInstance()->get('url') . '/index.php?' . implode('&', $params));
     }
     $content .= $P->Detail();
     $menu_opt = \Library\_('Item List');
@@ -121,9 +121,9 @@ default:
 
 // Create the user menu
 $menu = array();
-$menu[\Library\_('Item List')] = $_CONF_LIB['url'] . '/index.php';
+$menu[\Library\_('Item List')] = Library\Config::getInstance()->get('url') . '/index.php';
 if (SEC_hasRights('library.admin')) {
-    $menu[\Library\_('Admin Home')] = $_CONF_LIB['admin_url'] . '/index.php';
+    $menu[\Library\_('Admin Home')] = Library\Config::getInstance()->get('admin_url') . '/index.php';
 }
 
 $display = LIBRARY_siteHeader();

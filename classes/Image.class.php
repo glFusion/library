@@ -42,28 +42,29 @@ class Image extends \upload
      */
     public function __construct($item_id, $varname='photo')
     {
-        global $_CONF_LIB, $_CONF;
+        global $_CONF;
 
         $this->setContinueOnError(true);
         $this->setLogFile('/tmp/warn.log');
         $this->setDebug(true);
         parent::__construct();
 
+        $img_dir = Config::getInstance()->get('image_dir');
         // Before anything else, check the upload directory
-        if (!$this->setPath($_CONF_LIB['image_dir'])) {
+        if (!$this->setPath($img_dir);
             return;
         }
         $this->item_id = trim($item_id);
-        $this->pathImage = $_CONF_LIB['image_dir'];
+        $this->pathImage = $img_dir;
         //$this->pathThumb = $this->pathImage . '/thumbs';
         $this->setAllowedMimeTypes(array(
                 'image/pjpeg' => '.jpg,.jpeg',
                 'image/jpeg'  => '.jpg,.jpeg',
         ));
-        $this->setMaxFileSize($_CONF_LIB['max_image_size']);
+        $this->setMaxFileSize(Config::getInstance()->get('max_image_size'));
         $this->setMaxDimensions(
-                $_CONF_LIB['img_max_width'],
-                $_CONF_LIB['img_max_height']
+                Config::getInstance()->get('img_max_width'),
+                Config::getInstance()->get('img_max_height')
         );
         $this->setAutomaticResize(true);
         $this->setFieldName($varname);

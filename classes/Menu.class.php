@@ -68,27 +68,28 @@ class Menu
      */
     public static function Admin($view='')
     {
-        global $_CONF, $_CONF_LIB;
+        global $_CONF;
         USES_lib_admin();
 
+        $admin_url = Config::getInstance()->get('admin_url');
         $menu_arr = array(
             array(
-                'url'   => $_CONF_LIB['admin_url'] . '/index.php',
+                'url'   => $admin_url . '/index.php?itemlist',
                 'text'  => _('Item List'),
                 'active' => $view == 'itemlist' ? true : false,
             ),
             array(
-                'url'  => $_CONF_LIB['admin_url'] . '/index.php?mode=catlist',
+                'url'  => $admin_url . '/index.php?mode=catlist',
                 'text' => _('Categories'),
                 'active' => $view == 'catlist' ? true : false,
             ),
             array(
-                'url'   => $_CONF_LIB['admin_url'] . '/index.php?medialist=x',
+                'url'   => $admin_url . '/index.php?medialist=x',
                 'text'  => _('Media Types'),
                 'active' => $view == 'medialist' ? true : false,
             ),
             array(
-                'url'   => $_CONF_LIB['admin_url'] . '/index.php?status=4',
+                'url'   => $admin_url . '/index.php?overdue&status=4',
                 'text'  => _('Overdue'),
                 'active' => $view == 'overdue' ? true : false,
             ),
@@ -99,7 +100,7 @@ class Menu
         );
 
         $admin_hdr = 'admin_item_hdr';
-        $T = new \Template($_CONF_LIB['pi_path'] . '/templates');
+        $T = new \Template(__DIR__ . '/../templates');
         $T->set_file('title', 'library_title.thtml');
         $T->set_var('title', _('Library Administration'));
         $retval = $T->parse('', 'title');

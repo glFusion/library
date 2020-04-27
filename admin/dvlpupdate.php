@@ -21,13 +21,14 @@ if (!SEC_inGroup('Root')) {
     COM_404();
     exit;
 }
-require_once $_CONF_LIB['pi_path'] . '/upgrade.inc.php';   // needed for set_version()
+// needed for set_version()
+require_once Config::getInstance()->('pi_path']) . '/upgrade.inc.php';
 if (function_exists('CACHE_clear')) {
     CACHE_clear();
 }
 
 // Force the plugin version to the previous version and do the upgrade
-$_PLUGIN_INFO['library']['pi_version'] = '0.0.0';
+$_PLUGIN_INFO['library']['pi_version'] = '0.0.1';
 LIBRARY_do_upgrade(true);
 
 // need to clear the template cache so do it here
