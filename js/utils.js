@@ -87,7 +87,8 @@ var LIBR_astoreLookup = function(isbn) {
 *
 *   @param  string  isbn    Item ISBN number
 */
-var LIBR_openlibLookup = function(isbn) {
+var LIBR_openlibLookup = function(isbn)
+{
     LIBR_showIcon("working");
     var indicator = isbn.toLowerCase()
     indicator = indicator.substring(0,2);
