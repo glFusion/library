@@ -45,7 +45,6 @@ class MO
             // global not set, fall back to US english
             $locale = 'en_US';
         }
-        $locale='de_DE';
 
         $results = setlocale(LC_MESSAGES, $locale);
         if ($results) {
