@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.0.1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-24 08:44-0800\n"
+"POT-Creation-Date: 2020-05-27 15:22-0700\n"
 "PO-Revision-Date: 2019-01-23\n"
 "Last-Translator: Lee Garner<EMAIL@ADDRESS>\n"
 "Language-Team: None\n"
@@ -16,200 +16,399 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: functions.inc:141 functions.inc:524 functions.inc:584
+#: functions.inc:119 functions.inc:514 functions.inc:559
 msgid "Library"
 msgstr "Bibliothek"
 
-#: functions.inc:447
+#: functions.inc:238 functions.inc:241 functions.inc:442
+#: public_html/index.php:75 public_html/index.php:85
+msgid "Access Denied"
+msgstr "Zugriff Verweigert"
+
+#: functions.inc:438
 msgid "You do not have access to this page."
 msgstr "Sie haben keinen Zugriff auf diese Seite."
 
-#: functions.inc:448
+#: functions.inc:439
 msgid ""
 "If you believe you have reached this message in error, please contact your "
 "site administrator."
-msgstr ""
+msgstr "Wenn Sie glauben, dass Sie diese Nachricht fehlerhaft erreicht haben, wenden Sie sich bitte an Ihren site administrator."
 
-#: functions.inc:449
+#: functions.inc:440
 msgid "All attempts to access this page are logged."
-msgstr ""
+msgstr "Alle versuche, auf diese Seite zuzugreifen, werden protokolliert."
 
-#: functions.inc:451
-msgid "Access Denied"
-msgstr ""
-
-#: functions.inc:878
+#: functions.inc:851
 msgid "Information"
-msgstr ""
+msgstr "Information"
 
-#: functions.inc:884
+#: functions.inc:857
 msgid "Warning"
-msgstr ""
+msgstr "Warnung"
 
-#: functions.inc:890
+#: functions.inc:863
 msgid "Alert"
+msgstr "Warnung"
+
+#: functions.inc:985
+#, fuzzy
+msgid "Library Items"
+msgstr "Bibliothek"
+
+#: classes/Menu.class.php:78 public_html/index.php:111
+#: public_html/index.php:118 public_html/index.php:124
+msgid "Item List"
+msgstr "Artikelliste"
+
+#: classes/Menu.class.php:83
+msgid "Categories"
+msgstr "Kategorien"
+
+#: classes/Menu.class.php:88 classes/Item.class.php:1546
+msgid "Media Types"
+msgstr "Medientypen"
+
+#: classes/Menu.class.php:93 classes/Item.class.php:1555 admin/index.php:419
+msgid "Overdue"
 msgstr ""
 
-#: classes/Item.class.php:429 classes/Item.class.php:670
-msgid "Invalid Item ID"
-msgstr ""
+#: classes/Menu.class.php:98 public_html/index.php:126
+msgid "Admin Home"
+msgstr "Admin Startseite"
 
-#: classes/Item.class.php:440 classes/Item.class.php:699
-#: library_functions.inc.php:44 admin/index.php:384 admin/index.php:742
-#: admin/index.php:833 admin/index.php:885 admin/index.php:958
+#: classes/Menu.class.php:105 classes/Item.class.php:1242
+#: classes/Item.class.php:1298
+msgid "Library Administration"
+msgstr "Bibliotheksverwaltung"
+
+#: classes/MediaType.class.php:277 classes/MediaType.class.php:409
+#: classes/MediaType.class.php:491 classes/Category.class.php:294
+#: classes/Category.class.php:530 classes/Category.class.php:629
+#: classes/Item.class.php:594 classes/Item.class.php:862
+#: classes/Item.class.php:1369 library_functions.inc.php:49
 msgid "Edit"
+msgstr "Bearbeiten"
+
+#: classes/MediaType.class.php:280 classes/MediaType.class.php:453
+msgid "New Media Type"
+msgstr "Neuer Medientyp"
+
+#: classes/MediaType.class.php:288 classes/MediaType.class.php:415
+#: classes/Item.class.php:1392 library_functions.inc.php:42
+msgid "Media Type"
+msgstr "Medientypen"
+
+#: classes/MediaType.class.php:289
+msgid "Enter a name for this media type. This should be unique."
+msgstr "Geben Sie einen Namen für diesen Medientyp ein. Dies sollte einzigartig sein."
+
+#: classes/MediaType.class.php:290
+msgid "Save"
+msgstr "Speichern"
+
+#: classes/MediaType.class.php:291 classes/Category.class.php:319
+#: classes/Item.class.php:671 classes/Item.class.php:1103
+#: classes/Item.class.php:1256 classes/Item.class.php:1316
+msgid "Cancel"
+msgstr "Stornieren"
+
+#: classes/MediaType.class.php:292 classes/MediaType.class.php:420
+#: classes/MediaType.class.php:504 classes/Category.class.php:557
+#: classes/Item.class.php:664 classes/Item.class.php:672
+#: classes/Item.class.php:1417 classes/Instance.class.php:383
+msgid "Delete"
+msgstr "Löschen"
+
+#: classes/MediaType.class.php:502 classes/Category.class.php:650
+#: classes/Item.class.php:673 classes/Item.class.php:1519
+#: classes/Instance.class.php:485
+msgid "Are you sure you want to delete this item?"
+msgstr "Möchten Sie diesen Artikel wirklich löschen?"
+
+#: classes/MediaType.class.php:509
+msgid "In Use"
+msgstr "Im Einsatz"
+
+#: classes/Category.class.php:296
+msgid "Create Category"
+msgstr "Kategorie Erstellen"
+
+#: classes/Category.class.php:313
+msgid "Category Name"
+msgstr "Name Der Kategorie"
+
+#: classes/Category.class.php:314
+msgid "Parent Category"
+msgstr "Übergeordnete Kategorie"
+
+#: classes/Category.class.php:315 classes/Category.class.php:552
+#: classes/Item.class.php:661
+msgid "Description"
+msgstr "Beschreibung"
+
+#: classes/Category.class.php:316
+msgid "Enabled?"
+msgstr "Aktiviert?"
+
+#: classes/Category.class.php:317
+msgid "Group"
 msgstr ""
 
-#: classes/Item.class.php:442 admin/index.php:465
-msgid "New Item"
+#: classes/Category.class.php:318
+msgid "Save Category"
 msgstr ""
 
-#: classes/Item.class.php:465 classes/Item.class.php:499
-msgid "Item Information"
+#: classes/Category.class.php:320
+msgid "Delete Category"
 msgstr ""
 
-#: classes/Item.class.php:496
-msgid "Add Instances"
+#: classes/Category.class.php:536 classes/Item.class.php:1379
+msgid "ID"
 msgstr ""
 
-#: classes/Item.class.php:497
-msgid "Search OpenLib"
-msgstr ""
+#: classes/Category.class.php:541 classes/Item.class.php:667
+#: classes/Item.class.php:1383
+msgid "Enabled"
+msgstr "Aktiviert"
 
-#: classes/Item.class.php:498 admin/index.php:317
-msgid "Item ID"
-msgstr ""
-
-#: classes/Item.class.php:500 admin/index.php:403
-msgid "Item Name"
-msgstr ""
-
-#: classes/Item.class.php:501 library_functions.inc.php:43 admin/index.php:411
-#: admin/index.php:759
+#: classes/Category.class.php:547 classes/Item.class.php:656
+#: classes/Item.class.php:1396 library_functions.inc.php:43
+#: library_functions.inc.php:48
 msgid "Category"
 msgstr ""
 
-#: classes/Item.class.php:502 classes/Item.class.php:703
+#: classes/Category.class.php:590
+msgid "New Category"
+msgstr ""
+
+#: classes/Category.class.php:652 classes/Item.class.php:1521
+#: classes/Instance.class.php:487
+msgid "Delete Item"
+msgstr ""
+
+#: classes/Category.class.php:658
+msgid "Cannot delete categories that are in use."
+msgstr ""
+
+#: classes/Item.class.php:582 classes/Item.class.php:828
+msgid "Invalid Item ID"
+msgstr ""
+
+#: classes/Item.class.php:596 classes/Item.class.php:1453
+msgid "New Item"
+msgstr ""
+
+#: classes/Item.class.php:619 classes/Item.class.php:653
+msgid "Item Information"
+msgstr ""
+
+#: classes/Item.class.php:643
+#, php-format
+msgid "%d instance in the database"
+msgid_plural "%d total instances in the database"
+msgstr[0] "%d Instanz in der datenbank"
+msgstr[1] "%d Gesamtinstanzen in der datenbank"
+
+#: classes/Item.class.php:650
+msgid "Add Instances"
+msgstr "Instanzen Hinzufügen"
+
+#: classes/Item.class.php:651
+msgid "Search OpenLib"
+msgstr "Suche openlibrary"
+
+#: classes/Item.class.php:652 classes/Item.class.php:1251
+#: classes/Item.class.php:1309 classes/Instance.class.php:358
+msgid "Item ID"
+msgstr ""
+
+#: classes/Item.class.php:654 classes/Item.class.php:1252
+#: classes/Item.class.php:1310 classes/Item.class.php:1388
+msgid "Item Name"
+msgstr ""
+
+#: classes/Item.class.php:655
+msgid "Subtitle"
+msgstr ""
+
+#: classes/Item.class.php:657 classes/Item.class.php:866
 msgid "Author"
 msgstr ""
 
-#: classes/Item.class.php:503 classes/Item.class.php:701
+#: classes/Item.class.php:658 classes/Item.class.php:864
 msgid "Publisher"
 msgstr "Herausgeber"
 
-#: classes/Item.class.php:504 classes/Item.class.php:702
+#: classes/Item.class.php:659 classes/Item.class.php:865
 msgid "Date Published"
-msgstr ""
+msgstr "Veröffentlichungsdatum"
 
-#: classes/Item.class.php:505
+#: classes/Item.class.php:660
 msgid "Type"
 msgstr ""
 
-#: classes/Item.class.php:506 admin/index.php:764
-msgid "Description"
-msgstr ""
-
-#: classes/Item.class.php:507
+#: classes/Item.class.php:662
 msgid "Keywords"
 msgstr ""
 
-#: classes/Item.class.php:508
+#: classes/Item.class.php:663
 msgid "Images"
 msgstr ""
 
-#: classes/Item.class.php:509 classes/Item.class.php:517 admin/index.php:337
-#: admin/index.php:432 admin/index.php:769 admin/index.php:894
-#: admin/index.php:971
-msgid "Delete"
-msgstr ""
-
-#: classes/Item.class.php:510
+#: classes/Item.class.php:665
 msgid "Max Checkout Days"
 msgstr ""
 
-#: classes/Item.class.php:511
+#: classes/Item.class.php:666
 msgid "Days to hold for waitlist"
 msgstr ""
 
-#: classes/Item.class.php:512 admin/index.php:398 admin/index.php:753
-msgid "Enabled"
-msgstr ""
-
-#: classes/Item.class.php:513
+#: classes/Item.class.php:668
 msgid "Enable Comments"
 msgstr ""
 
-#: classes/Item.class.php:514
+#: classes/Item.class.php:669
 msgid "Save Item"
 msgstr ""
 
-#: classes/Item.class.php:515
+#: classes/Item.class.php:670
 msgid "Reset Form"
 msgstr ""
 
-#: classes/Item.class.php:516
-msgid "Cancel"
-msgstr ""
-
-#: classes/Item.class.php:518 admin/index.php:522 admin/index.php:591
-#: admin/index.php:854 admin/index.php:969
-msgid "Are you sure you want to delete this item?"
-msgstr ""
-
-#: classes/Item.class.php:519 language/lang_config.php:112
+#: classes/Item.class.php:674 language/lang_config.php:112
 msgid "Yes"
 msgstr "Ja"
 
-#: classes/Item.class.php:520 language/lang_config.php:113
+#: classes/Item.class.php:675 language/lang_config.php:113
 msgid "No"
 msgstr "Nein"
 
-#: classes/Item.class.php:700
+#: classes/Item.class.php:863
 msgid "Back to List"
 msgstr ""
 
-#: classes/Item.class.php:863
+#: classes/Item.class.php:867
+msgid "Click to Enlarge Image"
+msgstr ""
+
+#: classes/Item.class.php:1036
 msgid "Login Required"
 msgstr ""
 
-#: classes/Item.class.php:871
+#: classes/Item.class.php:1044
 #, php-format
 msgid "Pending reservations: %d"
 msgstr ""
 
-#: classes/Item.class.php:876
+#: classes/Item.class.php:1049
 #, php-format
 msgid "You're #%d on the waiting list"
 msgstr ""
 
-#: classes/Item.class.php:888
-msgid "by you"
+#: classes/Item.class.php:1062
+msgid "Checked out by you"
 msgstr ""
 
-#: classes/Item.class.php:895 classes/Item.class.php:929
+#: classes/Item.class.php:1069
 #, php-format
 msgid "%d available"
 msgstr ""
 
-#: classes/Item.class.php:897
+#: classes/Item.class.php:1071
 #, php-format
 msgid "You can reserve up to <br />%d items at a time."
-msgstr ""
+msgstr "Sie können bis zu reservieren<br />%d Artikel gleichzeitig."
 
-#: classes/Item.class.php:903 admin/index.php:325 admin/index.php:629
+#: classes/Item.class.php:1077 classes/Item.class.php:1558
+#: classes/Instance.class.php:368 admin/index.php:417
 msgid "Checked Out"
 msgstr ""
 
-#: classes/Item.class.php:930
-msgid "Place your reservation"
+#: classes/Item.class.php:1101
+#, php-format
+msgid "%s available"
 msgstr ""
 
-#: classes/Item.class.php:1060 admin/index.php:329
+#: classes/Item.class.php:1102
+msgid "Reserve"
+msgstr ""
+
+#: classes/Item.class.php:1104 classes/Item.class.php:1253
+#: classes/Item.class.php:1413 classes/Item.class.php:1586
+#: classes/Instance.class.php:378 classes/Instance.class.php:473
+msgid "Check In"
+msgstr ""
+
+#: classes/Item.class.php:1105 classes/Item.class.php:1312
+#: classes/Item.class.php:1409 classes/Item.class.php:1577
+msgid "Check Out"
+msgstr ""
+
+#: classes/Item.class.php:1106
+msgid "Due"
+msgstr ""
+
+#: classes/Item.class.php:1236 classes/Instance.class.php:373
 msgid "Due Date"
 msgstr ""
 
-#: classes/Item.class.php:1065 classes/Item.class.php:1113 admin/index.php:721
-msgid "Library Administration"
+#: classes/Item.class.php:1254
+msgid "Instance"
+msgstr ""
+
+#: classes/Item.class.php:1255
+msgid "Select the specific item instance to check in."
+msgstr ""
+
+#: classes/Item.class.php:1311 classes/Instance.class.php:363
+msgid "Check out to user"
+msgstr ""
+
+#: classes/Item.class.php:1313
+msgid "Date Due"
+msgstr ""
+
+#: classes/Item.class.php:1314
+msgid ""
+"Select the user to check out this item. The user at the top of the waiting "
+"list is shown first."
+msgstr ""
+
+#: classes/Item.class.php:1315
+msgid "Enter or select the due date for the item."
+msgstr ""
+
+#: classes/Item.class.php:1374
+msgid "Copy"
+msgstr ""
+
+#: classes/Item.class.php:1400 classes/Item.class.php:1565 admin/index.php:416
+msgid "Available"
+msgstr ""
+
+#: classes/Item.class.php:1405
+msgid "History"
+msgstr ""
+
+#: classes/Item.class.php:1493
+msgid "View Instances"
+msgstr ""
+
+#: classes/Item.class.php:1540
+msgid "View Item"
+msgstr ""
+
+#: classes/Item.class.php:1562
+msgid "Waitlisted"
+msgstr ""
+
+#: classes/Item.class.php:1597
+msgid "View History"
+msgstr ""
+
+#: classes/Waitlist.class.php:203 library_functions.inc.php:323
+msgid "Your requested library item is available"
 msgstr ""
 
 #: language/lang_config.php:64
@@ -384,122 +583,79 @@ msgstr ""
 msgid "Astore Plugin"
 msgstr ""
 
-#: library_functions.inc.php:39
+#: public_html/index.php:98
+msgid "Purchase History"
+msgstr ""
+
+#: library_functions.inc.php:44
 msgid "Search"
 msgstr ""
 
-#: library_functions.inc.php:40
+#: library_functions.inc.php:45 admin/index.php:415
 msgid "All"
 msgstr ""
 
-#: library_functions.inc.php:41
+#: library_functions.inc.php:46
 msgid "Ascending"
 msgstr ""
 
-#: library_functions.inc.php:42
+#: library_functions.inc.php:47
 msgid "Descending"
 msgstr ""
 
-#: library_functions.inc.php:45
+#: library_functions.inc.php:50
 msgid "Sort"
 msgstr ""
 
-#: library_functions.inc.php:447
+#: library_functions.inc.php:51
+msgid "Submit"
+msgstr ""
+
+#: library_functions.inc.php:53
+msgid "Admin"
+msgstr ""
+
+#: library_functions.inc.php:464
 msgid "Next on Waiting List"
 msgstr ""
 
-#: admin/index.php:113
+#: admin/ajax.php:54
+msgid "Item Updated"
+msgstr ""
+
+#: admin/ajax.php:56
+msgid "Item Unchanged"
+msgstr ""
+
+#: admin/index.php:112
 msgid "Category has related products, can't delete."
 msgstr ""
 
-#: admin/index.php:149
+#: admin/index.php:147 test/t.php:7
 msgid "The submitted form has missing or invalid fields"
+msgstr "Das übermittelte Formular enthält fehlende oder ungültige Felder"
+
+#: admin/index.php:299
+msgid "Date/Time"
 msgstr ""
 
-#: admin/index.php:321
-msgid "Check out to user"
+#: admin/index.php:303
+msgid "Action"
 msgstr ""
 
-#: admin/index.php:333 admin/index.php:428
-msgid "Check In"
+#: admin/index.php:307
+msgid "By"
 msgstr ""
 
-#: admin/index.php:389
-msgid "Copy"
+#: admin/index.php:311
+msgid "User Name"
 msgstr ""
 
-#: admin/index.php:394 admin/index.php:748
-msgid "ID"
+#: admin/index.php:323
+msgid "Transaction History for"
 msgstr ""
 
-#: admin/index.php:407 admin/index.php:890
-msgid "Media Type"
+#: admin/index.php:418
+msgid "Pending"
 msgstr ""
 
-#: admin/index.php:415 admin/index.php:636
-msgid "Available"
-msgstr ""
-
-#: admin/index.php:420
-msgid "History"
-msgstr ""
-
-#: admin/index.php:424
-msgid "Check Out"
-msgstr ""
-
-#: admin/index.php:524 admin/index.php:593 admin/index.php:856
-msgid "Delete Item"
-msgstr ""
-
-#: admin/index.php:565
-msgid "View Instances"
-msgstr ""
-
-#: admin/index.php:611
-msgid "View Item"
-msgstr ""
-
-#: admin/index.php:617 admin/index.php:704
-msgid "Media Types"
-msgstr ""
-
-#: admin/index.php:626 admin/index.php:709
-msgid "Overdue"
-msgstr ""
-
-#: admin/index.php:633
-msgid "Waitlisted"
-msgstr ""
-
-#: admin/index.php:666
-msgid "View History"
-msgstr ""
-
-#: admin/index.php:694
-msgid "Item List"
-msgstr ""
-
-#: admin/index.php:699
-msgid "Categories"
-msgstr ""
-
-#: admin/index.php:714
-msgid "Admin Home"
-msgstr ""
-
-#: admin/index.php:796
-msgid "New Category"
-msgstr ""
-
-#: admin/index.php:861
-msgid "Cannot delete categories that are in use."
-msgstr ""
-
-#: admin/index.php:923
-msgid "New Media Type"
-msgstr ""
-
-#: admin/index.php:977
-msgid "In Use"
-msgstr ""
