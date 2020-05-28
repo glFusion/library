@@ -63,17 +63,17 @@ function LIBRARY_ItemList()
             AND (c.enabled=1 OR c.enabled IS NULL)
             AND c.group_id IN ($user_groups) ";
 
-    $pagenav_args = '?1=1';
+    $pagenav_args = array();
 
     // If applicable, limit by category
     if ($cat_id > 0) {
         $sql .= " AND p.cat_id = $cat_id";
-        $pagenav_args .= '&category=' . $cat_id;
+        $pagenav_args['category'] = $cat_id;
     }
 
     if ($med_type > 0) {
         $sql .= " AND type = '$med_type'";
-        $pagenav_args .= '&type = ' . $med_type;
+        $pagenav_args['type'] = $med_type;
     }
 
     if (!empty($_GET['query'])) {
@@ -81,7 +81,7 @@ function LIBRARY_ItemList()
         $sql .= " AND (p.title like '%$query%'
                 OR p.dscp like '%$query%')";
         $T->set_var('query', htmlspecialchars($_GET['query']));
-        $pagenav_args .= '&query=' . urlencode($_GET['query']);
+        $pagenav_args['query'] = urlencode($_GET['query']);
     }
 
     // If applicable, order by
@@ -220,7 +220,7 @@ function LIBRARY_ItemList()
     ) {
         $T->set_var('pagination',
             COM_printPageNavigation(
-                $Config->get('url') . '/index.php' . $pagenav_args,
+                $Config->get('url') . '/index.php?' . http_build_query($pagenav_args),
                 $page,
                 ceil($count / $items_per_page)
             )
@@ -304,7 +304,7 @@ function LIBRARY_notifyWaitlist($id = '')
     }
 
     // Load the recipient's language.
-    $LANG = LIBRARY_loadLanguage($A['language']);
+    MO::init($A['language']);
 
     $T = new Template($template_dir);
     $T->set_file('message', 'item_avail.thtml');
@@ -320,7 +320,7 @@ function LIBRARY_notifyWaitlist($id = '')
 
     COM_mail(
         $A['email'],
-        $LANG['subj_item_avail'],
+        _('Your requested library item is available'),
         $message,
         "{$_CONF['site_name']} <{$_CONF['site_mail']}>",
         true

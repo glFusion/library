@@ -642,8 +642,7 @@ class Item
                 _n(
                     '%d instance in the database',
                     '%d total instances in the database',
-                    $total_instances,
-                    'library'
+                    $total_instances
                 ),
                 $total_instances),
             'type_select'   => MediaType::buildSelection($this->type, false),

@@ -183,7 +183,7 @@ class Waitlist
         }
 
         // Load the recipient's language.
-        $LANG = LIBRARY_loadLanguage($A['language']);
+        MO::init($A['language']);
 
         $T = new \Template($template_dir);
         $T->set_file('message', 'item_avail.thtml');
@@ -199,11 +199,14 @@ class Waitlist
 
         COM_mail(
             $A['email'],
-            "{$LANG['subj_item_avail']}",
-            "$message",
+            _('Your requested library item is available'),
+            $message,
             "{$_CONF['site_name']} <{$_CONF['site_mail']}>",
             true
         );
+
+        // Reset the locale back to default
+        MO::init();
     }
 
 
