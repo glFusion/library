@@ -24,7 +24,7 @@ final class Config
      * @var array */
     private $properties = NULL;
 
-    static private $instance = NULL;
+    private static $instance = NULL;
 
     /**
      * Get the Library configuration object.
@@ -34,10 +34,11 @@ final class Config
      */
     public static function getInstance()
     {
-        if (self::$instance === NULL) {
-            self::$instance = new self;
+        static $instance = NULL;
+        if ($instance === NULL) {
+            $instance = new self;
         }
-        return self::$instance;
+        return $instance;
     }
 
 
