@@ -24,7 +24,6 @@ final class Config
      * @var array */
     private $properties = NULL;
 
-    private static $instance = NULL;
 
     /**
      * Get the Library configuration object.
@@ -47,15 +46,9 @@ final class Config
      */
     private function __construct()
     {
-        global $_CONF_LIB;
-
-        if (
-            $this->properties === NULL
-            || empty($_CONF_LIB)
-        ) {
+        if ($this->properties === NULL) {
             $this->properties = \config::get_instance()
                 ->get_config('library');
-            $_CONF_LIB = $this->properties;
         }
     }
 
@@ -67,7 +60,7 @@ final class Config
      * @param   string|NULL $key    Name of item to retrieve
      * @return  mixed       Value of config item
      */
-    public function get($key=NULL)
+    public function _get($key=NULL)
     {
         if ($key === NULL) {
             return $this->properties;
@@ -86,27 +79,41 @@ final class Config
      * @param   mixed   $val    Value to set
      * @return  object  $this
      */
-    public function set($key, $val)
+    public function _set($key, $val)
     {
-        global $_CONF_LIB;
-        $_CONF_LIB[$key] = $val;
-        $this->properties[$key] = $val;
+        if ($val === NULL) {
+            unset($this->properties[$key]);
+        } else {
+            $this->properties[$key] = $val;
+        }
         return $this;
     }
 
 
     /**
-     * Remove a configuration value.
-     * Unlike the root glFusion config class, this does not change
-     * the database. It only removes config vars in memory.
+     * Set a configuration value.
+     * Unlike the root glFusion config class, this does not add anything to
+     * the database. It only adds temporary config vars.
      *
      * @param   string  $key    Configuration item name
-     * @return  object  $this
+     * @param   mixed   $val    Value to set, NULL to unset
      */
-    public function del($key)
+    public static function set($key, $val=NULL)
     {
-        unset($this->properties[$key]);
-        return $this;
+        return self::getInstance()->_set($key, $val);
+    }
+
+
+    /**
+     * Returns a configuration item.
+     * Returns all items if `$key` is NULL.
+     *
+     * @param   string|NULL $key    Name of item to retrieve
+     * @return  mixed       Value of config item
+     */
+    public static function get($key=NULL)
+    {
+        return self::getInstance()->_get($key);
     }
 
 }

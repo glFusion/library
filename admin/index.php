@@ -65,13 +65,13 @@ switch ($action) {
 case 'checkout':
     $I = \Library\Item::getInstance($_POST['id']);
     $I->checkOut($_POST['uid']);
-    COM_refresh(Config::getInstance()->get('admin_url') . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
+    COM_refresh(Library\Config::getInstance()->get('admin_url') . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
     break;
 
 case 'checkin':
     $I = \Library\Item::getInstance($_POST['id']);
     $I->checkIn($_POST['instance_id']);
-    COM_refresh(Config::getInstance()->get('admin_url') . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
+    COM_refresh(Library\Config::getInstance()->get('admin_url') . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
     break;
 
 case 'deleteitem':
@@ -79,7 +79,7 @@ case 'deleteitem':
     $P = \Library\Item::getInstance($_REQUEST['id']);
     if (!$P->isUsed()) {
         $P->Delete();
-        COM_refresh(Config::getInstance()->get('admin_url') . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
+        COM_refresh(Library\Config::getInstance()->get('admin_url') . '/index.php?status=' . SESS_getVar('library.itemlist.status'));
     } else {
         $content .= "Product has purchase records, can't delete.";
     }
@@ -89,7 +89,7 @@ case 'deleteinstance':
     // Instance ID only comes from $_GET
     $I = \Library\Instance::getInstance($_GET['id']);
     $I->Delete();
-    COM_refresh(Config::getInstance()->get('admin_url') . '/index.php?instances=x&item_id=' . $_GET['item_id']);;
+    COM_refresh(Library\Config::getInstance()->get('admin_url') . '/index.php?instances=x&item_id=' . $_GET['item_id']);;
     break;
 
 case 'deletecatimage':
@@ -128,7 +128,7 @@ case 'savemedia':
 
 case 'deletemedia':
     \Library\MediaType::getInstance(LGLIB_getVar($_GET, 'id', 'integer'))->Delete();
-    COM_refresh(Config::getInstance()->get('admin_url') . '/index.php?medialist=x');
+    COM_refresh(Library\Config::getInstance()->get('admin_url') . '/index.php?medialist=x');
     break;
 
 case 'saveitem':
@@ -147,7 +147,7 @@ case 'savecat':
         $content .= LIBRARY_popupMsg(_('The submitted form has missing or invalid fields'));
         $view = 'editcat';
     } else {
-        COM_refresh(Config::getInstance()->get('admin_url') . '/index.php?catlist');
+        COM_refresh(Library\Config::getInstance()->get('admin_url') . '/index.php?catlist');
     }
     break;
 
@@ -189,7 +189,7 @@ case 'copyitem':
     if (!empty($id)) {
         \Library\Item::makeClone($id);
     }
-    COM_refresh(Config::getInstance()->get('admin_url'));
+    COM_refresh(Library\Config::getInstance()->get('admin_url'));
     break;
 
 case 'editcat':

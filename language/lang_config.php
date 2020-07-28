@@ -11,52 +11,11 @@
  * @filesource
  */
 
-global $_CONF_LIB;
-
-$LANG_LIB_HELP = array(
-/*'item_id' => 'Enter a unique item ID. A SKU or ISBN is recommended.',
-'item_name' => 'Enter the item&apos;s name or title.',
-'short_dscp' => 'Enter a short one-line description of the item.',
-'item_cat_id' => 'Select the category for this item.',
-'author' => 'Enter the author name(s)',
-'publisher' => 'Enter the name of the publisher, if any.',
-'pub_date' => 'Enter the date published. Any text may be entered',
-'media_type' => 'Select the type of media for this item.',
-'item_dscp' => 'Enter a detailed description of this item.',
-'keywords' => 'Keywords are used for searching but do not appear in the item&apos;s display.',
-'images' => 'Upload images to be shown with the item, such as book covers.',
-'maxcheckout' => 'Enter the maximum number of days for which the item can be checked out.',
-'daysonhold' => 'Enter the grace period, in days, to redeem a waitlisted item once it becomes available.',
-'enabled' => 'Check if this item is enabled. Disabling an item can be used to temporarily remove an item from the catalog.',
-'comments' => 'Select whether comments are enabled for this item.',*/
-'max_wait_items' => 'You can reserve up to ' . $_CONF_LIB['max_wait_items'] . ' items at a time.',
-'due_dt' => 'Enter or select the due date for the item.',
-'checkout_user' => 'Select the user to check out this item. The user at the top of the waiting list is shown first.',
-'cat_name' => 'Enter a short name for this category',
-'cat_owner' => 'Select the category owner. There is no submission option so this should normally be an administrator.',
-'cat_group' => 'Select the category group. This can be used to limit read access to a specific group.',
-'cat_perms' => 'Select the permissions for this category. Only Read permission is used.',
-'cat_enabled' => 'Select whether this category is enabled. Disabling a category prevents any of its items from being displayed.',
-'mt_type' => 'Enter a name for this media type. This should be unique.',
-'add_instances' => 'Enter the number of instances to add for this item.',
-'checkin_instance' => 'Select the specific item instance to check in.',
-);
-
-/** Message indicating plugin version is up to date */
-$PLG_library_MESSAGE2 = 'The library plugin is already up to date.';
-
-$PLG_library_MESSAGE03 = 'Error retrieving current version number';
-$PLG_library_MESSAGE04 = 'Error performing the plugin upgrade';
-$PLG_library_MESSAGE05 = 'Error upgrading the plugin version number';
-$PLG_library_MESSAGE06 = 'Plugin is already up to date';
-
-/** Message indicating that no event was selected when required */
-$PLG_library_MESSAGE101 = 'No Event Selected';
 
 /** Language strings for the plugin configuration section */
 $LANG_configsections['library'] = array(
-    'label' => 'Library',
-    'title' => 'Library Configuration'
+    'label' => \Library\_('Library'),
+    'title' => \Library\_('Library Configuration'),
 );
 
 /** Language strings for the field names in the config section */
@@ -96,8 +55,7 @@ $LANG_fs['library'] = array(
 );
 
 /**
- *  Language strings for the selection option names in the config section
- *  Note: entries 0, 1, and 12 are the same as in $LANG_configselects['Core']
+ * Language strings for the selection option names in the config section
  */
 $LANG_configselects['library'] = array(
     0 => array(

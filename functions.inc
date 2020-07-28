@@ -54,12 +54,13 @@ define ('LIB_STATUS_AVAIL', 1);
 /** Define status code: item checked out */
 define ('LIB_STATUS_OUT', 2);
 
+use Library\Config;
+
 // Store the private image path in a conf var so it's available
-Library\Config::getInstance()
-    ->set('pi_path', __DIR__)
-    ->set('url', $_CONF['site_url'] . '/library')
-    ->set('admin_url', $_CONF['site_admin_url'] . '/plugins/library')
-    ->set('image_dir', $_CONF['path'] . 'data/library/images/items');
+Config::set('pi_path', __DIR__);
+Config::set('url', $_CONF['site_url'] . '/library');
+Config::set('admin_url', $_CONF['site_admin_url'] . '/plugins/library');
+Config::set('image_dir', $_CONF['path'] . 'data/library/images/items');
 
 //  Additional config items and table definitions are added here
 if (file_exists(__DIR__ . '/config.php')) {
@@ -113,11 +114,11 @@ function plugin_getmenuitems_library()
 {
     $menuitems = array();
     if (
-        Library\Config::getInstance()->get('menuitem') &&
+        Config::get('menuitem') &&
         SEC_hasRights('library.view,library.admin', 'OR')
     ) {
         $txt = _('Library');
-        $menuitems[$txt] = Library\Config::getInstance()->get('url') . '/index.php';
+        $menuitems[$txt] = Config::get('url') . '/index.php';
     }
     return $menuitems;
 }
@@ -130,7 +131,7 @@ function plugin_getmenuitems_library()
  */
 function plugin_commentsupport_library()
 {
-    return Library\Config::getInstance()->get('ena_comments') == 0 ? false : true;
+    return Config::get('ena_comments') == 0 ? false : true;
 }
 
 
@@ -176,7 +177,7 @@ function plugin_savecomment_library($title,$comment,$id,$pid,$postmode)
 
         return COM_refresh(
             COM_buildUrl(
-                Library\Config::getInstance()->get('url') .
+                Config::get('url') .
                 "/index.php?mode=detail&id=$id"
             )
         );
@@ -272,7 +273,7 @@ function plugin_deletecomment_library($cid, $id)
                     WHERE id='$id'");
             // Redirect back to the product detail page
             return COM_refresh(
-                Library\Config::getInstance()->get('url') .
+                Config::get('url') .
                 '/index.php?mode=detail&id=' . $id
             );
         }
@@ -295,7 +296,7 @@ function plugin_editcomment_library($cid, $id)
 {
     echo COM_refresh(
         COM_buildUrl(
-            Library\Config::getInstance()->get('url') . '/index.php?mode=detail&id=' . $id
+            Config::get('url') . '/index.php?mode=detail&id=' . $id
         )
     );
     exit;
@@ -309,8 +310,8 @@ function plugin_editcomment_library($cid, $id)
  */
 function plugin_geticon_library()
 {
-    return Library\Config::getInstance()->get('url') . '/images/' .
-        Library\Config::getInstance()->get('pi_name') . '.png';
+    return Config::get('url') . '/images/' .
+        Config::get('pi_name') . '.png';
 }
 
 
@@ -324,8 +325,8 @@ function plugin_cclabel_library()
 {
     if (SEC_hasRights('library.admin')) {
         return array(
-            Library\Config::getInstance()->get('pi_display_name'),
-            Library\Config::getInstance()->get('admin_url'),
+            Config::get('pi_display_name'),
+            Config::get('admin_url'),
             plugin_geticon_library()
         );
     }
@@ -343,8 +344,8 @@ function plugin_getadminoption_library()
 
     if (SEC_hasRights('library.admin')) {
         return array(
-            Library\Config::getInstance()->get('pi_display_name'),
-            Library\Config::getInstance()->get('admin_url'),
+            Config::get('pi_display_name'),
+            Config::get('admin_url'),
             DB_count($_TABLES['library.items'])
         );
     }
@@ -358,7 +359,7 @@ function plugin_getadminoption_library()
  */
 function plugin_chkVersion_library()
 {
-    return Library\Config::getInstance()->get('pi_version');
+    return Config::get('pi_version');
 }
 
 
@@ -396,7 +397,7 @@ function plugin_autotags_library ($op, $content = '', $autotag = '') {
         return 'library';
     } else if ($op == 'parse') {
         $id = COM_applyFilter($autotag['parm1']);
-        $url = Library\Config::getInstance()->get('url') . "/index.php?mode=detail&product=$id";
+        $url = Config::get('url') . "/index.php?mode=detail&product=$id";
 
         // Allow the author to use different text for the link.  Default
         // is the stored product name.
@@ -545,7 +546,7 @@ return;
     $htmlquery = urlencode($query);
 
     $query = trim(DB_escapeString(htmlspecialchars($query)));
-    $pi_name = Library\Config::getInstance()->get('pi_name');
+    $pi_name = Config::get('pi_name');
     $sql = "SELECT
                 p.id, p.name as title, p.dscp as description,
                 dt_add as date,  views as hits,
@@ -645,12 +646,12 @@ function LIBRARY_getDocURL($file='', $doclang='english')
         if (!file_exists($doc_path . $file)) {
             $doclang = 'english';
         }
-        $doc_url = Library\Config::getInstance()->get('url') . "/docs/$doclang/$file";
+        $doc_url = Config::get('url') . "/docs/$doclang/$file";
     } else {
         if (!is_dir($doc_path)) {
             $doclang = 'english';
         }
-        $doc_url = Library\Config::getInstance()->get('url') . "/docs/$doclang/";
+        $doc_url = Config::get('url') . "/docs/$doclang/";
     }
     return $doc_url;
 }
@@ -904,7 +905,10 @@ function plugin_itemrated_library($id, $rating, $votes)
  */
 function plugin_canuserrate_library($item_id, $uid)
 {
-    if (Library\Config::getInstance()->get('anon_can_rate') == 0 && COM_isAnonUser()) {
+    if (
+        Config::get('anon_can_rate') == 0 &&
+        COM_isAnonUser()
+    ) {
         return false;
     } else {
         return true;
@@ -986,7 +990,7 @@ function LIBRARY_siteHeader($subject='', $meta='')
     if ($subject != '')
         $title = $subject . ' : ' . $title;
 
-    switch (Library\Config::getInstance()->get('displayblocks')) {
+    switch (Config::get('displayblocks')) {
     case 2:     // right only
     case 0:     // none
         $retval .= COM_siteHeader('none', $title, $meta);
@@ -1013,7 +1017,7 @@ function LIBRARY_siteFooter()
 {
     $retval = '';
 
-    switch (Library\Config::getInstance()->get('displayblocks')) {
+    switch (Config::get('displayblocks')) {
     case 2 : // right only
     case 3 : // left and right
         $retval .= COM_siteFooter(true);
@@ -1066,7 +1070,7 @@ function LIBRARY_today()
 function LIBRARY_dueDate($days = 0)
 {
     if ($days == 0) {
-        $days = Library\Config::getInstance()->get('maxcheckout');
+        $days = Config::get('maxcheckout');
     }
     return LIBRARY_now()->add(new \DateInterval("P{$days}D"));
 }

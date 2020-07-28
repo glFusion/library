@@ -17,6 +17,8 @@
 /** Require core glFusion code */
 require_once '../lib-common.php';
 
+use Library\Config;
+
 // If plugin is installed but not enabled, display an error and exit gracefully
 if (!in_array('library', $_PLUGINS)) {
     COM_404();
@@ -66,7 +68,7 @@ case 'addwait':
     if ($Item->canCheckout()) {
         if (!$Item->isNew()) {
             Library\Waitlist::Add($Item);
-            if ($Item->isAvailable() && Library\Config::getInstance()->get('notify_checkout') == 1) {
+            if ($Item->isAvailable() && Config::get('notify_checkout') == 1) {
                 LIBRARY_notifyLibrarian($id, $_USER['uid']);
             }
         }
@@ -127,10 +129,6 @@ if (SEC_hasRights('library.admin')) {
 }
 
 $display = LIBRARY_siteHeader();
-//$T = new Template($_CONF_LIB['pi_path'] . '/templates');
-//$T->set_file('title', 'library_title.thtml');
-//$T->set_var('title', $LANG_LIB['main_title']);
-//$display .= $T->parse('', 'title');
 $display .= $content;
 $display .= LIBRARY_siteFooter();
 echo $display;
