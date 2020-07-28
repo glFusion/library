@@ -17,6 +17,7 @@ if (!defined ('GVERSION')) {
 
 global $_DB_dbms;
 
+require_once __DIR__ . '/classes/Config.class.php';
 require_once __DIR__ . '/library.php';
 require_once __DIR__ . '/sql/'.$_DB_dbms.'_install.php';
 require_once __DIR__ . '/install_defaults.php';
@@ -42,7 +43,7 @@ $INSTALL_plugin['library'] = array(
             'ver'   => $Cfg->get('pi_version'),
             'gl_ver' => $Cfg->get('gl_version'),
             'url'   => $Cfg->get('pi_url'),
-            'display' => $Cfg->get'pi_display_name')
+            'display' => $Cfg->get('pi_display_name')
         ),
     array(  'type' => 'table',
             'table' => $_TABLES['library.items'],
