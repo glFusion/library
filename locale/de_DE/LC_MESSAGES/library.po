@@ -585,51 +585,51 @@ msgstr ""
 
 #: public_html/index.php:98
 msgid "Purchase History"
-msgstr ""
+msgstr "Kaufhistorie"
 
 #: library_functions.inc.php:44
 msgid "Search"
-msgstr ""
+msgstr "Suche"
 
 #: library_functions.inc.php:45 admin/index.php:415
 msgid "All"
-msgstr ""
+msgstr "Alle"
 
 #: library_functions.inc.php:46
 msgid "Ascending"
-msgstr ""
+msgstr "Aufsteigend"
 
 #: library_functions.inc.php:47
 msgid "Descending"
-msgstr ""
+msgstr "Absteigend"
 
 #: library_functions.inc.php:50
 msgid "Sort"
-msgstr ""
+msgstr "Sortieren"
 
 #: library_functions.inc.php:51
 msgid "Submit"
-msgstr ""
+msgstr "Einreichen"
 
 #: library_functions.inc.php:53
 msgid "Admin"
-msgstr ""
+msgstr "Administratorin"
 
 #: library_functions.inc.php:464
 msgid "Next on Waiting List"
-msgstr ""
+msgstr "Weiter auf Warteliste"
 
 #: admin/ajax.php:54
 msgid "Item Updated"
-msgstr ""
+msgstr "Artikel aktualisiert"
 
 #: admin/ajax.php:56
 msgid "Item Unchanged"
-msgstr ""
+msgstr "Artikel unverändert"
 
 #: admin/index.php:112
 msgid "Category has related products, can't delete."
-msgstr ""
+msgstr "Kategorie hat verwandte Produkte, kann nicht gelöscht werden."
 
 #: admin/index.php:147 test/t.php:7
 msgid "The submitted form has missing or invalid fields"
@@ -637,25 +637,25 @@ msgstr "Das übermittelte Formular enthält fehlende oder ungültige Felder"
 
 #: admin/index.php:299
 msgid "Date/Time"
-msgstr ""
+msgstr "Datum/Zeit"
 
 #: admin/index.php:303
 msgid "Action"
-msgstr ""
+msgstr "Aktion"
 
 #: admin/index.php:307
 msgid "By"
-msgstr ""
+msgstr "Durch"
 
 #: admin/index.php:311
 msgid "User Name"
-msgstr ""
+msgstr "Nutzername"
 
 #: admin/index.php:323
 msgid "Transaction History for"
-msgstr ""
+msgstr "Transaktionsverlauf für"
 
 #: admin/index.php:418
 msgid "Pending"
-msgstr ""
+msgstr "steht aus"
 
