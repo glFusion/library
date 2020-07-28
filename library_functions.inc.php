@@ -362,9 +362,9 @@ function LIBRARY_notifyLibrarian($item_id, $uid)
     $Item = new Library\Item($item_id);
     if ($Item->isNew()) return;   // invalid item id
 
-    $msg = '<p>Someone has requested a library item.</p>' . LB .
-        '<p>Item Name: ' . $Item->getTitle() . '</p>' . LB .
-        '<p>Requested By: ' . $user . '</p>' . LB;
+    $msg = '<p>' . _('Someone has requested a library item.') . '</p>' . LB .
+        '<p>' . _('Item Name') . ': ' . $Item->getTitle() . '</p>' . LB .
+        '<p>' . _('Requested By') . ': ' . $user . '</p>' . LB;
 
     while ($A = DB_fetchArray($res, false)) {
         if (empty($A['email'])) continue;
