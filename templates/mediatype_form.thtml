@@ -9,7 +9,7 @@
       <span id="hlp_mediatype" class="tooltip_cfg tooltipstered"></span>
     </label>
     <div class="uk-form-controls">
-      <input required type="text" id="item_name" name="name" value="{name}" size="40" maxlength="255" />
+      <input required type="text" id="item_name" name="dscp" value="{dscp}" size="40" maxlength="40" />
     </div>
   </div>
 
@@ -19,7 +19,7 @@
 {!if candelete}
       <button type="submit" name="deletemedia" class="uk-button uk-button-danger">{lang_delete}</button>
 {!endif}
-      <button type="submit" name="medialist" class="uk-button">{lang_cancel}</button>
+      <a class="uk-button" href="{action_url}/index.php?medialist">{lang_cancel}</a>
     </div>
   </div>
 </form>
