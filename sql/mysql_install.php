@@ -95,7 +95,7 @@ $_SQL['library.categories'] = "CREATE TABLE `{$_TABLES['library.categories']}` (
 
 $_SQL['library.types'] = "CREATE TABLE `{$_TABLES['library.types']}` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL DEFAULT '',
+  `dscp` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM";
 

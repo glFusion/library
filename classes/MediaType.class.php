@@ -18,17 +18,21 @@ namespace Library;
 */
 class MediaType
 {
-    /** Property fields.  Accessed via `__set()` and `__get()`.
-     *  @var array */
-    var $properties;
+    /** Record ID.
+     * @var integer */
+    private $id = 0;
+
+    /** Description.
+     * @var string */
+    private $dscp = '';
 
     /** Indicate whether the current user is an administrator.
      *  @var boolean */
-    var $isAdmin;
+    private $isAdmin = 0;
 
     /** Indicate that this is a new record.
      * @var boolean */
-    var $isNew;
+    private $isNew = 1;
 
     /** Array of error messages, to be accessible by the calling routines.
      *  @var array */
@@ -44,16 +48,13 @@ class MediaType
      */
     public function __construct($id=0)
     {
-        $this->properties = array();
-        $this->isNew = true;
-
         if (is_array($id)) {    // Record passed in
             $this->setVars($id);
             $this->isNew = false;
         } else {
             $id = (int)$id;
             if ($id < 1) {
-                $this->name = '';
+                $this->dscp = '';
             } else {
                 $this->id = $id;
                 if (!$this->Read()) {
@@ -62,48 +63,6 @@ class MediaType
             }
         }
         $this->isAdmin = SEC_hasRights('library.admin') ? 1 : 0;
-    }
-
-
-    /**
-     * Set a property's value.
-     *
-     * @param   string  $var    Name of property to set.
-     * @param   mixed   $value  New value for property.
-     */
-    public function __set($var, $value='')
-    {
-        switch ($var) {
-        case 'id':
-           // Integer values
-            $this->properties[$var] = (int)$value;
-            break;
-
-        case 'name':
-            // String values
-            $this->properties[$var] = trim($value);
-            break;
-
-        default:
-            // Undefined values (do nothing)
-            break;
-        }
-    }
-
-
-    /**
-     * Get the value of a property.
-     *
-     * @param   string  $var    Name of property to retrieve.
-     * @return  mixed           Value of property, NULL if undefined.
-     */
-    public function __get($var)
-    {
-        if (array_key_exists($var, $this->properties)) {
-            return $this->properties[$var];
-        } else {
-            return NULL;
-        }
     }
 
 
@@ -139,16 +98,12 @@ class MediaType
         static $types = NULL;
         if ($types === NULL) {      // check if previously loaded
             $key = 'all_mediatypes';
-            $types = Cache::get($key);
-            if ($types === NULL) {  // still not found
-                $types = array();
-                $res = DB_query("SELECT * FROM {$_TABLES['library.types']}");
-                if ($res) {
-                    while ($A = DB_fetchArray($res, false)) {
-                        $types[$A['id']] = $A;
-                    }
+            $types = array();
+            $res = DB_query("SELECT * FROM {$_TABLES['library.types']}");
+            if ($res) {
+                while ($A = DB_fetchArray($res, false)) {
+                    $types[$A['id']] = $A;
                 }
-                Cache::set($key, $types, 'mediatypes');
             }
         }
         return $types;
@@ -164,8 +119,8 @@ class MediaType
     {
         if (!is_array($row)) return;
 
-        $this->id = $row['id'];
-        $this->name = $row['name'];
+        $this->id = (int)$row['id'];
+        $this->dscp = $row['dscp'];
     }
 
 
@@ -186,9 +141,10 @@ class MediaType
             return;
         }
 
-        $result = DB_query("SELECT *
-                    FROM {$_TABLES['library.types']}
-                    WHERE id='$id'");
+        $result = DB_query(
+            "SELECT * FROM {$_TABLES['library.types']}
+            WHERE id='$id'"
+        );
         if (!$result || DB_numRows($result) != 1) {
             return false;
         } else {
@@ -216,11 +172,12 @@ class MediaType
 
         if ($this->isNew) {
             $sql = "INSERT INTO {$_TABLES['library.types']}
-                    VALUES (0, '" . DB_escapeString($this->name) . "')";
+                (id, dscp)
+                VALUES (0, '" . DB_escapeString($this->dscp) . "')";
         } else {
             $sql = "UPDATE {$_TABLES['library.types']}
-                    SET name='" . DB_escapeString($this->name) . "'
-                    WHERE id = '{$this->id}'";
+                SET dscp ='" . DB_escapeString($this->dscp) . "'
+                WHERE id = '{$this->id}'";
         }
         $status = DB_query($sql);
         if (!$status) {
@@ -228,7 +185,6 @@ class MediaType
         }
 
         if (empty($this->Errors)) {
-            Cache::clear('mediatypes');
             return true;
         } else {
             return false;
@@ -245,7 +201,6 @@ class MediaType
 
         if ($this->id > 0) {
             DB_delete($_TABLES['library.types'], 'id', $this->id);
-            Cache::clear('mediatypes');
             $this->id = 0;
             return true;
         } else {
@@ -274,7 +229,7 @@ class MediaType
         // Otherwise, we're creating a new item.  Also set the $not and $items
         // values to be used in the parent media type selection accordingly.
         if ($this->id > 0) {
-            $retval = COM_startBlock(_('Edit') . ': ' . $this->name);
+            $retval = COM_startBlock(_('Edit') . ': ' . $this->dscp);
             $T->set_var('id', $this->id);
         } else {
             $retval = COM_startBlock(_('New Media Type'));
@@ -283,10 +238,10 @@ class MediaType
 
         $T->set_var(array(
             'action_url'    => Config::getInstance()->get('admin_url'),
-            'name'          => $this->name,
+            'dscp'          => $this->dscp,
             'candelete'     => !$this->isNew && !self::isUsed($this->id),
             'lang_type'     => _('Media Type'),
-            'lang_hlp_mt_type' => _('Enter a name for this media type. This should be unique.'),
+            'lang_hlp_mt_type' => _('Enter a description for this media type. This should be unique.'),
             'lang_save'     => _('Save'),
             'lang_cancel'   => _('Cancel'),
             'lang_delete'   => _('Delete'),
@@ -359,21 +314,16 @@ class MediaType
         global $_TABLES;
 
         $retval = '';
-        $cache_key = 'mt_select_' . ($used_only ? 'used' : 'all');
-        $A = Cache::get($cache_key);
-        if ($A === NULL) {
-            $sql = "SELECT m.* from {$_TABLES['library.types']} m";
-            if ($used_only) {
-                $sql .= " RIGHT JOIN {$_TABLES['library.items']} i
-                    ON i.type = m.id GROUP BY m.id";
-            }
-            $res = DB_query($sql, 1);
-            $A = DB_fetchAll($res);
-            Cache::set($cache_key, $A, array('mediatypes', 'items'));
+        $sql = "SELECT m.* from {$_TABLES['library.types']} m";
+        if ($used_only) {
+            $sql .= " RIGHT JOIN {$_TABLES['library.items']} i
+                ON i.type = m.id GROUP BY m.id";
         }
+        $res = DB_query($sql, 1);
+        $A = DB_fetchAll($res);
         foreach ($A as $data) {
             $sel = $data['id'] == $sel_type ? 'selected="selected"' : '';
-            $retval .= "<option value='{$data['id']}' $sel>{$data['name']}</option>" . LB;
+            $retval .= "<option value='{$data['id']}' $sel>{$data['dscp']}</option>" . LB;
         }
         return $retval;
     }
@@ -413,7 +363,7 @@ class MediaType
             ),
             array(
                 'text'  => _('Media Type'),
-                'field' => 'name',
+                'field' => 'dscp',
                 'sort'  => true,
             ),
             array(
@@ -435,7 +385,7 @@ class MediaType
         $query_arr = array(
             'table' => 'library.types',
             'sql' => $sql,
-            'query_fields' => array('name'),
+            'query_fields' => array('dscp'),
             'default_filter' => 'WHERE 1=1',
         );
         $text_arr = array(
