@@ -20,19 +20,12 @@ class Image extends \upload
 {
     /** Path to actual image (without filename)
      * @var string */
-    var $pathImage;
-
-    /** Path to image thumbnail (without filename)
-     * @var string */
-    //var $pathThumb;
+    private $pathImage;
 
     /** ID of the current ad
      * @var string */
-    var $item_id;
+    private $item_id;
 
-    /** Array of the names of successfully uploaded files
-     * @var array */
-    var $goodfiles = array();
 
     /**
      * Constructor.
@@ -51,12 +44,11 @@ class Image extends \upload
 
         $img_dir = Config::getInstance()->get('image_dir');
         // Before anything else, check the upload directory
-        if (!$this->setPath($img_dir);
+        if (!$this->setPath($img_dir)) {
             return;
         }
         $this->item_id = trim($item_id);
         $this->pathImage = $img_dir;
-        //$this->pathThumb = $this->pathImage . '/thumbs';
         $this->setAllowedMimeTypes(array(
                 'image/pjpeg' => '.jpg,.jpeg',
                 'image/jpeg'  => '.jpg,.jpeg',
@@ -140,7 +132,7 @@ class Image extends \upload
     public function Upload($file)
     {
         if (!is_array($file))
-            return "Invalid file given to Upload()";
+            return _('Invalid file given to Upload()');
 
         $msg = $this->Validate($file);
         if ($msg != '')
@@ -148,8 +140,11 @@ class Image extends \upload
 
         $this->filename = $this->item_id . '.' . rand(10,99) . $this->filetype;
 
-        if (!@move_uploaded_file($file['tmp_name'],
-                $this->pathImage . '/' . $this->filename)) {
+        if (!@move_uploaded_file(
+                $file['tmp_name'],
+                $this->pathImage . '/' . $this->filename
+            )
+        ) {
             return 'upload_failed_msg';
         }
 
@@ -167,8 +162,9 @@ class Image extends \upload
      */
     private function Validate($file)
     {
-        if (!is_array($file))
-            return;
+        if (!is_array($file)) {
+            return _('No files provided to Validate()');
+        }
 
         $msg = '';
         // verify that the image is a jpeg or other acceptable format.
@@ -184,7 +180,7 @@ class Image extends \upload
                 break;
             }
         } else {
-            return "System Error: Missing exif_imagetype function";
+            return _('System Error: Missing exif_imagetype function');
         }
 
         // Now check for error messages in the file upload: too large, etc.
@@ -196,13 +192,13 @@ class Image extends \upload
             break;
         case UPLOAD_ERR_INI_SIZE:
         case UPLOAD_ERR_FORM_SIZE:
-            $msg = "<li>upload_too_big</li>\n";
+            $msg .= "<li>upload_too_big</li>\n";
             break;
         case UPLOAD_ERR_NO_FILE:
-            $msg = "<li>upload_missing_msg</li>\n";
+            $msg .= "<li>upload_missing_msg</li>\n";
             break;
         default:
-            $msg = "<li>upload_failed_msg</li>\n";
+            $msg .= "<li>upload_failed_msg</li>\n";
             break;
         }
         return $msg;

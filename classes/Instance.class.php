@@ -18,9 +18,22 @@ namespace Library;
  */
 class Instance
 {
-    /** Property fields.  Accessed via __set() and __get()
-    *   @var array */
-    var $properties;
+    /** Instance DB record ID.
+     * @var integer */
+    private $instance_id = 0;
+
+    /** ID of user who has the instance checked out.
+     * @var integer */
+    private $uid = 0;
+
+    /** Due date object.
+     * @var integer */
+    private $due = NULL;
+
+    /** Parent item ID.
+     * @var string */
+    private $item_id = '';
+
 
     /**
      * Constructor.
@@ -31,8 +44,6 @@ class Instance
      */
     public function __construct($id=0)
     {
-        $this->properties = array();
-
         if (is_array($id)) {
             // Got a DB record, just load the values
             $this->setVars($id);
@@ -42,52 +53,72 @@ class Instance
             $this->instance_id = $id;
             if (!$this->Read()) {
                 $this->instance_id = 0;
+                $this->setDueDate(0);
             }
         }
     }
 
 
     /**
-     * Set a property's value.
+     * Get the user ID who has the item checked out.
      *
-     * @param   string  $var    Name of property to set.
-     * @param   mixed   $value  New value for property.
+     * @return  integer     User ID
      */
-    public function __set($var, $value='')
+    public function getUid()
     {
-        switch ($var) {
-        case 'instance_id':
-        case 'uid':
-        case 'due':
-           // Integer values
-            $this->properties[$var] = (int)$value;
-            break;
+        return (int)$this->uid;
+    }
 
-        case 'item_id':
-            // String values
-            $this->properties[$var] = trim($value);
-            break;
 
-        default:
-            // Undefined values (do nothing)
-            break;
+    /**
+     * Set the due date for this instance.
+     *
+     * @param   string|integer  $ts     Timestamp or date string
+     * @return  object  $this
+     */
+    private function setDueDate($ts=0)
+    {
+        global $_CONF;
+
+        $this->due = new \Date($ts, $_CONF['timezone']);
+        return $this;
+    }
+
+
+    /**
+     * Get the due date for this instance.
+     *
+     * @return  string|object   Formatted date or date object
+     */
+    public function getDueDate($format=NULL)
+    {
+        if ($format === NULL) {
+            return $this->due;
+        } else {
+            return $this->due->format($format,true);
         }
     }
 
 
     /**
-     * Get the value of a property.
+     * Get the DB record ID for this instance.
      *
-     * @param   string  $var    Name of property to retrieve.
-     * @return  mixed           Value of property, NULL if undefined.
+     * @return  integer     DB record ID
      */
-    public function __get($var)
+    public function getID()
     {
-        if (array_key_exists($var, $this->properties)) {
-            return $this->properties[$var];
-        } else {
-            return NULL;
-        }
+        return (int)$this->instance_id;
+    }
+
+
+    /**
+     * Get the parent item record ID.
+     *
+     * @return  string      Parent item id
+     */
+    public function getItemID()
+    {
+        return $this->item_id;
     }
 
 
@@ -98,12 +129,14 @@ class Instance
      */
     public function setVars($row)
     {
+        global $_CONF;
+
         if (!is_array($row)) return;
 
-        $this->instance_id = $row['instance_id'];
+        $this->instance_id = (int)$row['instance_id'];
         $this->item_id = $row['item_id'];
-        $this->uid = $row['uid'];
-        $this->due = $row['due'];
+        $this->uid = (int)$row['uid'];
+        $this->setDueDate((int)$row['due']);
     }
 
 
@@ -218,14 +251,14 @@ class Instance
                 uid = '$to',
                 checkout = UNIX_TIMESTAMP(),
                 due = '$due'
-                WHERE instance_id = {$instance->instance_id}";
-        Cache::clear(array('instance', $instance->item_id));
+                WHERE instance_id = {$instance->getID()}";
+        Cache::clear(array('instance', $instance->getItemID()));
         DB_query($sql);
 
         // Insert the trasaction record
         $sql = "INSERT INTO {$_TABLES['library.log']} SET
-                    item_id = '{$instance->item_id}',
-                    instance_id = '{$instance->instance_id}',
+                    item_id = '{$instance->getID()}',
+                    instance_id = '{$instance->getItemID()}',
                     dt = UNIX_TIMESTAMP(),
                     doneby = $me,
                     uid = $to,
@@ -251,7 +284,6 @@ class Instance
                     checkout = 0,
                     due = 0
                     WHERE instance_id='{$this->instance_id}'";
-COM_errorLog($sql);
         DB_query($sql);
         Cache::clear(array('instance', $this->item_id));
 
@@ -491,7 +523,7 @@ COM_errorLog($sql);
             }
             break;
         case 'item_id':
-            $retval .= '<span title="' . htmlspecialchars($A['name']) . '" class="tooltip">' . $fieldvalue . '</span>';
+            $retval .= '<span title="' . htmlspecialchars($A['title']) . '" class="tooltip">' . $fieldvalue . '</span>';
             break;
         default:
             $retval .= $fieldvalue;

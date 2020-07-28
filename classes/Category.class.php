@@ -18,22 +18,36 @@ namespace Library;
  */
 class Category
 {
-    /** Property fields.  Accessed via Set() and Get()
-    *   @var array */
-    var $properties;
-
     /** Indicate whether the current user is an administrator
-    *   @var boolean */
-    var $isAdmin;
+     * @var boolean */
+    private $isAdmin = 0;
 
     /** Indicate that this is a new category, vs. one read from the DB.
      * @var boolean */
-    var $isNew;
+    private $isNew = 1;
 
-    //var $button_types = array();
+    /** Category record ID.
+     * @var integer */
+    private $cat_id = 0;
+
+    /** Group ID that can view and check out.
+     * @var integer */
+    private $group_id = 13;
+
+    /** Category name.
+     * @var string */
+    private $cat_name = '';
+
+    /** Category description.
+     * @var string */
+    private $dscp = '';
+
+    /** Flag indicating the category is enabled.
+     * @var boolean */
+    private $enabled = 1;
 
     /** Array of error messages, to be accessible by the calling routines.
-    *   @var array */
+     * @var array */
     public $Errors = array();
 
 
@@ -74,56 +88,6 @@ class Category
 
 
     /**
-     * Set a property's value.
-     * Emulates the __set() magic function in PHP 5.
-     *
-     * @param   string  $var    Name of property to set.
-     * @param   mixed   $value  New value for property.
-     */
-    public function __set($var, $value='')
-    {
-        switch ($var) {
-        case 'cat_id':
-        case 'group_id':
-            // Integer values
-            $this->properties[$var] = (int)$value;
-            break;
-
-        case 'cat_name':
-        case 'dscp':
-            // String values
-            $this->properties[$var] = trim($value);
-            break;
-
-        case 'enabled':
-            // Boolean values
-            $this->properties[$var] = $value == 1 ? 1 : 0;
-            break;
-
-        default:
-            // Undefined values (do nothing)
-            break;
-        }
-    }
-
-
-    /**
-     * Get the value of a property.
-     *
-     * @param   string  $var    Name of property to retrieve.
-     * @return  mixed           Value of property, NULL if undefined.
-     */
-    public function __get($var)
-    {
-        if (array_key_exists($var, $this->properties)) {
-            return $this->properties[$var];
-        } else {
-            return NULL;
-        }
-    }
-
-
-    /**
      * Get an instance of a category object.
      * Caches objects in a static variable.
      *
@@ -139,12 +103,7 @@ class Category
         } elseif (isset($cats[$cat_id])) {
             return $cats[$cat_id];
         } else{
-            $key = 'category_' . $cat_id;
-            $cats[$cat_id] = Cache::get($key);
-            if ($cats[$cat_id] === NULL) {
-                $cats[$cat_id] = new self($cat_id);
-            }
-            Cache::set($key, $cats[$cat_id], 'categories');
+            $cats[$cat_id] = new self($cat_id);
         }
         return $cats[$cat_id];
     }
@@ -160,11 +119,11 @@ class Category
     {
         if (!is_array($row)) return;
 
-        $this->cat_id = $row['cat_id'];
+        $this->cat_id = (int)$row['cat_id'];
         $this->dscp = $row['dscp'];
-        $this->enabled = $row['enabled'];
+        $this->enabled = isset($row['enabled']) && $row['enabled'] ? 1 : 0;
         $this->cat_name = $row['cat_name'];
-        $this->group_id = $row['group_id'];
+        $this->group_id = (int)$row['group_id'];
     }
 
 
@@ -235,7 +194,6 @@ class Category
         }
 
         if (empty($this->Errors)) {
-            Cache::clear('categories');
             return true;
         } else {
             return false;
@@ -255,7 +213,6 @@ class Category
         // Can't delete root category
         if ($this->cat_id > 1) {
             DB_delete($_TABLES['library.categories'], 'cat_id', $this->cat_id);
-            Cache::clear('categories');
             $this->cat_id = 0;
             return true;
         } else {
@@ -476,18 +433,14 @@ class Category
 
         $All = array();
         $key = 'category_tree_' . $enabled ? 1 : 0;
-        $cats = Cache::get($key);
-        if ($cats === NULL) {
-            $sql = "SELECT * FROM {$_TABLES['library.categories']}";
-            if ($enabled) {
-                $sql .= ' WHERE enabled = 1';
-            }
-            $sql .= ' ORDER BY cat_id ASC';
-            //echo $sql;die;
-            $result = DB_query($sql);
-            $cats = DB_fetchAll($result, false);
-            Cache::set($key, $cats, 'categories');
+        $sql = "SELECT * FROM {$_TABLES['library.categories']}";
+        if ($enabled) {
+            $sql .= ' WHERE enabled = 1';
         }
+        $sql .= ' ORDER BY cat_id ASC';
+        //echo $sql;die;
+        $result = DB_query($sql);
+        $cats = DB_fetchAll($result, false);
         foreach ($cats as $A) {
             $All[$A['cat_id']] = new self($A['cat_id'], $A);
         }
