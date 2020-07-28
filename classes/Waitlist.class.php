@@ -116,6 +116,9 @@ class Waitlist
     {
         global $_TABLES, $_CONF;
 
+        // Save so it's the same in both SQL queries
+        $time = time();
+
         // Delete expired waitlist entries.  This could be done as one
         // sql statement, but we want to log each deletion.
         $sql = "SELECT w.id, w.expire, u.username, i.id as item_id
@@ -125,7 +128,7 @@ class Waitlist
                 LEFT JOIN {$_TABLES['users']} u
                     ON u.uid = w.uid
                 WHERE i.daysonhold > 0
-                AND w.expire > 0 AND w.expire < UNIX_TIMESTAMP()
+                AND w.expire > 0 AND w.expire < $time
                 AND i.status=" . LIB_STATUS_AVAIL . "
                 GROUP BY i.id
                 ORDER BY w.id ASC";
@@ -136,6 +139,10 @@ class Waitlist
             COM_errorLog('LIBRARY: delete waitlist, ' .
                 "user {$A['username']}, item {$A['item_id']} dated {$A['expire']}");
         }
+        // Now delete any records that didn't come up before.
+        // Usually this is if there's an invalid item ID in the list.
+        DB_query("DELETE FROM {$_TABLES['library.waitlist']}
+            WHERE expire > 0 AND expire < $time");
     }
 
 
@@ -161,14 +168,15 @@ class Waitlist
             LIMIT 1";
         //echo $sql;die;
         $result = DB_query($sql);
-        if (!$result || DB_numrows($result) < 1)
+        if (!$result || DB_numrows($result) < 1) {
             return;
+        }
 
         USES_library_functions();
 
         $A = DB_fetchArray($result, false);
         $username = COM_getDisplayName($A['uid']);
-        $daysonhold = $A['daysonhold ']> 0 ? $A['daysonhold'] : '';
+        $daysonhold = (isset($A['daysonhold ']) && $A['daysonhold']> 0) ? $A['daysonhold'] : '';
 
         // Update the waitlist record with the expiration
         DB_query("UPDATE {$_TABLES['library.waitlist']}
@@ -176,10 +184,10 @@ class Waitlist
                 " WHERE id = {$A['id']}");
 
         // Select the template for the message
-        $template_dir = Config::getInstance()->get('pi_path') .
+        $template_dir = Config::get('pi_path') .
             '/templates/notify/' . $A['language'];
         if (!file_exists($template_dir . '/item_avail.thtml')) {
-            $template_dir = Config::getInstance()->get('pi_path') . '/templates/notify/english';
+            $template_dir = Config::get('pi_path') . '/templates/notify/english';
         }
 
         // Load the recipient's language.
@@ -189,9 +197,9 @@ class Waitlist
         $T->set_file('message', 'item_avail.thtml');
         $T->set_var(array(
             'username'      => $username,
-            'pi_url'        => Config::getInstance()->get('url'),
+            'pi_url'        => Config::get('url'),
             'item_id'       => $A['item_id'],
-            'item_descrip'  => $A['name'],
+            'item_descrip'  => $A['title'],
             'daysonhold'    => $daysonhold,
         ) );
         $T->parse('output','message');
@@ -229,6 +237,20 @@ class Waitlist
             $waitlist[$item_id] = DB_fetchAll($res, false);
         }
         return $waitlist[$item_id];
+    }
+
+
+    /**
+     * Delete all waitlist entries by item ID.
+     * Used when an item is deleted.
+     *
+     * @param   string  $item_id    Item ID
+     */
+    public static function deleteByItem($item_id)
+    {
+        global $_TABLES;
+
+        DB_delete($_TABLES['library.waitlist'], 'item_id', DB_escapeString($item_id));
     }
 
 
