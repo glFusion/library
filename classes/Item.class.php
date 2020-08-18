@@ -1136,6 +1136,329 @@ class Item
         return $T->finish($T->get_var('output'));
     }
 
-}   // class Item
+    /**
+     * Product Admin List View.
+     *
+     * @param   integer $cat_id     Optional category to limit view
+     * @param   integer $status     Optional status, to limit view
+     */
+    public static function adminList($cat_id = 0, $status = 0)
+    {
+        global $_CONF, $_TABLES, $_USER;
+/*+------------------+---------------------+------+-----+---------+-------+
+| Field            | Type                | Null | Key | Default | Extra |
++------------------+---------------------+------+-----+---------+-------+
+| id               | varchar(40)         | NO   | PRI | NULL    |       |
+| title            | varchar(128)        | NO   | MUL | NULL    |       |
+| subtitle         | varchar(128)        | YES  |     | NULL    |       |
+| cat_id           | int(11) unsigned    | NO   |     | 0       |       |
+| dscp             | text                | YES  |     | NULL    |       |
+| keywords         | varchar(255)        | YES  |     |         |       |
+| author           | varchar(255)        | YES  |     |         |       |
+| publisher        | varchar(255)        | YES  |     |         |       |
+| pub_date         | varchar(20)         | YES  |     |         |       |
+| type             | tinyint(2)          | YES  |     | 0       |       |
+| qoh              | int(4)              | YES  |     | 1       |       |
+| daysonhold       | int(4)              | YES  |     | 0       |       |
+| maxcheckout      | int(4)              | NO   |     | 0       |       |
+| enabled          | tinyint(1)          | YES  |     | 1       |       |
+| dt_add           | int(11) unsigned    | YES  |     | NULL    |       |
+| views            | int(4) unsigned     | YES  |     | 0       |       |
+| comments         | int(5) unsigned     | YES  |     | 0       |       |
+| comments_enabled | tinyint(1) unsigned | YES  |     | 0       |       |
+| rating           | double(6,4)         | NO   |     | 0.0000  |       |
+| votes            | int(11) unsigned    | NO   |     | 0       |       |
+| status           | tinyint(1)          | YES  |     | 0       |       |
++------------------+---------------------+------+-----+---------+-------+*/
+
+        $sql = "SELECT p.id, MAX(p.title) AS title,
+            MAX(p.enabled) AS enabled,
+            MAX(t.dscp) AS typename,
+            MAX(c.cat_name) as cat_name
+            FROM {$_TABLES['library.items']} p
+            LEFT JOIN {$_TABLES['library.types']} t
+                ON p.type = t.id
+            LEFT JOIN {$_TABLES['library.categories']} c
+                ON c.cat_id = p.cat_id
+            LEFT JOIN {$_TABLES['library.instances']} inst
+                ON p.id = inst.item_id
+            LEFT JOIN {$_TABLES['library.waitlist']} w
+                ON p.id = w.item_id ";
+            //GROUP BY p.id ";
+        $query_arr = array(
+            'table' => 'library.items',
+            'sql' => $sql,
+            'query_fields' => array('p.name', 'p.dscp'),
+            'default_filter' => '',
+            //'group_by' => 'p.id',
+        );
+
+        switch ($status) {
+        case 0:     // All
+            $sql .= ' GROUP BY p.id';
+            break;
+        case 1:     // Available
+            $sql .= " WHERE inst.uid = 0 GROUP BY p.id HAVING COUNT(inst.item_id) > 0";
+            break;
+        case 2:     // Checked Out
+            $sql .= " WHERE inst.uid > 0 GROUP BY p.id HAVING COUNT(inst.item_id) > 0";
+            break;
+        case 3:     // Pending Actions, include available only
+            $sql .= " GROUP BY p.id HAVING count(w.id) > 0";
+            break;
+        case 4:     // Overdue
+            //$sql .= "LEFT JOIN {$_TABLES['library.instances']} inst
+            //            ON p.id = inst.item_id
+            $sql .= " WHERE inst.uid > 0 AND inst.due < UNIX_TIMESTAMP() ";
+            $sql .= " GROUP BY  p.id ";
+            break;
+        }
+
+        $display = '';
+        $header_arr = array(
+            array(  'text'  => _('Edit'),
+                'field' => 'edit',
+                'sort'  => false,
+                'align' => 'center',
+            ),
+            array(  'text'  => _('Copy'),
+                'field' => 'copy',
+                'sort'  => false,
+                'align' => 'center',
+            ),
+            array(  'text'  => _('ID'),
+                'field' => 'id',
+                'sort'  => true,
+            ),
+            array(  'text'  => _('Enabled'),
+                'field' => 'enabled',
+                'sort'  => false,
+                'align' => 'center',
+            ),
+            array(  'text'  => _('Item Name'),
+                'field' => 'title',
+                'sort'  => true,
+            ),
+            array(  'text'  => _('Media Type'),
+                'field' => 'typename',
+                'sort'  => true,
+            ),
+            array(  'text'  => _('Category'),
+                'field' => 'cat_name',
+                'sort'  => true,
+            ),
+            array(  'text'  => _('Available'),
+                'field' => 'status',
+                'sort'  => false,
+                'align' => 'center',
+            ),
+            array(  'text'  => _('History'),
+                'field' => 'history',
+                'sort'  => false,
+            ),
+            array(  'text'  => _('Check Out'),
+                'field' => 'checkout',
+                'sort'  => false,
+            ),
+            array(  'text'  => _('Check In'),
+                'field' => 'checkin',
+                'sort'  => false,
+            ),
+            array(  'text'  => _('Delete'),
+                'field' => 'delete',
+                'sort'  => false,
+                'align' => 'center',
+            ),
+        );
+
+        $defsort_arr = array(
+            'field' => 'id',
+            'direction' => 'asc',
+        );
+
+        $display .= COM_startBlock(
+            '', '',
+            COM_getBlockTemplate('_admin_block', 'header')
+        );
+
+        $query_arr = array(
+            'table' => 'library.items',
+            'sql' => $sql,
+            'query_fields' => array('p.name', 'p.dscp'),
+            'default_filter' => '',
+            'group_by' => 'p.id',
+        );
+        $text_arr = array(
+            //'has_extras' => true,
+            'form_url' => Config::get('admin_url') . '/index.php?status=' . $status,
+        );
+        $form_arr = LIBRARY_itemStatusForm($status);
+        $filter = '';
+        $extras = array(
+            'status'    => $status,
+        );
+        if (!isset($_REQUEST['query_limit'])) {
+            $_GET['query_limit'] = 20;
+        }
+
+        $display .= '<div class="floatright">' . COM_createLink(_('New Item'),
+            Config::get('admin_url') . '/index.php?edititem=0',
+            array('class' => 'uk-button uk-button-success')
+        ) . '</div>';
+        $display .= ADMIN_list(
+            'library_adminlist_item',
+            array(__CLASS__, 'adminListField'),
+            $header_arr, $text_arr, $query_arr, $defsort_arr,
+            $filter, $extras, '', $form_arr
+        );
+        $display .= COM_endBlock(COM_getBlockTemplate('_admin_block', 'footer'));
+        return $display;
+    }
+
+
+    /**
+     * Get an individual field for the Item Admin screen.
+     *
+     * @param   string  $fieldname  Name of field (from the array, not the db)
+     * @param   mixed   $fieldvalue Value of the field
+     * @param   array   $A          Array of all fields from the database
+     * @param   array   $icon_arr   System icon array (not used)
+     * @return  string              HTML for field display in the table
+     */
+    public static function adminListField($fieldname, $fieldvalue, $A, $icon_arr)
+    {
+        global $_CONF, $_TABLES;
+
+        $retval = '';
+
+        $avail = count(Instance::getAll($A['id'], LIB_STATUS_AVAIL));
+        $out = count(Instance::getAll($A['id'], LIB_STATUS_OUT));
+        $total = $avail + $out;
+
+        switch($fieldname) {
+        case 'id':
+            $retval = COM_createLink(
+                $fieldvalue,
+                Config::get('admin_url') . '/index.php?instances=x&item_id=' . $fieldvalue,
+                array(
+                    'title' => _('View Instances'),
+                    'class' => 'tooltip',
+                ) );
+            break;
+
+        case 'edit':
+            $retval .= COM_createLink(
+                '<i class="uk-icon uk-icon-edit"></i>',
+                Config::get('admin_url') . "/index.php?edititem=x&amp;id={$A['id']}"
+            );
+            break;
+
+        case 'copy':
+            $retval .= COM_createLink(
+                '<i class="uk-icon uk-icon-copy"></i>',
+                Config::get('admin_url') . "/index.php?copyitem=x&amp;id={$A['id']}"
+            );
+            break;
+
+        case 'delete':
+            if (!self::isUsed($A['id'])) {
+                $retval .= COM_createLink(
+                    Icon::getHTML('delete'),
+                    Config::get('admin_url') . '/index.php?deleteitem=x&amp;id=' . $A['id'],
+                    array(
+                        'onclick'=>'return confirm(\'' .
+                        _('Are you sure you want to delete this item?') .
+                        '\');',
+                        'title' => _('Delete Item'),
+                        'class' => 'tooltip',
+                    )
+                );
+            }
+            break;
+
+        case 'enabled':
+            $chk = $fieldvalue == 1 ? ' checked="checked"' : '';
+            $retval .= "<input type=\"checkbox\" $chk value=\"1\" name=\"ena_check\"
+                id=\"togenabled{$A['id']}\"
+                onclick='LIBR_toggle(this,\"{$A['id']}\",\"enabled\",\"item\");'>".LB;
+            break;
+
+        case 'title':
+            $retval = COM_createLink(
+                $fieldvalue,
+                Config::get('url') . '/index.php?detail=x&id=' . $A['id'],
+                array(
+                    'title' => _('View Item'),
+                    'class' => 'tooltip',
+                ) );
+            break;
+
+        case 'type':
+            $retval = LGLIB_getVar(_('Media Types'), $A['type'], 'string', 'Unknown');
+            break;
+
+        case 'status':
+            $retval = $avail . ' / ' . $total;
+            break;
+            if ($fieldvalue == LIB_STATUS_OUT) {
+                if ($A['due'] < LIBRARY_now()) {
+                    $cls = 'danger';
+                    $msg = _('Overdue');
+                } else {
+                    $cls = 'unknown';
+                    $msg = _('Checked Out');
+                }
+            } elseif (isset($A['wait_count']) && $A['wait_count'] > 0) {
+                $cls = 'warning';
+                $msg = _('Waitlisted');
+            } elseif ($fieldvalue == LIB_STATUS_AVAIL) {
+                $cls = 'ok';
+                $msg = _('Available');
+            } else {
+                $cls = 'unknown';
+                $msg = '';
+            }
+            $retval .= '<i class="uk-icon uk-icon-circle uk-icon-' . $cls .
+                '" title="' . $msg . '" class="tooltip"></i>';
+            break;
+
+        case 'checkout':
+            if ($avail > 0) {
+                $retval .= COM_createLink(
+                    _('Check Out'),
+                    Config::get('admin_url') . '/index.php?checkoutform=x&id=' . $A['id']
+                );
+            }
+            break;
+
+        case 'checkin':
+            if ($total > $avail) {
+                $retval .= COM_createLink(
+                    _('Check In'),
+                    Config::get('admin_url') . '/index.php?checkinform=x&id=' . $A['id']
+                );
+            }
+            break;
+
+        case 'history':
+            if (DB_count($_TABLES['library.log'], 'item_id', $A['id']) > 0) {
+                $retval .= COM_createLink('<i class="uk-icon uk-icon-file-text-o"></i>',
+                    Config::get('admin_url') . '/index.php?history=x&id=' . $A['id'],
+                    array(
+                        'title' => _('View History'),
+                        'class' => 'tooltip',
+                    ) );
+            }
+            break;
+
+        default:
+            $retval = htmlspecialchars($fieldvalue);
+            break;
+        }
+
+        return $retval;
+    }
+
+}
 
 ?>
