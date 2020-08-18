@@ -437,7 +437,7 @@ class Instance
         $filter = '';
         $text_arr = array(
             //'has_extras' => true,
-            'form_url' => Config::getInstance()->get('admin_url') . '/index.php?status=' . $status,
+            'form_url' => Config::getInstance()->get('admin_url') . '/index.php?instances&status=' . $status,
         );
         $form_arr = LIBRARY_itemStatusForm($status, $item_id);
         $extras = array();
