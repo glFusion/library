@@ -85,7 +85,7 @@ function LIBRARY_ItemList()
     }
 
     // If applicable, order by
-    $sql .= " ORDER BY $sortby $sortdir";
+    //$sql .= " ORDER BY $sortby $sortdir";
 
     // If applicable, handle pagination of query
     $items_per_page = (int)$Config->get('items_per_page');
@@ -97,10 +97,11 @@ function LIBRARY_ItemList()
         if ($count === NULL) {
             $res = DB_query($count_sql);
             $x = DB_fetchArray($res, false);
-            if (isset($x['cnt']))
+            if (isset($x['cnt'])) {
                 $count = (int)$x['cnt'];
-            else
+            } else {
                 $count = 0;
+            }
             Library\Cache::set($key, $count, 'items');
         }
 
@@ -117,7 +118,7 @@ function LIBRARY_ItemList()
     }
 
     $sql1 = 'SELECT p.* ' . $sql;
-    $key = md5($sql);
+    $key = md5($sql1);
     $Items = Library\Cache::get($key);
     if ($Items === NULL) {
         // Re-execute query with the limit clause in place

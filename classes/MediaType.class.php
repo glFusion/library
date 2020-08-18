@@ -314,10 +314,13 @@ class MediaType
         global $_TABLES;
 
         $retval = '';
-        $sql = "SELECT m.* from {$_TABLES['library.types']} m";
         if ($used_only) {
+            $sql = "SELECT m.id, MAX(m.dscp) AS dscp
+                FROM {$_TABLES['library.types']} m";
             $sql .= " RIGHT JOIN {$_TABLES['library.items']} i
                 ON i.type = m.id GROUP BY m.id";
+        } else {
+            $sql = "SELECT m.* FROM {$_TABLES['library.types']} m";
         }
         $res = DB_query($sql, 1);
         $A = DB_fetchAll($res);
