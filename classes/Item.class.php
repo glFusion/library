@@ -1301,37 +1301,71 @@ class Item
     public static function adminList($cat_id = 0, $status = 0)
     {
         global $_CONF, $_TABLES, $_USER;
+/*+------------------+---------------------+------+-----+---------+-------+
+| Field            | Type                | Null | Key | Default | Extra |
++------------------+---------------------+------+-----+---------+-------+
+| id               | varchar(40)         | NO   | PRI | NULL    |       |
+| title            | varchar(128)        | NO   | MUL | NULL    |       |
+| subtitle         | varchar(128)        | YES  |     | NULL    |       |
+| cat_id           | int(11) unsigned    | NO   |     | 0       |       |
+| dscp             | text                | YES  |     | NULL    |       |
+| keywords         | varchar(255)        | YES  |     |         |       |
+| author           | varchar(255)        | YES  |     |         |       |
+| publisher        | varchar(255)        | YES  |     |         |       |
+| pub_date         | varchar(20)         | YES  |     |         |       |
+| type             | tinyint(2)          | YES  |     | 0       |       |
+| qoh              | int(4)              | YES  |     | 1       |       |
+| daysonhold       | int(4)              | YES  |     | 0       |       |
+| maxcheckout      | int(4)              | NO   |     | 0       |       |
+| enabled          | tinyint(1)          | YES  |     | 1       |       |
+| dt_add           | int(11) unsigned    | YES  |     | NULL    |       |
+| views            | int(4) unsigned     | YES  |     | 0       |       |
+| comments         | int(5) unsigned     | YES  |     | 0       |       |
+| comments_enabled | tinyint(1) unsigned | YES  |     | 0       |       |
+| rating           | double(6,4)         | NO   |     | 0.0000  |       |
+| votes            | int(11) unsigned    | NO   |     | 0       |       |
+| status           | tinyint(1)          | YES  |     | 0       |       |
++------------------+---------------------+------+-----+---------+-------+*/
 
-        $sql = "SELECT p.*,
-                t.dscp AS typename,
-                c.cat_name as cat_name
+        $sql = "SELECT p.id, MAX(p.title) AS title,
+            MAX(p.enabled) AS enabled,
+            MAX(t.dscp) AS typename,
+            MAX(c.cat_name) as cat_name
             FROM {$_TABLES['library.items']} p
             LEFT JOIN {$_TABLES['library.types']} t
                 ON p.type = t.id
             LEFT JOIN {$_TABLES['library.categories']} c
-                ON c.cat_id = p.cat_id ";
+                ON c.cat_id = p.cat_id
+            LEFT JOIN {$_TABLES['library.instances']} inst
+                ON p.id = inst.item_id
+            LEFT JOIN {$_TABLES['library.waitlist']} w
+                ON p.id = w.item_id ";
+            //GROUP BY p.id ";
+        $query_arr = array(
+            'table' => 'library.items',
+            'sql' => $sql,
+            'query_fields' => array('p.name', 'p.dscp'),
+            'default_filter' => '',
+            //'group_by' => 'p.id',
+        );
+
         switch ($status) {
         case 0:     // All
+            $sql .= ' GROUP BY p.id';
             break;
         case 1:     // Available
-            $sql .= "LEFT JOIN {$_TABLES['library.instances']} inst
-                    ON p.id = inst.item_id
-                WHERE inst.uid = 0 GROUP BY inst.item_id HAVING COUNT(inst.item_id) > 0";
+            $sql .= " WHERE inst.uid = 0 GROUP BY p.id HAVING COUNT(inst.item_id) > 0";
             break;
         case 2:     // Checked Out
-            $sql .= "LEFT JOIN {$_TABLES['library.instances']} inst
-                    ON p.id = inst.item_id
-                WHERE inst.uid > 0 GROUP BY inst.item_id HAVING COUNT(inst.item_id) > 0";
+            $sql .= " WHERE inst.uid > 0 GROUP BY p.id HAVING COUNT(inst.item_id) > 0";
             break;
         case 3:     // Pending Actions, include available only
-            $sql .= "LEFT JOIN {$_TABLES['library.waitlist']} w
-                    ON p.id = w.item_id
-                GROUP BY w.item_id HAVING count(w.id) > 0";
+            $sql .= " GROUP BY p.id HAVING count(w.id) > 0";
             break;
         case 4:     // Overdue
             //$sql .= "LEFT JOIN {$_TABLES['library.instances']} inst
             //            ON p.id = inst.item_id
-            $sql .= "        WHERE inst.uid > 0 AND inst.due < UNIX_TIMESTAMP() ";
+            $sql .= " WHERE inst.uid > 0 AND inst.due < UNIX_TIMESTAMP() ";
             $sql .= " GROUP BY  p.id ";
             break;
         }
@@ -1408,6 +1442,7 @@ class Item
             'sql' => $sql,
             'query_fields' => array('p.name', 'p.dscp'),
             'default_filter' => '',
+            'group_by' => 'p.id',
         );
         $text_arr = array(
             //'has_extras' => true,

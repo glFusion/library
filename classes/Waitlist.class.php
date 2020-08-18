@@ -121,7 +121,8 @@ class Waitlist
 
         // Delete expired waitlist entries.  This could be done as one
         // sql statement, but we want to log each deletion.
-        $sql = "SELECT w.id, w.expire, u.username, i.id as item_id
+        $sql = "SELECT w.id, MAX(w.expire) AS expire,
+                MAX(u.username) AS username, MAX(i.id) as item_id
                 FROM {$_TABLES['library.waitlist']} w
                 LEFT JOIN {$_TABLES['library.items']} i
                     ON i.id = w.item_id
@@ -130,7 +131,7 @@ class Waitlist
                 WHERE i.daysonhold > 0
                 AND w.expire > 0 AND w.expire < $time
                 AND i.status=" . LIB_STATUS_AVAIL . "
-                GROUP BY i.id
+                GROUP BY w.id
                 ORDER BY w.id ASC";
         $result = DB_query($sql);
         while ($A = DB_fetchArray($result, false)) {
