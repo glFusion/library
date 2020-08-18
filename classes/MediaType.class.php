@@ -368,7 +368,7 @@ class MediaType
         }
         foreach ($A as $data) {
             $sel = $data['id'] == $sel_type ? 'selected="selected"' : '';
-            $retval .= "<option value='{$data['id']}' $sel>{$data['name']}</option>" . LB;
+            $retval .= "<option value='{$data['id']}' $sel>{$data['dscp']}</option>" . LB;
         }
         return $retval;
     }
