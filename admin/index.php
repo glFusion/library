@@ -396,6 +396,55 @@ function LIBRARY_getTransHistoryField($fieldname, $fieldvalue, $A, $icon_arr)
 
 
 /**
+ * Get the SQL query for the item list.
+ *
+ * @param   integer $cat_id     Category ID
+ * @param   integer $status     Optional status, default = "all"
+ * @return  string      SQL query to get the items
+ */
+function LIBRARY_admin_getSQL($cat_id, $status = 0)
+{
+    global $_TABLES;
+
+    $sql = "SELECT p.*,
+                t.dscp AS typename,
+                c.cat_name as cat_name
+            FROM {$_TABLES['library.items']} p
+            LEFT JOIN {$_TABLES['library.types']} t
+                ON p.type = t.id
+            LEFT JOIN {$_TABLES['library.categories']} c
+                ON c.cat_id = p.cat_id ";
+    switch ($status) {
+    case 0:     // All
+        break;
+    case 1:     // Available
+        $sql .= "LEFT JOIN {$_TABLES['library.instances']} inst
+                    ON p.id = inst.item_id
+                WHERE inst.uid = 0 GROUP BY inst.item_id HAVING COUNT(inst.item_id) > 0";
+        break;
+    case 2:     // Checked Out
+        $sql .= "LEFT JOIN {$_TABLES['library.instances']} inst
+                    ON p.id = inst.item_id
+                WHERE inst.uid > 0 GROUP BY inst.item_id HAVING COUNT(inst.item_id) > 0";
+        break;
+    case 3:     // Pending Actions, include available only
+        $sql .= "LEFT JOIN {$_TABLES['library.waitlist']} w
+                    ON p.id = w.item_id
+                GROUP BY w.item_id HAVING count(w.id) > 0";
+        break;
+    case 4:     // Overdue
+        //$sql .= "LEFT JOIN {$_TABLES['library.instances']} inst
+        //            ON p.id = inst.item_id
+        $sql .= "        WHERE inst.uid > 0 AND inst.due < UNIX_TIMESTAMP() ";
+        $sql .= " GROUP BY  p.id ";
+        break;
+    }
+    //echo $sql;die;
+    return $sql;
+}
+
+
+/**
  * Get the item status selection form.
  * Common to the item and instance displays.
  *
