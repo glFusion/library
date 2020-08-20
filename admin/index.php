@@ -749,7 +749,8 @@ function LIBRARY_adminlist_Category()
 
     $defsort_arr = array('field' => 'cat_id',
             'direction' => 'asc');
-    $query_arr = array('table' => 'library.categories',
+    $query_arr = array(
+        'table' => 'library.categories',
         'sql' => $sql,
         'query_fields' => array('cat.name', 'cat.dscp'),
         'default_filter' => 'WHERE 1=1',
@@ -1111,9 +1112,8 @@ function LIBRARY_admin_getSQL($cat_id, $status = 0)
                 WHERE inst.uid > 0 GROUP BY inst.item_id HAVING COUNT(inst.item_id) > 0";
         break;
     case 3:     // Pending Actions, include available only
-        $sql .= "LEFT JOIN {$_TABLES['library.waitlist']} w
-                    ON p.id = w.item_id
-                GROUP BY w.item_id HAVING count(w.id) > 0";
+        $sql .= "WHERE p.id IN (SELECT item_id FROM {$_TABLES['library.waitlist']}
+            GROUP BY item_id HAVING COUNT(id) > 0)";
         break;
     case 4:     // Overdue
         //$sql .= "LEFT JOIN {$_TABLES['library.instances']} inst
