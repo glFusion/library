@@ -106,9 +106,14 @@ $INSTALL_plugin['library'] = array(
             'log' => 'Adding admin feature to the admin group'
         ),
     array(  'type' => 'mapping',
+            'findgroup' => 'Root',  // also give admin right to Root
+            'feature' => 'admin_feature_id',
+            'log' => 'Adding admin feature to the Root group'
+        ),
+    array(  'type' => 'mapping',
             'findgroup' => 'Logged-in Users',
             'feature' => 'checkout_feature_id',
-            'log' => 'Adding checkout feature to the logged-in group'
+            'log' => 'Adding checkout feature to the Logged-in Users group'
         ),
     array(  'type' => 'mapping',
             'findgroup' => 'Logged-in Users',

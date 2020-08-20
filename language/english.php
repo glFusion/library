@@ -11,8 +11,6 @@
 *   @filesource
 */
 
-global $_CONF_LIB;
-
 /**
 *   Global array to hold all plugin-specific configuration items.
 */
@@ -148,7 +146,7 @@ $LANG_LIB = array (
 'item_updated'  => 'Item has been updated.',
 'item_nochange' => 'Item has not been changed.',
 'search_openlib' => 'Search online for the ISBN.',
-'max_wait_items' => 'You can reserve up to <br />' . $_CONF_LIB['max_wait_items'] . ' items at a time.',
+'max_wait_items' => 'You can reserve up to <br />%s items at a time.',
 'add_instances' => 'Add Instances',
 'instance'  => 'Instance',
 'view_instances' => 'View instances of this item',
@@ -172,7 +170,7 @@ $LANG_LIB_HELP = array(
 'daysonhold' => 'Enter the grace period, in days, to redeem a waitlisted item once it becomes available.',
 'enabled' => 'Check if this item is enabled. Disabling an item can be used to temporarily remove an item from the catalog.',
 'comments' => 'Select whether comments are enabled for this item.',*/
-'max_wait_items' => 'You can reserve up to ' . $_CONF_LIB['max_wait_items'] . ' items at a time.',
+'max_wait_items' => 'You can reserve up to %s items at a time.',
 'due_dt' => 'Enter or select the due date for the item.',
 'checkout_user' => 'Select the user to check out this item. The user at the top of the waiting list is shown first.',
 'cat_name' => 'Enter a short name for this category',

@@ -1291,7 +1291,10 @@ class Item
         return $T->finish($T->get_var('output'));
     }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
     /**
      * Product Admin List View.
      *
