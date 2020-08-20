@@ -905,7 +905,7 @@ class Item
                 if (($user_wait_items + $all_checked_out) < $_CONF_LIB['max_wait_items']) {
                     $avail_txt = sprintf($LANG_LIB['avail_cnt'], $num_avail);
                 } elseif (!$is_reserved) {
-                    $avail_txt = $LANG_LIB['max_wait_items'];
+                    $avail_txt = sprintf($LANG_LIB['max_wait_items'], $_CONF_LIB['max_wait_items']);
                     $can_reserve = false;
                 } else {
                     $avail_txt = '';
