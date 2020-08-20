@@ -1090,7 +1090,7 @@ function LIBRARY_admin_getSQL($cat_id, $status = 0)
     global $_TABLES;
 
     $sql = "SELECT p.*,
-                t.name AS typename,
+                t.dscp AS typename,
                 c.cat_name as cat_name
             FROM {$_TABLES['library.items']} p
             LEFT JOIN {$_TABLES['library.types']} t
