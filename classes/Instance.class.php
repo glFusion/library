@@ -344,7 +344,7 @@ class Instance
      * @param   integer $status     Optional item status, to limit view
      * @return  string      HTML for admin list
      */
-    public static function adminlist($item_id=0, $status=0)
+    public static function adminList($item_id=0, $status=0)
     {
         global $_CONF, $_TABLES, $_USER;
 
