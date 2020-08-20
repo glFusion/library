@@ -266,6 +266,7 @@ $display .= COM_siteFooter();
 echo $display;
 exit;
 
+
 /**
  * Checkout History View.
  * Displays the purchase history for the current user.
@@ -428,9 +429,8 @@ function LIBRARY_admin_getSQL($cat_id, $status = 0)
                 WHERE inst.uid > 0 GROUP BY inst.item_id HAVING COUNT(inst.item_id) > 0";
         break;
     case 3:     // Pending Actions, include available only
-        $sql .= "LEFT JOIN {$_TABLES['library.waitlist']} w
-                    ON p.id = w.item_id
-                GROUP BY w.item_id HAVING count(w.id) > 0";
+        $sql .= "WHERE p.id IN (SELECT item_id FROM {$_TABLES['library.waitlist']}
+            GROUP BY item_id HAVING COUNT(id) > 0)";
         break;
     case 4:     // Overdue
         //$sql .= "LEFT JOIN {$_TABLES['library.instances']} inst

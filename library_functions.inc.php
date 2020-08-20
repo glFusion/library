@@ -366,6 +366,10 @@ function LIBRARY_notifyLibrarian($item_id, $uid)
     $msg = '<p>' . _('Someone has requested a library item.') . '</p>' . LB .
         '<p>' . _('Item Name') . ': ' . $Item->getTitle() . '</p>' . LB .
         '<p>' . _('Requested By') . ': ' . $user . '</p>' . LB;
+    $msg .= '<p>' . sprintf(
+        _('Click %s here to review the request.'),
+        '<a href="' . $_CONF['site_admin_url'] . '/plugins/library/index.php?status=3">'
+    ) . '</p>' . LB;
 
     while ($A = DB_fetchArray($res, false)) {
         if (empty($A['email'])) continue;
