@@ -40,6 +40,8 @@ $LANG_confignames['library'] = array(
     'def_group_id'  => \Library\_('Default Access Group'),
     'notify_checkout' => \Library\_('Notify Librarians on item reservation?'),
     'lookup_method' => \Library\_('ISBN Lookup Method'),
+    'max_wait_items' => \Library\_('Max Waitlist Items'),
+    'def_checkout_limit' => \Library\_('Max Checkouts Allowed'),
 );
 
 /** Language strings for the subgroup names in the config section */
@@ -52,6 +54,7 @@ $LANG_fs['library'] = array(
     'fs_main'   => \Library\_('General Settings'),
     'fs_paths'  => \Library\_('Images and Paths'),
     'fs_notifications' => \Library\_('Notifications'),
+    'fs_limits' => \Library\_('Limits'),
 );
 
 /**

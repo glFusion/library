@@ -252,7 +252,6 @@ $libraryConfigData = array(
         'set' => true,
         'group' => 'library',
     ),
-
     array(
         'name' => 'notify_checkout',
         'default_value' => 1,
@@ -264,7 +263,42 @@ $libraryConfigData = array(
         'set' => true,
         'group' => 'library',
     ),
+
+    array(
+        'name' => 'fs_limits',
+        'default_value' => NULL,
+        'type' => 'fieldset',
+        'subgroup' => 0,
+        'fieldset' => 30,
+        'selection_array' => NULL,
+        'sort' => 30,
+        'set' => true,
+        'group' => 'library',
+    ),
+    array(
+        'name' => 'def_checkout_limit',
+        'default_value' => 2,
+        'type' => 'text',
+        'subgroup' => 0,
+        'fieldset' => 30,
+        'selection_array' => 0,
+        'sort' => 10,
+        'set' => true,
+        'group' => 'library',
+    ),
+    array(
+        'name' => 'max_wait_items',
+        'default_value' => 2,
+        'type' => 'text',
+        'subgroup' => 0,
+        'fieldset' => 30,
+        'selection_array' => 0,
+        'sort' => 20,
+        'set' => true,
+        'group' => 'library',
+    ),
 );
+
 
 /**
 *  Initialize Library plugin configuration
