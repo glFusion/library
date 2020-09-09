@@ -40,9 +40,9 @@
 
     <div style="float:left;width:80%;">
       {avail_blk}
-      <a class="lib_itemlist" href="{pi_url}/index.php?detail=x&id={id}{url_opts}">
-        <b><large>{hi_name}</large></b>
-      </a>
+      <h2><a class="lib_itemlist" href="{pi_url}/index.php?detail=x&id={id}{url_opts}">
+        {hi_name}
+      </a></h2>
 {!if can_edit}
       <a href="{site_admin_url}/plugins/library/index.php?edititem=x&id={id}">
         <i class="uk-icon uk-icon-edit" data-uk-tooltip title="{$LANG_ADMIN['edit']}"></i>
