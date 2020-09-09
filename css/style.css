@@ -39,19 +39,17 @@ display: block
     text-decoration: none;
 }
 
-a.lib_itemlist {
-    color:black;
+h2 a.lib_itemlist {
     text-decoration:none;
-    font-size:1.2em;
-    font-weight:bold;
 }
 
 div.libAvailBlk {
     float:right;
     position:relative;
-    background-color:#EEE;
     padding: .5rem;
     margin: .2rem;
+    border: 1px solid;
+    border-radius: 4px;
 }
 
 div.libAvailBlk .adminAvail {

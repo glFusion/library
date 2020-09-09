@@ -147,38 +147,37 @@ function plugin_commentsupport_library()
  */
 function plugin_savecomment_library($title,$comment,$id,$pid,$postmode)
 {
-    global $_CONF, $LANG03, $_TABLES;
+    global $_CONF, $LANG03, $_TABLES, $_CONF_LIB;
 
     // Without comment support, we shouldn't get here unless something
     // nefarious is going on, but just in case...
-    if (!plugin_commentsupport_library())
+    if (!plugin_commentsupport_library()) {
         return;
+    }
 
     $title = strip_tags($title);
     $pid = COM_applyFilter($pid, true);
     $postmode = COM_applyFilter($postmode);
     $id = COM_sanitizeID($id, false);
 
-    $ret = CMT_saveComment ( $title, $comment, $id, $pid,
-            'library', $postmode);
-
-    if ( $ret > 0 ) { // failure
+    $ret = CMT_saveComment($title, $comment, $id, $pid, 'library', $postmode);
+    if ($ret > 0) {     // failure
         return COM_siteHeader()
-            . CMT_commentform ($title, $comment, $id, $pid,
-                    'library', $LANG03[14], $postmode)
+            . CMT_commentform(
+                $title, $comment, $id, $pid,
+                'library', $LANG03[14], $postmode
+            )
             . COM_siteFooter();
-    } else {        // success - update the comment counter for this ad
-        $comments = DB_count($_TABLES['comments'],
-                        array('type', 'sid'),
-                        array('library', DB_escapeString($id)));
-
-        DB_change($_TABLES['library.items'], 'comments',  $comments,
-                'id', $id);
-
+    } else {            // success - update the comment counter for this ad
+        $comments = DB_count(
+            $_TABLES['comments'],
+            array('type', 'sid'),
+            array('library', DB_escapeString($id))
+        );
+        DB_change($_TABLES['library.items'], 'comments', $comments, 'id', $id);
         return COM_refresh(
             COM_buildUrl(
-                Config::get('url') .
-                "/index.php?mode=detail&id=$id"
+                $_CONF_LIB['url'] . "/index.php?mode=detail&id=$id"
             )
         );
     }
