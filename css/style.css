@@ -44,6 +44,7 @@ h2 a.lib_itemlist {
 }
 
 div.libAvailBlk {
+    width: 100%;
     float:right;
     position:relative;
     padding: .5rem;
@@ -84,4 +85,7 @@ div.libAvailBlk .adminAvail {
 }
 .lib-icon-unknown {
     color: #aaaaaa;
+}
+div.lib_ratingbar {
+    margin-top: 1rem;
 }

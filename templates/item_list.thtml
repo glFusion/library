@@ -53,24 +53,23 @@
         </li>
 
         <li class="uk-width-3-5">
-            <a class="lib_itemlist" href="{pi_url}/index.php?detail=x&id={id}{url_opts}">
-                <b><large>{hi_name}</large></b>
-            </a>
+            <h2><a class="lib_itemlist" href="{pi_url}/index.php?detail=x&id={id}{url_opts}">
+                {hi_name}
+            </a></h2>
 {!if can_edit}
             <a href="{site_admin_url}/plugins/library/index.php?edititem=x&id={id}">
                 <i class="uk-icon uk-icon-edit" data-uk-tooltip title="{lang_edit}"></i>
             </a>
 {!endif}
-            <br />
             {#<small>{id}</small><br />#}
 {!if publisher}
             {publisher}<br />
 {!endif}
 {!if author}
-            {author}
+            {author}<br />
 {!endif}
 {!if rating_bar}
-            <div>{rating_bar}</div>
+            <div class="lib_ratingbar">{rating_bar}</div>
 {!endif}
         </li>
         <li class="uk-width-1-5">
