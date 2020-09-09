@@ -22,7 +22,7 @@ if (!SEC_inGroup('Root')) {
     exit;
 }
 // needed for set_version()
-require_once Config::getInstance()->('pi_path']) . '/upgrade.inc.php';
+require_once Library\Config::getInstance()->get('pi_path') . '/upgrade.inc.php';
 if (function_exists('CACHE_clear')) {
     CACHE_clear();
 }
