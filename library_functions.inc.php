@@ -11,7 +11,7 @@
  * @filesource
  */
 
-use Library\_;
+use Library\MO;
 
 /**
  * Diaplay the product catalog items.
@@ -39,16 +39,16 @@ function LIBRARY_ItemList()
         'pi_url'        => $Config->get('url'),
         'type_select'   => Library\MediaType::buildSelection($med_type, true),
         'cat_select'    => Library\Category::buildSelection($cat_id),
-        'lang_type'     => _('Media Type'),
-        'lang_category' => _('Category'),
-        'lang_search'   => _('Search'),
-        'lang_all'      => _('All'),
-        'lang_ascending' => _('Ascending'),
-        'lang_descending' => _('Descending'),
-        'lang_category' => _('Category'),
-        'lang_edit' => _('Edit'),
-        'lang_sort' => _('Sort'),
-        'lang_submit' => _('Submit'),
+        'lang_type'     => MO::_('Media Type'),
+        'lang_category' => MO::_('Category'),
+        'lang_search'   => MO::_('Search'),
+        'lang_all'      => MO::_('All'),
+        'lang_ascending' => MO::_('Ascending'),
+        'lang_descending' => MO::_('Descending'),
+        'lang_category' => MO::_('Category'),
+        'lang_edit' => MO::_('Edit'),
+        'lang_sort' => MO::_('Sort'),
+        'lang_submit' => MO::_('Submit'),
         'is_admin' => plugin_ismoderator_library(),
         'lang_admin' => _('Admin'),
         //'is_librarian'  => plugin_ismoderatorator_library(),
@@ -321,7 +321,7 @@ function LIBRARY_notifyWaitlist($id = '')
 
     COM_mail(
         $A['email'],
-        _('Your requested library item is available'),
+        MO::_('Your requested library item is available'),
         $message,
         "{$_CONF['site_name']} <{$_CONF['site_mail']}>",
         true
@@ -363,11 +363,11 @@ function LIBRARY_notifyLibrarian($item_id, $uid)
     $Item = new Library\Item($item_id);
     if ($Item->isNew()) return;   // invalid item id
 
-    $msg = '<p>' . _('Someone has requested a library item.') . '</p>' . LB .
-        '<p>' . _('Item Name') . ': ' . $Item->getTitle() . '</p>' . LB .
-        '<p>' . _('Requested By') . ': ' . $user . '</p>' . LB;
+    $msg = '<p>' . MO::_('Someone has requested a library item.') . '</p>' . LB .
+        '<p>' . MO::_('Item Name') . ': ' . $Item->getTitle() . '</p>' . LB .
+        '<p>' . MO::_('Requested By') . ': ' . $user . '</p>' . LB;
     $msg .= '<p>' . sprintf(
-        _('Click %s here to review the request.'),
+        MO::_('Click %s here to review the request.'),
         '<a href="' . $_CONF['site_admin_url'] . '/plugins/library/index.php?status=3">'
     ) . '</p>' . LB;
 
@@ -466,7 +466,7 @@ function LIBRARY_userSelect($item_id='')
                 $sel = '';
             }
             $userdisplay = "{$A['fullname']} ({$A['username']}) &lt;== " .
-                _('Next on Waiting List');
+                MO::_('Next on Waiting List');
             $retval .= "<option value='{$A['uid']}' $sel>$userdisplay</option>\n";
         }
     }

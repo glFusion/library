@@ -55,6 +55,8 @@ define ('LIB_STATUS_AVAIL', 1);
 define ('LIB_STATUS_OUT', 2);
 
 use Library\Config;
+use Library\MO;
+MO::init();
 
 // Store the private image path in a conf var so it's available
 Config::set('pi_path', __DIR__);
@@ -80,8 +82,7 @@ if (file_exists("$langpath/custom/$langfile")) {
     include_once "$langpath/custom/$langfile";
 }
 */
-include_once __DIR__ . '/gettext.php';
-use Library\_;
+
 require_once $langpath . '/lang_config.php';
 
 /** Import plugin-specific functions */
@@ -117,7 +118,7 @@ function plugin_getmenuitems_library()
         Config::get('menuitem') &&
         SEC_hasRights('library.view,library.admin', 'OR')
     ) {
-        $txt = _('Library');
+        $txt = MO::_('Library');
         $menuitems[$txt] = Config::get('url') . '/index.php';
     }
     return $menuitems;

@@ -1,11 +1,31 @@
 <?php
+/**
+ * Class to manage locale settings.
+ *
+ * @author      Lee Garner <lee@leegarner.com>
+ * @copyright   Copyright (c) 2020 Lee Garner <lee@leegarner.com>
+ * @package     library
+ * @version     v0.0.2
+ * @since       v0.0.2
+ * @license     http://opensource.org/licenses/gpl-2.0.php
+ *              GNU Public License v2 or later
+ * @filesource
+ */
 namespace Library;
 
+/**
+ * Manage locale settings for the Library plugin.
+ * @package library
+ */
 class MO
 {
     /** Language domain, e.g. plugin name.
      * @var string */
     private static $domain = NULL;
+
+    /** Variable to save the original locale if changed by init().
+     * @var string */
+    private static $old_locale = NULL;
 
     /** Supported language name=>locale mapping.
      * @var array */
@@ -38,7 +58,7 @@ class MO
 
         // Set the requested language, falling back to the default if not
         // specified.
-        if ($lang === NULL) {
+        if (empty($lang)) {
             $lang = $_CONF['language'];
         }
 
@@ -63,11 +83,43 @@ class MO
             $locale = 'en_US';
         }
 
+        self::$old_locale = setlocale(LC_MESSAGES, "0");
         $results = setlocale(LC_MESSAGES, $locale);
         if ($results) {
-            $dom = bind_textdomain_codeset(self::$domain, 'UTF-8');
-            $dom = bindtextdomain(self::$domain, __DIR__ . "/locale");
+            $dom =bind_textdomain_codeset(self::$domain, 'UTF-8');
+            $dom = bindtextdomain(self::$domain, __DIR__ . "/../locale");
         }
+    }
+
+
+    /**
+     * Reset the locale back to the previously-defined value.
+     * Called after processes that change the locale for a specific user,
+     * such as system-generated notifications.
+     */
+    public static function reset()
+    {
+        if (self::$old_locale !== NULL) {
+            setlocale(LC_MESSAGES, self::$old_locale);
+        }
+    }
+
+
+    /**
+     * Initialize the locale for a specific user ID.
+     *
+     * @uses    self::init()
+     * @param   integer $uid    User ID
+     */
+    public static function initUser($uid=0)
+    {
+        global $_USER;
+
+        if ($uid == 0) {
+            $uid = $_USER['uid'];
+        }
+        $lang = DB_getItem($_TABLES['users'], 'language', 'uid = ' . (int)$uid);
+        self::init($lang);
     }
 
 
@@ -80,7 +132,9 @@ class MO
      */
     public static function dngettext($single, $plural, $number)
     {
-        if (!self::$domain) self::init();
+        if (!self::$domain) {
+            self::init();
+        }
         return \dngettext(self::$domain, $single, $plural, $number);
     }
     public static function _n($single, $plural, $number)
@@ -97,12 +151,14 @@ class MO
      */
     public static function dgettext($txt)
     {
-        if (!self::$domain) self::init();
+        if (!self::$domain) {
+            self::init();
+        }
         return \dgettext(self::$domain, $txt);
     }
     public static function _($txt)
     {
-        return self::dgettext($text);
+        return self::dgettext($txt);
     }
 
 }
@@ -123,7 +179,7 @@ function _n($single, $plural, $number)
 
 
 /**
- * Get a single text string.
+ * Get a single text string, automatically applying the domain.
  *
  * @param   string  $txt    Text to be translated
  * @return  string      Translated string

@@ -133,38 +133,21 @@ class Item
     {
         $this->user_ckout_limit = (int)Config::get('def_checkout_limit');
         if ($id == '') {
-            $this->isNew = true;
             $this->id = COM_makeSid();
-            $this->oldid = '';
-            $this->title = '';
-            $this->subtitle = '';
-            $this->cat_id = '';
-            $this->dscp= '';
-            $this->publisher = '';
-            $this->pub_date = '';
-            $this->author = '';
             $this->daysonhold = (int)Config::get('daysonhold');
-            $this->type = 0;
             $this->maxcheckout = (int)Config::get('maxcheckout');
-            $this->enabled = 1;
             $this->dt_add = time();
-            $this->views = 0;
-            $this->rating = 0;
-            $this->votes = 0;
-            $this->keywords = '';
-            $this->status = 0;
-            $this->uid = 0;
-            $this->Category = NULL;
         } elseif (is_array($id)) {
             $this->setVars($id, true);
+            $this->isNew = 0;
             $this->Category = Category::getInstance($this->cat_id);
         } else {
             $this->id = $id;
             if (!$this->Read()) {
                 $this->id = COM_makeSid();
-                $this->isNew = true;
+                $this->isNew = 1;
             } else {
-                $this->isNew = false;
+                $this->isNew = 0;
                 $this->Category = Category::getInstance($this->cat_id);
             }
         }
@@ -555,7 +538,7 @@ class Item
         if ($id != '') {
             // If an id is passed in, then read that record
             if (!$this->Read($id)) {
-                return LIBRARY_errorMessage(_('Invalid Item ID'), 'info');
+                return LIBRARY_errorMessage(MO::_('Invalid Item ID'), 'info');
             }
         }
         $id = $this->id;
@@ -567,9 +550,9 @@ class Item
         ) );
         $action_url = Config::get('admin_url') . '/index.php';
         if ($this->oldid != '') {
-            $retval = COM_startBlock(_('Edit') . ': ' . $this->title);
+            $retval = COM_startBlock(MO::_('Edit') . ': ' . $this->title);
         } else {
-            $retval = COM_startBlock(_('New Item'));
+            $retval = COM_startBlock(MO::_('New Item'));
         }
 
         // Set up the wysiwyg editor, if available
@@ -592,7 +575,7 @@ class Item
         $total_instances = count(Instance::getAll($this->id));
 
         $T->set_var(array(
-            'lang_item_info' => _('Item Information'),
+            'lang_item_info' => MO::_('Item Information'),
             'oldid'         => $this->oldid,
             'dt_add'        => $this->dt_add,
             'id'            => $this->id,
@@ -623,32 +606,32 @@ class Item
                 $total_instances),
             'type_select'   => MediaType::buildSelection($this->type, false),
             'ena_chk'       => $this->enabled == 1 ? ' checked="checked"' : '',
-            'lang_add_instances' => _('Add Instances'),
-            'lang_search_openlib' => _('Search OpenLib'),
-            'lang_item_id'  => _('Item ID'),
-            'lang_item_info' => _('Item Information'),
-            'lang_item_name' => _('Item Name'),
-            'lang_subtitle' => _('Subtitle'),
-            'lang_category' => _('Category'),
-            'lang_author' => _('Author'),
-            'lang_publisher' => _('Publisher'),
-            'lang_pub_date' => _('Date Published'),
-            'lang_type' => _('Type'),
-            'lang_dscp' => _('Description'),
-            'lang_keywords' => _('Keywords'),
-            'lang_images' => _('Images'),
-            'lang_delete' => _('Delete'),
-            'lang_maxcheckout' => _('Max Checkout Days'),
-            'lang_daysonhold' => _('Days to hold for waitlist'),
-            'lang_enabled' => _('Enabled'),
-            'lang_comments' => _('Enable Comments'),
-            'lang_saveitem' => _('Save Item'),
-            'lang_clearform' => _('Reset Form'),
-            'lang_cancel' => _('Cancel'),
-            'lang_delete' => _('Delete'),
-            'lang_conf_del_item' => _('Are you sure you want to delete this item?'),
-            'lang_yes' => _('Yes'),
-            'lang_no' => _('No'),
+            'lang_add_instances' => MO::_('Add Instances'),
+            'lang_search_openlib' => MO::_('Search OpenLib'),
+            'lang_item_id'  => MO::_('Item ID'),
+            'lang_item_info' => MO::_('Item Information'),
+            'lang_item_name' => MO::_('Item Name'),
+            'lang_subtitle' => MO::_('Subtitle'),
+            'lang_category' => MO::_('Category'),
+            'lang_author' => MO::_('Author'),
+            'lang_publisher' => MO::_('Publisher'),
+            'lang_pub_date' => MO::_('Date Published'),
+            'lang_type' => MO::_('Type'),
+            'lang_dscp' => MO::_('Description'),
+            'lang_keywords' => MO::_('Keywords'),
+            'lang_images' => MO::_('Images'),
+            'lang_delete' => MO::_('Delete'),
+            'lang_maxcheckout' => MO::_('Max Checkout Days'),
+            'lang_daysonhold' => MO::_('Days to hold for waitlist'),
+            'lang_enabled' => MO::_('Enabled'),
+            'lang_comments' => MO::_('Enable Comments'),
+            'lang_saveitem' => MO::_('Save Item'),
+            'lang_clearform' => MO::_('Reset Form'),
+            'lang_cancel' => MO::_('Cancel'),
+            'lang_delete' => MO::_('Delete'),
+            'lang_conf_del_item' => MO::_('Are you sure you want to delete this item?'),
+            'lang_yes' => MO::_('Yes'),
+            'lang_no' => MO::_('No'),
         ) );
         if (!$this->isNew && !self::isUsed($this->id)) {
             $T->set_var('candelete', 'true');
@@ -801,7 +784,7 @@ class Item
         USES_lib_comments();
 
         if ($this->id == '') {
-            return LIBRARY_errorMessage(_('Invalid Item ID'), 'info');
+            return LIBRARY_errorMessage(MO::_('Invalid Item ID'), 'info');
         }
 
         $retval = COM_startBlock();
@@ -835,12 +818,12 @@ class Item
             'author'            => $this->author,
             'listing_url'       => $this->ListingUrl,
             'can_edit'          => plugin_ismoderator_library(),
-            'lang_edit'         => _('Edit'),
-            'lang_back_to_list' => _('Back to List'),
-            'lang_publisher'    => _('Publisher'),
-            'lang_pub_date'     => _('Date Published'),
-            'lang_author'       => _('Author'),
-            'lang_click_to_enlarge' => _('Click to Enlarge Image'),
+            'lang_edit'         => MO::_('Edit'),
+            'lang_back_to_list' => MO::_('Back to List'),
+            'lang_publisher'    => MO::_('Publisher'),
+            'lang_pub_date'     => MO::_('Date Published'),
+            'lang_author'       => MO::_('Author'),
+            'lang_click_to_enlarge' => MO::_('Click to Enlarge Image'),
         ) );
 
         // Retrieve the photos and put into the template
@@ -1007,7 +990,7 @@ class Item
         if (!$this->canCheckout()) {
             $can_reserve = false;
             $is_reserved = false;
-            $reserve_txt = _('Login Required');
+            $reserve_txt = MO::_('Login Required');
             $waitlisters = 0;
             $user_wait_items = 0;
             $waitlist_txt = '';
@@ -1015,12 +998,12 @@ class Item
             $waitlist_pos = Waitlist::getUserPosition($this->id, $_USER['uid']);
             //$waitlisters = Waitlist::countByItem($this->id);
             $user_wait_items = Waitlist::countByUser($_USER['uid']);
-            $reserve_txt = $waitlisters ? sprintf(_('Pending reservations: %d'), $waitlisters) : '';
+            $reserve_txt = $waitlisters ? sprintf(MO::_('Reservations: %d'), $waitlisters) : '';
             $waitlist_txt = '';
             if ($waitlist_pos > 0) {
                 $can_reserve = false;
                 $is_reserved = true;
-                $waitlist_txt = sprintf(_('You\'re #%d on the waiting list'), $waitlist_pos);
+                $waitlist_txt = sprintf(MO::_('You\'re #%d on the waiting list'), $waitlist_pos);
             } else {
                 $can_reserve = $user_wait_items < Config::get('max_wait_items') ? true : false;
                 $is_reserved = false;
@@ -1033,22 +1016,22 @@ class Item
         $all_checked_out= Instance::countByUser($_USER['uid']);
         if ($item_checked_out) {
         //if ($all_checked_out >= $this->user_ckout_limit) {
-            $avail_txt = _('Checked out by you');
+            $avail_txt = MO::_('Checked out by you');
             $can_reserve = false;
             $wait_action_txt = '';
             $reserve_txt = '';
         } else {
             if ($num_avail > 0) {
                 if (($user_wait_items + $all_checked_out) < $max_wait_items) {
-                    $avail_txt = sprintf(_('%d available'), $num_avail);
+                    $avail_txt = sprintf(MO::_('%d available'), $num_avail);
                 } elseif (!$is_reserved) {
-                    $avail_txt = sprintf(_('You can reserve up to <br />%d items at a time.'), $max_wait_items);
+                    $avail_txt = sprintf(MO::_('You can reserve up to <br />%d items at a time.'), $max_wait_items);
                     $can_reserve = false;
                 } else {
                     $avail_txt = '';
                 }
             } else {
-                $avail_txt = _('Checked Out');
+                $avail_txt = MO::_('Checked Out');
                 $avail_icon = 'red.png';
             }
         }
@@ -1072,12 +1055,12 @@ class Item
             'is_librarian'  => plugin_ismoderator_library(),
             'can_checkout'  => count($avail),
             'can_checkin'   => $can_checkin,
-            'num_avail'     => sprintf(_('%s available'), count($avail) . '/' . $total_instances),
-            'lang_add_waitlist' => _('Reserve'),
-            'lang_click_to_remove' => _('Cancel'),
-            'lang_checkin'  => _('Check In'),
-            'lang_checkout' => _('Check Out'),
-            'lang_due'      => _('Due'),
+            'num_avail'     => sprintf(MO::_('%s available'), count($avail) . '/' . $total_instances),
+            'lang_add_waitlist' => MO::_('Reserve'),
+            'lang_click_to_remove' => MO::_('Cancel'),
+            'lang_checkin'  => MO::_('Check In'),
+            'lang_checkout' => MO::_('Check Out'),
+            'lang_due'      => MO::_('Due'),
         ) );
         $T->parse('output', 'avail');
         $retval = $T->finish($T->get_var('output'));
@@ -1205,13 +1188,13 @@ class Item
             $username = COM_getDisplayName($inst->getUid());
             $due = $inst->getDueDate('Y-m-d');
             $opts .= '<option value="' . $inst->getID() . '">' .
-                $username . ' - ' . _('Due Date') . ': ' . $due .
+                $username . ' - ' . MO::_('Due Date') . ': ' . $due .
                 '</option>';
         }
         $T = new \Template(Config::get('pi_path') . '/templates');
         $T->set_file('form', 'checkin_form.thtml');
         $T->set_var(array(
-            'title'         => _('Library Administration'),
+            'title'         => MO::_('Library Administration'),
             'action_url'    => Config::get('admin_url') . '/index.php',
             'pi_url'        => Config::get('url'),
             'item_id'       => $I->getID(),
@@ -1220,12 +1203,12 @@ class Item
             'item_desc'     => $I->getDscp(),
             'instance_select' => $opts,
             'is_ajax'       => $ajax,
-            'lang_item_id'  => _('Item ID'),
-            'lang_item_name' => _('Item Name'),
-            'lang_checkin'  => _('Check In'),
-            'lang_instance' => _('Instance'),
-            'lang_hlp_checkin_instance' => _('Select the specific item instance to check in.'),
-            'lang_cancel'   => _('Cancel'),
+            'lang_item_id'  => MO::_('Item ID'),
+            'lang_item_name' => MO::_('Item Name'),
+            'lang_checkin'  => MO::_('Check In'),
+            'lang_instance' => MO::_('Instance'),
+            'lang_hlp_checkin_instance' => MO::_('Select the specific item instance to check in.'),
+            'lang_cancel'   => MO::_('Cancel'),
         ) );
         $T->parse('output', 'form');
         return $T->finish($T->get_var('output'));
@@ -1267,7 +1250,7 @@ class Item
         $T = new \Template(Config::get('pi_path') . '/templates');
         $T->set_file('form', 'checkout_form.thtml');
         $T->set_var(array(
-            'title'         => _('Library Administration'),
+            'title'         => MO::_('Library Administration'),
             'action_url'    => Config::get('admin_url') . '/index.php',
             'pi_url'        => Config::get('url'),
             'item_id'       => $I->id,
@@ -1278,14 +1261,14 @@ class Item
             'due'           => LIBRARY_dueDate($I->maxcheckout)->format('Y-m-d'),
             'iso_lang'      => $iso_lang,
             'is_ajax'       => $ajax,
-            'lang_item_id'  => _('Item ID'),
-            'lang_item_name' => _('Item Name'),
-            'lang_checkout_user' => _('Check out to user'),
-            'lang_checkout' => _('Check Out'),
-            'lang_dt_due'   => _('Date Due'),
-            'lang_hlp_checkout_user' => _('Select the user to check out this item. The user at the top of the waiting list is shown first.'),
-            'lang_hlp_dt_due' => _('Enter or select the due date for the item.'),
-            'lang_cancel'   => _('Cancel'),
+            'lang_item_id'  => MO::_('Item ID'),
+            'lang_item_name' => MO::_('Item Name'),
+            'lang_checkout_user' => MO::_('Check out to user'),
+            'lang_checkout' => MO::_('Check Out'),
+            'lang_dt_due'   => MO::_('Date Due'),
+            'lang_hlp_checkout_user' => MO::_('Select the user to check out this item. The user at the top of the waiting list is shown first.'),
+            'lang_hlp_dt_due' => MO::_('Enter or select the due date for the item.'),
+            'lang_cancel'   => MO::_('Cancel'),
         ) );
         $T->parse('output', 'form');
         return $T->finish($T->get_var('output'));
@@ -1372,55 +1355,55 @@ class Item
 
         $display = '';
         $header_arr = array(
-            array(  'text'  => _('Edit'),
+            array(  'text'  => MO::_('Edit'),
                 'field' => 'edit',
                 'sort'  => false,
                 'align' => 'center',
             ),
-            array(  'text'  => _('Copy'),
+            array(  'text'  => MO::_('Copy'),
                 'field' => 'copy',
                 'sort'  => false,
                 'align' => 'center',
             ),
-            array(  'text'  => _('ID'),
+            array(  'text'  => MO::_('ID'),
                 'field' => 'id',
                 'sort'  => true,
             ),
-            array(  'text'  => _('Enabled'),
+            array(  'text'  => MO::_('Enabled'),
                 'field' => 'enabled',
                 'sort'  => false,
                 'align' => 'center',
             ),
-            array(  'text'  => _('Item Name'),
+            array(  'text'  => MO::_('Item Name'),
                 'field' => 'title',
                 'sort'  => true,
             ),
-            array(  'text'  => _('Media Type'),
+            array(  'text'  => MO::_('Media Type'),
                 'field' => 'typename',
                 'sort'  => true,
             ),
-            array(  'text'  => _('Category'),
+            array(  'text'  => MO::_('Category'),
                 'field' => 'cat_name',
                 'sort'  => true,
             ),
-            array(  'text'  => _('Available'),
+            array(  'text'  => MO::_('Available'),
                 'field' => 'status',
                 'sort'  => false,
                 'align' => 'center',
             ),
-            array(  'text'  => _('History'),
+            array(  'text'  => MO::_('History'),
                 'field' => 'history',
                 'sort'  => false,
             ),
-            array(  'text'  => _('Check Out'),
+            array(  'text'  => MO::_('Check Out'),
                 'field' => 'checkout',
                 'sort'  => false,
             ),
-            array(  'text'  => _('Check In'),
+            array(  'text'  => MO::_('Check In'),
                 'field' => 'checkin',
                 'sort'  => false,
             ),
-            array(  'text'  => _('Delete'),
+            array(  'text'  => MO::_('Delete'),
                 'field' => 'delete',
                 'sort'  => false,
                 'align' => 'center',
@@ -1457,7 +1440,7 @@ class Item
             $_GET['query_limit'] = 20;
         }
 
-        $display .= '<div class="floatright">' . COM_createLink(_('New Item'),
+        $display .= '<div class="floatright">' . COM_createLink(MO::_('New Item'),
             Config::get('admin_url') . '/index.php?edititem=0',
             array('class' => 'uk-button uk-button-success')
         ) . '</div>';
@@ -1497,7 +1480,7 @@ class Item
                 $fieldvalue,
                 Config::get('admin_url') . '/index.php?instances=x&item_id=' . $fieldvalue,
                 array(
-                    'title' => _('View Instances'),
+                    'title' => MO::_('View Instances'),
                     'class' => 'tooltip',
                 ) );
             break;
@@ -1523,9 +1506,9 @@ class Item
                     Config::get('admin_url') . '/index.php?deleteitem=x&amp;id=' . $A['id'],
                     array(
                         'onclick'=>'return confirm(\'' .
-                        _('Are you sure you want to delete this item?') .
+                        MO::_('Are you sure you want to delete this item?') .
                         '\');',
-                        'title' => _('Delete Item'),
+                        'title' => MO::_('Delete Item'),
                         'class' => 'tooltip',
                     )
                 );
@@ -1544,13 +1527,13 @@ class Item
                 $fieldvalue,
                 Config::get('url') . '/index.php?detail=x&id=' . $A['id'],
                 array(
-                    'title' => _('View Item'),
+                    'title' => MO::_('View Item'),
                     'class' => 'tooltip',
                 ) );
             break;
 
         case 'type':
-            $retval = LGLIB_getVar(_('Media Types'), $A['type'], 'string', 'Unknown');
+            $retval = LGLIB_getVar(MO::_('Media Types'), $A['type'], 'string', 'Unknown');
             break;
 
         case 'status':
@@ -1559,17 +1542,17 @@ class Item
             if ($fieldvalue == LIB_STATUS_OUT) {
                 if ($A['due'] < LIBRARY_now()) {
                     $cls = 'danger';
-                    $msg = _('Overdue');
+                    $msg = MO::_('Overdue');
                 } else {
                     $cls = 'unknown';
-                    $msg = _('Checked Out');
+                    $msg = MO::_('Checked Out');
                 }
             } elseif (isset($A['wait_count']) && $A['wait_count'] > 0) {
                 $cls = 'warning';
-                $msg = _('Waitlisted');
+                $msg = MO::_('Waitlisted');
             } elseif ($fieldvalue == LIB_STATUS_AVAIL) {
                 $cls = 'ok';
-                $msg = _('Available');
+                $msg = MO::_('Available');
             } else {
                 $cls = 'unknown';
                 $msg = '';
@@ -1581,7 +1564,7 @@ class Item
         case 'checkout':
             if ($avail > 0) {
                 $retval .= COM_createLink(
-                    _('Check Out'),
+                    MO::_('Check Out'),
                     Config::get('admin_url') . '/index.php?checkoutform=x&id=' . $A['id']
                 );
             }
@@ -1590,7 +1573,7 @@ class Item
         case 'checkin':
             if ($total > $avail) {
                 $retval .= COM_createLink(
-                    _('Check In'),
+                    MO::_('Check In'),
                     Config::get('admin_url') . '/index.php?checkinform=x&id=' . $A['id']
                 );
             }
@@ -1601,7 +1584,7 @@ class Item
                 $retval .= COM_createLink('<i class="uk-icon uk-icon-file-text-o"></i>',
                     Config::get('admin_url') . '/index.php?history=x&id=' . $A['id'],
                     array(
-                        'title' => _('View History'),
+                        'title' => MO::_('View History'),
                         'class' => 'tooltip',
                     ) );
             }
@@ -1617,10 +1600,3 @@ class Item
 
 }
 
-function test()
-{
-    echo \_('This is a dummy test');
-    echo _('This is a good string');
-}
-
-?>
