@@ -47,9 +47,11 @@ class Waitlist
 
         // If there are existing reservations, this one will get queued behind
         // the current one.
-        if (DB_count($_TABLES['library.waitlist'],
-                array('item_id', 'uid'),
-                array($Item->getID(), $uid)) > 0) {
+        if (DB_count(
+            $_TABLES['library.waitlist'],
+            array('item_id', 'uid'),
+            array($Item->getID(), $uid)) > 0
+        ) {
             $exp_dt = 0;
         } else {
             $exp_dt = self::_calcExp($Item->getDaysOnHold());
@@ -60,6 +62,7 @@ class Waitlist
             expire = '" . $exp_dt . "',
             item_id = '{$Item->getID()}',
             uid = '$uid'";
+        //echo $sql;die;
         DB_query($sql,1);
         if (!DB_error()) {
             USES_library_functions();
