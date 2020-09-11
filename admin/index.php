@@ -12,7 +12,7 @@
  * @filesource
  */
 
-use Library\_;
+use Library\MO;
 
 /** Import Required glFusion libraries */
 require_once('../../../lib-common.php');
@@ -109,7 +109,7 @@ case 'deletecat':
     if (!$C->isUsed()) {
         $C->Delete();
     } else {
-        $content .= _("Category has related products, can't delete.");
+        $content .= MO::_("Category has related products, can't delete.");
     }
     $view = 'catlist';
     break;
@@ -144,7 +144,7 @@ case 'saveitem':
 case 'savecat':
     $C = \Library\Category::getInstance($_POST['cat_id']);
     if (!$C->Save($_POST)) {
-        $content .= LIBRARY_popupMsg(_('The submitted form has missing or invalid fields'));
+        $content .= LIBRARY_popupMsg(MO::_('The submitted form has missing or invalid fields'));
         $view = 'editcat';
     } else {
         COM_refresh(Library\Config::getInstance()->get('admin_url') . '/index.php?catlist');
@@ -297,19 +297,19 @@ function LIBRARY_history($item_id)
     $base_url = Library\Config::getInstance()->get('admin_url');
 
     $header_arr = array(
-        array(  'text'  => _('Date/Time'),
+        array(  'text'  => MO::_('Date/Time'),
                 'field' => 'dt',
                 'sort'  => true,
             ),
-        array(  'text'  => _('Action'),
+        array(  'text'  => MO::_('Action'),
                 'field' => 'trans_type',
                 'sort' => true,
             ),
-        array(  'text'  => _('By'),
+        array(  'text'  => MO::_('By'),
                 'field' => 'doneby',
                 'sort'  => true,
             ),
-        array(  'text'  => _('User Name'),
+        array(  'text'  => MO::_('User Name'),
                 'field' => 'uid',
                 'sort' => true,
             ),
@@ -321,7 +321,7 @@ function LIBRARY_history($item_id)
     );
 
     $display .= COM_startBlock(
-        _('Transaction History for') . ": $item_name ($item_id)",
+        MO::_('Transaction History for') . ": $item_name ($item_id)",
         '',
         COM_getBlockTemplate('_admin_block', 'header'));
 
@@ -461,11 +461,11 @@ function LIBRARY_itemStatusForm($status, $item_id = '')
         'top'    =>
                 '<input type="hidden" name="item_id" value="' . $item_id . '" />' .
                 '<select name="status" onchange="this.form.submit();">' .
-                "<option value=\"0\" $sel_0>" . _('All') . "</option>" .
-                "<option value=\"1\" $sel_1>" . _('Available') . "</option>" .
-                "<option value=\"2\" $sel_2>" . _('Checked Out') . "</option>" .
-                "<option value=\"3\" $sel_3>" . _('Pending') . "</option>" .
-                "<option value=\"4\" $sel_4>" . _('Overdue') . "</option>" .
+                "<option value=\"0\" $sel_0>" . MO::_('All') . "</option>" .
+                "<option value=\"1\" $sel_1>" . MO::_('Available') . "</option>" .
+                "<option value=\"2\" $sel_2>" . MO::_('Checked Out') . "</option>" .
+                "<option value=\"3\" $sel_3>" . MO::_('Pending') . "</option>" .
+                "<option value=\"4\" $sel_4>" . MO::_('Overdue') . "</option>" .
                 '</select>' . LB,
     );
     return $form_arr;

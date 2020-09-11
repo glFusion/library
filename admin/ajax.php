@@ -14,7 +14,7 @@
 /** Include required glFusion common functions */
 require_once '../../../lib-common.php';
 
-use Library\_;
+use Library\MO;
 
 // This is for administrators only.  It's called by Javascript,
 // so don't try to display a message
@@ -51,9 +51,9 @@ case 'toggle':
     }
     if ($newval !== NULL) {
         if ($newval != $_POST['oldval']) {
-            $message = _('Item Updated');
+            $message = MO::_('Item Updated');
         } else {
-            $message = _('Item Unchanged');
+            $message = MO::_('Item Unchanged');
         }
         $retval = array(
             'id'    => $_POST['id'],

@@ -18,6 +18,7 @@
 require_once '../lib-common.php';
 
 use Library\Config;
+use Library\MO;
 
 // If plugin is installed but not enabled, display an error and exit gracefully
 if (!in_array('library', $_PLUGINS)) {
@@ -72,9 +73,9 @@ case 'addwait':
                 LIBRARY_notifyLibrarian($id, $_USER['uid']);
             }
         }
-        COM_refresh(Library\Config::getInstance()->get('url'));
+        COM_refresh(Config::getInstance()->get('url'));
     } else {
-        $content .= COM_showMessageText(Library\_('Access Denied'));
+        $content .= COM_showMessageText(MO::_('Access Denied'));
         $view = 'itemlist';
     }
     break;
@@ -82,9 +83,9 @@ case 'addwait':
 case 'rmvwait':
     if (SEC_hasRights('library.checkout')) {
         Library\Waitlist::Remove($id);
-        COM_refresh(Library\Config::getInstance()->get('url'));
+        COM_refresh(Config::getInstance()->get('url'));
     } else {
-        $content .= COM_showMessageText(Library\_('Access Denied'));
+        $content .= COM_showMessageText(MO::_('Access Denied'));
         $view = 'itemlist';
     }
     break;
@@ -97,7 +98,7 @@ default:
 switch ($page) {
 case 'history':
     $content .= LIBRARY_history();
-    $menu_opt = \Library\_('Purchase History');
+    $menu_opt = MO::_('Purchase History');
     break;
 
 case 'detail':
@@ -107,25 +108,25 @@ case 'detail':
     if (isset($_GET['sortdir'])) $params[] = 'sortdir=' . $_GET['sortdir'];
     if (isset($_GET['type'])) $params[] = 'type=' . $_GET['type'];
     if (!empty($params)) {
-        $P->SetListUrl(Library\Config::getInstance()->get('url') . '/index.php?' . implode('&', $params));
+        $P->SetListUrl(Config::getInstance()->get('url') . '/index.php?' . implode('&', $params));
     }
     $content .= $P->Detail();
-    $menu_opt = \Library\_('Item List');
+    $menu_opt = MO::_('Item List');
     break;
 
 case 'itemlist':
 default:
     $cat = isset($_GET['category']) ? $_GET['category'] : 0;
     $content .= LIBRARY_ItemList($cat);
-    $menu_opt = \Library\_('Item List');
+    $menu_opt = MO::_('Item List');
     break;
 }
 
 // Create the user menu
 $menu = array();
-$menu[\Library\_('Item List')] = Library\Config::getInstance()->get('url') . '/index.php';
+$menu[MO::_('Item List')] = Config::getInstance()->get('url') . '/index.php';
 if (SEC_hasRights('library.admin')) {
-    $menu[\Library\_('Admin Home')] = Library\Config::getInstance()->get('admin_url') . '/index.php';
+    $menu[MO::_('Admin Home')] = Config::getInstance()->get('admin_url') . '/index.php';
 }
 
 $display = LIBRARY_siteHeader();
