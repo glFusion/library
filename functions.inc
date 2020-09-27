@@ -390,12 +390,28 @@ function plugin_user_delete_library($uid)
  * @param   array   $autotag    Autotag details
  * @return  string              Updated $content
  */
-function plugin_autotags_library ($op, $content = '', $autotag = '') {
+function plugin_autotags_library ($op, $content = '', $autotag = '')
+{
     global $_CONF, $_TABLES;
 
-    if ($op == 'tagname' ) {
+    switch ($op) {
+    case 'tagname':
         return 'library';
-    } else if ($op == 'parse') {
+        break;
+    case 'tagusage':
+        return array('namespace' => 'library', 'usage' => 'description');
+        break;
+    case 'desc':
+        switch ($content) {
+        case 'library':
+            return MO::_('Include the short description of an item in the content');
+            break;
+        default:
+            return '';
+            break;
+        }
+        break;
+    case 'parse':
         $id = COM_applyFilter($autotag['parm1']);
         $url = Config::get('url') . "/index.php?mode=detail&product=$id";
 
@@ -414,6 +430,7 @@ function plugin_autotags_library ($op, $content = '', $autotag = '') {
         $content = str_replace ($autotag['tagstr'], $link, $content);
 
         return $content;
+        break;
     }
 }
 
